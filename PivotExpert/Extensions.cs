@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace PivotExpert
 {
-	internal class Class3
+	public static class Extensions
 	{
+		public static IEnumerable<T> Yield<T>(this T t)
+		{
+			// Alternative: return new[] { t };
+			yield return t;
+		}
 	}
 }
