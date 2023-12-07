@@ -1,0 +1,45 @@
+﻿Key start with "/": this means the kay is dynamic. Can not be directly coded against.
+
+
+FLAT:
+"key": "value"
+"/key:value/key:value/key": "value1",
+"/key:value/key:value/key": "value1",
+
+NESTED LEVEL 1
+
+"/key:value/key:value": {
+  "key:" "value1",
+  "key:" "value2",
+  "key:" "value3",
+}
+
+
+NESTED LEVEL 2 (in this example this was the max)
+
+"/key:value": {
+  "/key:value": {
+    "key:" "value1",
+    "key:" "value2",
+    "key:" "value3",
+  }
+}
+
+Can calue be null? Yes, I guess then it will be the same as "" (blank)
+Example where the values are null:
+"/key:/key:/key": "value1",
+I guess it will be based on the type of the key. If one key is string?, it wont be possible to tell null from "".
+^
+~
++
+?
+=
+&
+%
+¤
+$
+#
+@
+!
+/key:?/key:?/
+Idea: use ? for null.

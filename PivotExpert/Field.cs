@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PivotExpert
 {
+	/// <summary>
+	/// Field is the display part of the system.
+	/// Lets imagine we have a data source with 1 million PropertyColumn. Via some api, any of these can be selected for display, and this is done via a Field.
+	/// So if I send in eg. 10 fields, only data for 10 PropertyColumn's will be fetched.
+	/// So the number of Fields and PropertyColumn will always be matched in number.
+	/// </summary>
 	public class Field
 	{
 		public IEqualityComparer<object?> Comparer = EqualityComparer<object?>.Default;
@@ -64,7 +71,23 @@ namespace PivotExpert
 
 		// Should we cache the value for every row?
 		//internal int idx;
+
+
+
+		public static List<Field> CreateFieldsFromType<T>()
+		{
+			return typeof(T).GetProperties().Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
+		}
+
+		public static List<Field> CreateFieldsFromProps(IEnumerable<PropertyDescriptor> props)
+		{
+			return props.Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
+		}
+
 	}
+
+
+
 
 	public class Field<T> : Field
 	{
