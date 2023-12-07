@@ -127,12 +127,15 @@ namespace PivotExpert
 
 
 
-		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType, bool sort = false)
 		{
 			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
-			lastGroups.Add(new Group<TRow> { Rows = _rows, IsRoot = true });
+			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
 
-			return GroupRows(lastGroups, fields, sort: sort);
+			var res = GroupRows(lastGroups, fields, sort: sort);
+			if (!res.Any())
+				return new List<List<Group<TRow>>>() { lastGroups };
+			return res;
 		}
 
 		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field> fields, bool freeOriginalLastGroupsMem = true, bool sort = false)
@@ -215,18 +218,18 @@ namespace PivotExpert
 			var rowFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.RowGroup).OrderBy(f => f.GroupIndex).ToArray();
 			var colFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.ColGroup).OrderBy(f => f.GroupIndex).ToArray();
 
-			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder);
-			List<List<Group<TRow>>> allColGroups = GroupRows(colFieldsInGroupOrder);
+			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, enRootType.Row);
+			List<List<Group<TRow>>> allColGroups = GroupRows(colFieldsInGroupOrder, enRootType.Col);
 
 
 			if (!allRowGroups.Any())
 			{
 				var list = new List<Group<TRow>>();
-				list.Add(new Group<TRow>() { IsRoot = true, Rows = _rows });
+				list.Add(new Group<TRow>() { RootType = enRootType.Row, Rows = _rows });
 				allRowGroups.Add( list);
 			}
 
-			List<Group<TRow>> lastRowGroups = allRowGroups.LastOrDefault() ?? new() { new Group<TRow>() { IsRoot = true, Rows = _rows } };
+			List<Group<TRow>> lastRowGroups = allRowGroups.Last();// OrDefault();// ?? new() { new Group<TRow>() { RootType = true, Rows = _rows } };
 			
 
 			List<Group<TRow>> lastColGroups = allColGroups.LastOrDefault();
@@ -326,7 +329,7 @@ namespace PivotExpert
 			var rowFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.RowGroup).OrderBy(f => f.GroupIndex).ToArray();
 			var colFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.ColGroup).OrderBy(f => f.GroupIndex).ToArray();
 
-			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder);
+			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, enRootType.Row);
 			List<List<Group<TRow>>> allRowThenColGroups = colFieldsInGroupOrder.Any() ? GroupRows(allRowGroups.Last(), colFieldsInGroupOrder)
 				: allRowGroups;
 
@@ -434,7 +437,7 @@ namespace PivotExpert
 				st.Push(current);
 
 				current = current.ParentGroup;
-			} while (current != null && current.Field.FieldType == FieldType.ColGroup);
+			} while (current != null && current.FieldType == FieldType.ColGroup);
 
 			//return new GroupingKey<object>(st.ToArray());
 			Group<TRow>? curr = null;
@@ -600,7 +603,7 @@ namespace PivotExpert
 			// FIXME: handle IsRoot
 
 			var current = lastG;
-			while (current.ParentGroup != null && current.Field.FieldType != FieldType.RowGroup)
+			while (current.ParentGroup != null && current.FieldType != FieldType.RowGroup)
 			{
 				current = current.ParentGroup;
 			}

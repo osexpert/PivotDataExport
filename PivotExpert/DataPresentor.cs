@@ -106,14 +106,17 @@ namespace PivotExpert
 				//	rowFieldIdx++;
 				//}
 
-				var current = lastRowGroup;
-				int par_idx = rowFieldsInGroupOrder.Length - 1;
-				do
+				if (!lastRowGroup.IsRoot)
 				{
-					row[par_idx] = current.Key;
-					current = current.ParentGroup;
-					par_idx--;
-				} while (current != null && !current.IsRoot);
+					var current = lastRowGroup;
+					int par_idx = rowFieldsInGroupOrder.Length - 1;
+					do
+					{
+						row[par_idx] = current.Key;
+						current = current.ParentGroup;
+						par_idx--;
+					} while (current != null && !current.IsRoot);
+				}
 
 				if (lastColGroups.Any())
 				{

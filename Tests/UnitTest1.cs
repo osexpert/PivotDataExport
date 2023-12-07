@@ -134,8 +134,6 @@ namespace Tests
 			fields[nameof(Test1Row.Name)].Sorting = Sorting.Asc;
 			fields[nameof(Test1Row.Name)].SortIndex = 0;
 
-	//		fields[nameof(Test1Row.Number)].Sorting = Sorting.Asc;
-//			fields[nameof(Test1Row.Number)].SortIndex = 1;
 
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
@@ -153,23 +151,34 @@ namespace Tests
 			Assert.Equal(sFast, sSlow);
 		}
 
-	//	[Fact]
+		const string str_TestCompareFastAndSlow_ColGroupOnName = @"<DocumentElement>
+  <row>
+    <_x002F_Name_x003A_Name1_x002F_Site>Site1, Site3, Site5</_x002F_Name_x003A_Name1_x002F_Site>
+    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1, Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
+    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
+    <_x002F_Name_x003A_Name1_x002F_Number>14</_x002F_Name_x003A_Name1_x002F_Number>
+    <_x002F_Name_x003A_Name1_x002F_Weight>9.5</_x002F_Name_x003A_Name1_x002F_Weight>
+    <_x002F_Name_x003A_Name1_x002F_RowCount>4</_x002F_Name_x003A_Name1_x002F_RowCount>
+    <_x002F_Name_x003A_Name3_x002F_Site>Site1</_x002F_Name_x003A_Name3_x002F_Site>
+    <_x002F_Name_x003A_Name3_x002F_Unit>Unit2</_x002F_Name_x003A_Name3_x002F_Unit>
+    <_x002F_Name_x003A_Name3_x002F_Group>Group1</_x002F_Name_x003A_Name3_x002F_Group>
+    <_x002F_Name_x003A_Name3_x002F_Number>4</_x002F_Name_x003A_Name3_x002F_Number>
+    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
+    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
+  </row>
+</DocumentElement>";
+
+		[Fact]
 	// Expected: when only group in col, 1 row in the result with only totalt
 		public void TestCompareFastAndSlow_ColGroupOnName()
 		{
 			Pivoter<Test1Row> p = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.FieldName);
-			//fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
-			//fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
-			//fields[nameof(Test1Row.Site)].SortIndex = 0;
 
 			fields[nameof(Test1Row.Name)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Name)].Sorting = Sorting.Asc;
 			fields[nameof(Test1Row.Name)].SortIndex = 0;
-
-			//		fields[nameof(Test1Row.Number)].Sorting = Sorting.Asc;
-			//			fields[nameof(Test1Row.Number)].SortIndex = 1;
 
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
@@ -183,8 +192,46 @@ namespace Tests
 			string sFast = DTToXml(fastDT);
 			string sSlow = DTToXml(slowDT);
 
+			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName, sFast);
 			Assert.Equal(sFast, sSlow);
 		}
+
+		const string str_TestCompareFastAndSlow_NoGroup = @"<DocumentElement>
+  <row>
+    <Site>Site1, Site3, Site5</Site>
+    <Unit>Unit1, Unit2, Unit6</Unit>
+    <Group>Group1, Group2</Group>
+    <Name>Name1, Name3</Name>
+    <Number>18</Number>
+    <Weight>10.9</Weight>
+    <RowCount>5</RowCount>
+  </row>
+</DocumentElement>";
+
+		[Fact]
+		// Expected: 1 row with totals
+		public void TestCompareFastAndSlow_NoGroup()
+		{
+			Pivoter<Test1Row> p = GetPivoterTestData();
+
+			var fields = p.Fields.ToDictionary(k => k.FieldName);
+
+			var slow = p.GetGroupedData_SlowIntersect();
+			var fast = p.GetGroupedData_FastIntersect();
+
+			var slowData = new DataPresentor<Test1Row>(slow);
+			var fastData = new DataPresentor<Test1Row>(fast);
+
+			var slowDT = slowData.GetDataTable();
+			var fastDT = fastData.GetDataTable();
+
+			string sFast = DTToXml(fastDT);
+			string sSlow = DTToXml(slowDT);
+
+			Assert.Equal(str_TestCompareFastAndSlow_NoGroup, sFast);
+			Assert.Equal(sFast, sSlow);
+		}
+
 
 		private static Pivoter<Test1Row> GetPivoterTestData()
 		{
