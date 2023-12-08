@@ -610,7 +610,11 @@ namespace PivotExpert
 			return name;
 		}
 
-		private Table<KeyValueClass<TRow>> GetTable_NestedDict()
+		/// <summary>
+		/// I think this one nests just one level
+		/// </summary>
+		/// <returns></returns>
+		public Table<KeyValueClass<TRow>> GetTable_NestedDict()
 		{
 			var lastRowGroups = _data.allRowGroups.Last();
 			var firstColGroups = _data.allColGroups.First();

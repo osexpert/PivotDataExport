@@ -21,7 +21,7 @@ using NotVisualBasic;
 using NotVisualBasic.FileIO;
 using PivotExpert.CsvTest;
 //using static PivotExpert.Pivoter;
-
+using NReco.PivotData;
 
 namespace PivotExpert
 {
@@ -146,7 +146,14 @@ namespace PivotExpert
 			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
 			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
 
-			
+
+			var sw3 = Stopwatch.StartNew();
+
+			NRecoTest(allRTows, props, fieldsss);
+
+			sw3.Stop();
+
+
 
 			//			TypeValue: object, name, fullname
 
@@ -163,6 +170,9 @@ namespace PivotExpert
 			var slow = pp.GetGroupedData_SlowIntersect();
 
 			sw2.Stop();
+
+
+
 
 
 
@@ -259,9 +269,23 @@ namespace PivotExpert
 			// TODO: dt can be slow? add option to use different construct? and then need different sorting?
 		}
 
+		private void NRecoTest(List<CsvRow> allRTows, List<PropertyDescriptor> props, List<Field> fieldsss)
+		{
+			var ht = props.ToDictionary(k => k.Name);
+			//			var fieldNames = fieldsss.Select(f => f.FieldName).ToArray();
+			var fieldNames = new string[] { "Region", "Country", "SalesChannel", "ItemType" };
+			var pd = new PivotData(fieldNames, new CountAggregatorFactory());
+
+			object Lol(object s, string o)
+			{
 
 
 
+				return ht[o].GetValue(s);
+			}
+			
+			pd.ProcessData(allRTows, Lol);
+		}
 
 		private Field GetField(IEnumerable<Field> fieldsss, string v)
 		{

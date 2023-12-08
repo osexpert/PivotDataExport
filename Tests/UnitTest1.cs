@@ -353,6 +353,379 @@ namespace Tests
   </row>
 </DocumentElement>";
 
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json = @"{
+  ""RowGroups"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""ColumnGroups"": [
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 2,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Columns"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""/Name:Name1/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    }
+  ],
+  ""Rows"": [
+    [
+      ""Site1"",
+      ""Unit1"",
+      ""Group1, Group2"",
+      3,
+      2.3,
+      2,
+      ""Unit2"",
+      ""Group1"",
+      4,
+      1.4,
+      1
+    ],
+    [
+      ""Site3"",
+      ""Unit1"",
+      ""Group1"",
+      5,
+      2.1,
+      1,
+      """",
+      """",
+      0,
+      0,
+      0
+    ],
+    [
+      ""Site5"",
+      ""Unit6"",
+      ""Group1"",
+      6,
+      5.1,
+      1,
+      """",
+      """",
+      0,
+      0,
+      0
+    ]
+  ]
+}";
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr = @"{
+  ""RowGroups"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""ColumnGroups"": [
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 2,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Columns"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""/Name:Name1/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    }
+  ],
+  ""Rows"": [
+    {
+      ""Site"": ""Site1"",
+      ""/Name:Name1/Unit"": ""Unit1"",
+      ""/Name:Name1/Group"": ""Group1, Group2"",
+      ""/Name:Name1/Number"": 3,
+      ""/Name:Name1/Weight"": 2.3,
+      ""/Name:Name1/RowCount"": 2,
+      ""/Name:Name3/Unit"": ""Unit2"",
+      ""/Name:Name3/Group"": ""Group1"",
+      ""/Name:Name3/Number"": 4,
+      ""/Name:Name3/Weight"": 1.4,
+      ""/Name:Name3/RowCount"": 1
+    },
+    {
+      ""Site"": ""Site3"",
+      ""/Name:Name1/Unit"": ""Unit1"",
+      ""/Name:Name1/Group"": ""Group1"",
+      ""/Name:Name1/Number"": 5,
+      ""/Name:Name1/Weight"": 2.1,
+      ""/Name:Name1/RowCount"": 1,
+      ""/Name:Name3/Unit"": """",
+      ""/Name:Name3/Group"": """",
+      ""/Name:Name3/Number"": 0,
+      ""/Name:Name3/Weight"": 0,
+      ""/Name:Name3/RowCount"": 0
+    },
+    {
+      ""Site"": ""Site5"",
+      ""/Name:Name1/Unit"": ""Unit6"",
+      ""/Name:Name1/Group"": ""Group1"",
+      ""/Name:Name1/Number"": 6,
+      ""/Name:Name1/Weight"": 5.1,
+      ""/Name:Name1/RowCount"": 1,
+      ""/Name:Name3/Unit"": """",
+      ""/Name:Name3/Group"": """",
+      ""/Name:Name3/Number"": 0,
+      ""/Name:Name3/Weight"": 0,
+      ""/Name:Name3/RowCount"": 0
+    }
+  ]
+}";
+
 		[Fact]
 		public void TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName()
 		{
@@ -382,6 +755,15 @@ namespace Tests
 
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, sFast);
 			Assert.Equal(sFast, sSlow);
+
+			string slowJson = ToJson(slowData.GetTable_Array());
+			string fastJson = ToJson(fastData.GetTable_Array());
+			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json, slowJson);
+			Assert.Equal(slowJson, fastJson);
+
+			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArrStr = ToJson(slowTblDictArr);
+			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
 		}
 
 		const string str_TestCompareFastAndSlow_ColGroupOnName = @"<DocumentElement>
@@ -400,6 +782,335 @@ namespace Tests
     <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
   </row>
 </DocumentElement>";
+
+		const string str_TestCompareFastAndSlow_ColGroupOnName_json = @"{
+  ""RowGroups"": [],
+  ""ColumnGroups"": [
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 2,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Columns"": [
+    {
+      ""Name"": ""/Name:Name1/Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    }
+  ],
+  ""Rows"": [
+    [
+      ""Site1, Site3, Site5"",
+      ""Unit1, Unit6"",
+      ""Group1, Group2"",
+      14,
+      9.5,
+      4,
+      ""Site1"",
+      ""Unit2"",
+      ""Group1"",
+      4,
+      1.4,
+      1
+    ]
+  ]
+}";
+		const string str_TestCompareFastAndSlow_ColGroupOnName_DictArr = @"{
+  ""RowGroups"": [],
+  ""ColumnGroups"": [
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 2,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Columns"": [
+    {
+      ""Name"": ""/Name:Name1/Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name1/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name1""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    },
+    {
+      ""Name"": ""/Name:Name3/RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": [
+        ""Name3""
+      ]
+    }
+  ],
+  ""Rows"": [
+    {
+      ""/Name:Name1/Site"": ""Site1, Site3, Site5"",
+      ""/Name:Name1/Unit"": ""Unit1, Unit6"",
+      ""/Name:Name1/Group"": ""Group1, Group2"",
+      ""/Name:Name1/Number"": 14,
+      ""/Name:Name1/Weight"": 9.5,
+      ""/Name:Name1/RowCount"": 4,
+      ""/Name:Name3/Site"": ""Site1"",
+      ""/Name:Name3/Unit"": ""Unit2"",
+      ""/Name:Name3/Group"": ""Group1"",
+      ""/Name:Name3/Number"": 4,
+      ""/Name:Name3/Weight"": 1.4,
+      ""/Name:Name3/RowCount"": 1
+    }
+  ]
+}";
 
 		[Fact]
 	// Expected: when only group in col, 1 row in the result with only totalt
@@ -427,6 +1138,15 @@ namespace Tests
 
 			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName, sFast);
 			Assert.Equal(sFast, sSlow);
+
+			string slowJson = ToJson(slowData.GetTable_Array());
+			string fastJson = ToJson(fastData.GetTable_Array());
+			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_json, slowJson);
+			Assert.Equal(slowJson, fastJson);
+
+			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArrStr = ToJson(slowTblDictArr);
+			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_DictArr, slowTblDictArrStr);
 		}
 
 		const string str_TestCompareFastAndSlow_NoGroup = @"<DocumentElement>
@@ -440,6 +1160,167 @@ namespace Tests
     <RowCount>5</RowCount>
   </row>
 </DocumentElement>";
+
+		const string str_TestCompareFastAndSlow_NoGroup_json = @"{
+  ""RowGroups"": [],
+  ""ColumnGroups"": [],
+  ""Columns"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Rows"": [
+    [
+      ""Site1, Site3, Site5"",
+      ""Unit1, Unit2, Unit6"",
+      ""Group1, Group2"",
+      ""Name1, Name3"",
+      18,
+      10.9,
+      5
+    ]
+  ]
+}";
+		const string str_TestCompareFastAndSlow_NoGroup_DictArr = @"{
+  ""RowGroups"": [],
+  ""ColumnGroups"": [],
+  ""Columns"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Rows"": [
+    {
+      ""Site"": ""Site1, Site3, Site5"",
+      ""Unit"": ""Unit1, Unit2, Unit6"",
+      ""Group"": ""Group1, Group2"",
+      ""Name"": ""Name1, Name3"",
+      ""Number"": 18,
+      ""Weight"": 10.9,
+      ""RowCount"": 5
+    }
+  ]
+}";
 
 		[Fact]
 		// Expected: 1 row with totals
@@ -463,6 +1344,15 @@ namespace Tests
 
 			Assert.Equal(str_TestCompareFastAndSlow_NoGroup, sFast);
 			Assert.Equal(sFast, sSlow);
+
+			string slowJson = ToJson(slowData.GetTable_Array());
+			string fastJson = ToJson(fastData.GetTable_Array());
+			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_json, slowJson);
+			Assert.Equal(slowJson, fastJson);
+
+			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArrStr = ToJson(slowTblDictArr);
+			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_DictArr, slowTblDictArrStr);
 		}
 
 

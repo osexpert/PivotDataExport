@@ -29,7 +29,8 @@
         "RowCount": 1110
       },
       
-      To:
+      To fully nested (ingen '/' i navn)
+
   "Rows": [
     {
       "Country": "Palau",
