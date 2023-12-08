@@ -10,19 +10,19 @@ namespace PivotExpert
 	public class Presentation<TRow> where TRow : class
 	{
 
-		GroupedData<TRow> _s1d;
+		GroupedData<TRow> _data;
 
-		public Presentation(GroupedData<TRow> s1d)
+		public Presentation(GroupedData<TRow> data)
 		{
-			_s1d = s1d;			
+			_data = data;			
 		}
 
-		public Table<TRoww> GetTable<TRoww>(Func<List<object?[]>, List<TableColumn>, List<TRoww>> toRows)
+		public Table<TTableRow> GetTableCore<TTableRow>(Func<List<object?[]>, List<TableColumn>, List<TTableRow>> toRows)
 		{
-			var lastRowGroups = _s1d.allRowGroups.LastOrDefault() ?? [];
-			var lastColGroups = _s1d.allColGroups.LastOrDefault() ?? [];
+			var lastRowGroups = _data.allRowGroups.Last();// OrDefault() ?? [];
+			var lastColGroups = _data.allColGroups.Last();// OrDefault() ?? [];
 
-			var colFieldsInSortOrder = _s1d._fields.Where(f => f.FieldType == FieldType.ColGroup)
+			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
 				.Where(f => f.Sorting != Sorting.None)
 				.OrderBy(f => f.SortIndex).ToArray();
 
@@ -34,7 +34,7 @@ namespace PivotExpert
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rowsss = GetFullRows(_s1d.dataFields, _s1d.rowFieldsInGroupOrder, lastRowGroups, lastColGroupsSorted);
+			List<object?[]> rowsss = CreateFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroups, lastColGroupsSorted);
 
 			//}
 			// else...a mode for output 1:1?
@@ -55,22 +55,25 @@ namespace PivotExpert
 			//}
 
 
-			var tableCols = CreateTableCols(_s1d.dataFields, _s1d.rowFieldsInGroupOrder, lastColGroupsSorted);
+			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 
-			rowsss = SortRowsNew(rowsss, tableCols);
+			rowsss = SortRows(rowsss, tableCols);
 
-			Table<TRoww> t = new Table<TRoww>();
+			Table<TTableRow> t = new Table<TTableRow>();
 			t.Rows = toRows(rowsss, tableCols);
 
 			t.Columns = tableCols;
-			t.RowGroups = _s1d.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
-			t.ColumnGroups = _s1d.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
+			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
+			t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
 
 
 			return t;
 		}
 
-		private List<object?[]> GetFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups, List<Group<TRow>> lastColGroups /* sorted */)
+		/// <summary>
+		/// Create rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
+		/// </summary>
+		private List<object?[]> CreateFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups, List<Group<TRow>> lastColGroups /* sorted */)
 		{
 			List<object?[]> rows = new();
 
@@ -92,7 +95,7 @@ namespace PivotExpert
 				// produce starting index in row for colGrp
 			}
 
-			object?[] defaultValues = null;// new object?[dataFields.Length];
+			object?[] defaultValues = null;
 
 			foreach (var lastRowGroup in lastRowGroups)
 			{
@@ -140,7 +143,7 @@ namespace PivotExpert
 								int i = 0;
 								foreach (var df in dataFields)
 								{
-									defVals[i++] = _s1d._props[df.FieldName].GetValue(Enumerable.Empty<TRow>());
+									defVals[i++] = _data.props[df.FieldName].GetValue(Enumerable.Empty<TRow>());
 								}
 								defaultValues = defVals;
 							}
@@ -161,9 +164,9 @@ namespace PivotExpert
 		}
 
 
-		private List<object?[]> SortRowsNew(List<object?[]> rows, List<TableColumn> tableCols)
+		private List<object?[]> SortRows(List<object?[]> rows, List<TableColumn> tableCols)
 		{
-			var sortFields = _s1d._fields
+			var sortFields = _data.fields
 				.Where(f => f.FieldType != FieldType.ColGroup) // sorting col groups mean sorting the columns themself (the labels)
 				.Where(f => f.Sorting != Sorting.None)
 				.OrderBy(f => f.SortIndex);
@@ -188,36 +191,11 @@ namespace PivotExpert
 			return rows;
 		}
 
-		public Table<Dictionary<string, object?>> GetTable_DictArr_WithZip()
+
+		public Table<object?[]> GetTable_Array()
 		{
-			return GetTable((rows, tcols) =>
-			{
-				List<Dictionary<string, object?>> dictRows = new();
-
-				foreach (var row in rows)
-				{
-					Dictionary<string, object?> dictRow = new();
-					foreach (var v in row.Zip(tcols))
-						dictRow.Add(v.Second.Name, v.First);
-
-					dictRows.Add(dictRow);
-				}
-
-				return dictRows;
-			});
+			return GetTableCore((rows, tcols) => rows);
 		}
-
-
-		public Table<object?[]> GetTable_objectArr()
-		{
-			return GetTable((rows, tcols) => rows);
-		}
-
-		
-
-
-
-
 
 		/*
 		 * Example data
@@ -244,9 +222,13 @@ namespace PivotExpert
 		 * 
 		 * */
 
-		public Table<IDictionary<string, object?>> GetTable_DictArr_NoZip()
+		/// <summary>
+		/// Flat = only one level.
+		/// </summary>
+		/// <returns></returns>
+		public Table<IDictionary<string, object?>> GetTable_FlatDict()
 		{
-			return GetTable((rows, tcols) =>
+			return GetTableCore((rows, tcols) =>
 			{
 				List<IDictionary<string, object?>> dictRows = new();
 
@@ -256,7 +238,8 @@ namespace PivotExpert
 					//foreach (var v in row.Zip(tcols))
 					//	dictRow.Add(v.Second.Name, v.First);
 
-					var dictRow = new WrapperObj(row, tcols);
+					// perf: to avoid creating one dict per row
+					var dictRow = new FakeDict(row, tcols);
 
 					dictRows.Add(dictRow);
 				}
@@ -267,7 +250,7 @@ namespace PivotExpert
 
 		public DataTable GetDataTable()
 		{
-			var t = GetTable_objectArr();
+			var t = GetTable_Array();
 
 			DataTable res = new("row");
 
@@ -280,8 +263,8 @@ namespace PivotExpert
 			foreach (var oarr in t.Rows)
 				res.LoadDataRow(oarr, fAcceptChanges: false /* ?? */);
 
-			if (t.GrandTotalRow != null)
-				res.LoadDataRow(t.GrandTotalRow, fAcceptChanges: false /* ?? */);
+//			if (t.GrandTotalRow != null)
+//				res.LoadDataRow(t.GrandTotalRow, fAcceptChanges: false /* ?? */);
 
 			res.EndLoadData();
 
@@ -309,9 +292,9 @@ namespace PivotExpert
   }
 	 * 
 	 * */
-		public Table<KeyValueClass<TRow>> GetTable_DictArrNested()
+		public Table<KeyValueClass<TRow>> GetTable_NestedDict_NG_TODO()
 		{
-			return GetTable_DictNested();
+			return GetTable_NestedDict();
 			//return Next<IDictionary<string, object?>>(s1d, (rows, tcols) =>
 			//{
 			//	List<IDictionary<string, object?>> dictRows = new();
@@ -331,11 +314,6 @@ namespace PivotExpert
 			//});
 		}
 
-
-	
-
-
-
 		class TableGroup
 		{
 			public string Name { get; set; }
@@ -345,11 +323,6 @@ namespace PivotExpert
 
 			//public TableGroup Parent { get; set; }
 		}
-
-
-
-
-
 
 		private List<TableColumn> CreateTableCols(Field[] dataFields, Field[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
 		{
@@ -389,8 +362,8 @@ namespace PivotExpert
 						foreach (var dataField in dataFields)
 						{
 							// /fdfd:34/gfgfg:fdfd/gfgfgfggf
-							var middle = string.Join('/', tgs.Select(tg => $"{Escape(tg.Name)}:{Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
-							var combNAme = $"/{middle}/{Escape(dataField.FieldName)}";
+							var middle = string.Join('/', tgs.Select(tg => $"{DataPath.Escape(tg.Name)}:{DataPath.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
+							var combNAme = $"/{middle}/{DataPath.Escape(dataField.FieldName)}";
 
 							tablecols_after.Add(dataField.ToTableColumn(combNAme, tgs.Select(tg => tg.Value).ToArray()));
 						}
@@ -410,10 +383,7 @@ namespace PivotExpert
 			return tablecols;
 		}
 
-
-
-
-		private List<KeyValueClass<TRow>> GetFullRowsNestedDict(Field[] dataFields,
+		private List<KeyValueClass<TRow>> GetFullRows_NestedDict(Field[] dataFields,
 			Field[] rowFieldsInGroupOrder,
 			List<Group<TRow>> lastRowGroups,
 			List<Group<TRow>> lastColGroups, /* sorted */
@@ -445,7 +415,7 @@ namespace PivotExpert
 				// produce starting index in row for colGrp
 			}
 
-			var colFieldsInSortOrder = _s1d._fields.Where(f => f.FieldType == FieldType.ColGroup)
+			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
 	.Where(f => f.Sorting != Sorting.None)
 	.OrderBy(f => f.SortIndex).ToArray();
 
@@ -629,7 +599,7 @@ namespace PivotExpert
 				//			foreach (var dataField in dataFields)
 				{
 					// /fdfd:34/gfgfg:fdfd/gfgfgfggf
-					name = string.Join('/', tgs.Select(tg => $"{Escape(tg.Name)}:{Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
+					name = string.Join('/', tgs.Select(tg => $"{DataPath.Escape(tg.Name)}:{DataPath.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
 					//var combNAme = $"/{middle}/{Escape(dataField.FieldName)}";
 
 					//					tablecols_after.Add(dataField.ToTableColumn(combNAme, tgs.Select(tg => tg.Value).ToArray()));
@@ -640,28 +610,21 @@ namespace PivotExpert
 			return name;
 		}
 
-
-
-		private Table<KeyValueClass<TRow>> GetTable_DictNested()
+		private Table<KeyValueClass<TRow>> GetTable_NestedDict()
 		{
-			var lastRowGroups = _s1d.allRowGroups.Last();
-			var firstColGroups = _s1d.allColGroups.First();
-			var lastColGroups = _s1d.allColGroups.Last();
+			var lastRowGroups = _data.allRowGroups.Last();
+			var firstColGroups = _data.allColGroups.First();
+			var lastColGroups = _data.allColGroups.Last();
 
-			var colFieldsInSortOrder = _s1d._fields.Where(f => f.FieldType == FieldType.ColGroup)
+			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
 				.Where(f => f.Sorting != Sorting.None)
 				.OrderBy(f => f.SortIndex).ToArray();
 
 			var lastColGroupsSorted = SortColGroups(lastColGroups, colFieldsInSortOrder, ele => ele).ToList();
 
-
 			// create a new GetFullRows that create nested objects
 
-
-
-
-
-			var tableCols = CreateTableCols(_s1d.dataFields, _s1d.rowFieldsInGroupOrder, lastColGroupsSorted);
+			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 			//			rowsss = SortRowsNew(rowsss, tableCols);
 
 			Table<KeyValueClass<TRow>> t = new Table<KeyValueClass<TRow>>();
@@ -670,24 +633,21 @@ namespace PivotExpert
 			//	
 			//			t.Rows = toRows(rowsss, tableCols);
 
-			var rowsss = GetFullRowsNestedDict(_s1d.dataFields, _s1d.rowFieldsInGroupOrder, lastRowGroups,
+			var rowsss = GetFullRows_NestedDict(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroups,
 				lastColGroupsSorted, firstColGroups, tableCols);
 
 			t.Rows = rowsss;
 			t.Columns = tableCols;
-			t.RowGroups = _s1d.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
-			t.ColumnGroups = _s1d.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
-
+			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
+			t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
 
 			return t;
 		}
-
 
 		private IEnumerable<TEle> SortColGroups<TEle>(IEnumerable<TEle> colGrops, Field[] colFields) where TEle : Group<TRow>
 		{
 			return SortColGroups<TEle>(colGrops, colFields, ele => ele);
 		}
-
 
 		//KeyValuePair<Group<T>, object?[]>
 		private IEnumerable<TEle> SortColGroups<TEle>(IEnumerable<TEle> colGrops, Field[] colFields, Func<TEle, Group<TRow>> getGroup)
@@ -724,197 +684,6 @@ namespace PivotExpert
 			}
 
 			return colGrops;
-
 		}
-
-
-		/// <summary>
-		///  : 	%3A
-		///	 / 	%2F
-		///  % 	%25
-		///  ?  %3F
-		/// </summary>
-		/// <param name="str"></param>
-		/// <returns></returns>
-		private static string Escape(string str)
-		{
-			StringBuilder sb = new();
-			foreach (var c in str)
-			{
-				if (c == '/')
-					sb.Append("%2F");
-				else if (c == ':')
-					sb.Append("%3A");
-				else if (c == '%')
-					sb.Append("%25");
-				else if (c == '?')
-					sb.Append("%3F");
-				else
-					sb.Append(c);
-			}
-			return sb.ToString();
-		}
-
-		//public class PathElement
-		//{
-		//	public string Name;
-		//	public object Value;
-		//}
-
-		//public static PathElement[] SplitPathName(string str)
-		//{
-		//	if (!str.StartsWith('/'))
-		//		throw new ArgumentException("Must start with '/'");
-
-		//	var parts = str.Split('/');
-		//	// make sure first part is empty
-
-		//	PathElement[] res = new PathElement[parts.Length - 1];
-
-
-
-		//}
-
-
-
-		/// <summary>
-		/// You have a column name.
-		/// First, split it by '/'. Now have the groups.
-		/// For every group, split by ':'. Now have the group name (key) and the value.
-		/// Next, Unescape the group name and the value.
-		/// 
-		/// 
-		///  : 	%3A
-		///	 / 	%2F
-		///  % 	%25
-		///  ?  %3F
-		/// </summary>
-		/// <param name="str"></param>
-		/// <returns></returns>
-		public static string Unescape(string str)
-		{
-			StringBuilder sb = new();
-			bool foundPerc = false;
-			bool foundChar1 = false;
-			char char1 = 'X';
-
-			foreach (var c in str)
-			{
-				if (foundPerc)
-				{
-					if (foundChar1)
-					{
-						// now we have char2
-						if (char1 == '3' && c == 'A')
-						{
-							sb.Append(':');
-						}
-						else if (char1 == '2' && c == 'F')
-						{
-							sb.Append('/');
-						}
-						else if (char1 == '2' && c == '5')
-						{
-							sb.Append('%');
-						}
-						else if (char1 == '3' && c == 'F')
-						{
-							sb.Append('?');
-						}
-						else
-						{
-							throw new Exception($"Invalid escape code '%{char1}{c}'");
-						}
-
-						// reset
-						foundPerc = false;
-						foundChar1 = false;
-						char1 = 'X';
-					}
-					else
-					{
-						foundChar1 = true;
-						char1 = c;
-					}
-				}
-				else if (c == '%')
-				{
-					foundPerc = true;
-				}
-				else
-				{
-					sb.Append(c);
-				}
-			}
-			return sb.ToString();
-		}
-
-		public class DissectedPropertyName
-		{
-			public KeyValuePair<string, string?>[]? KeyValues;
-			public string? FinalKey;
-		}
-
-		public static bool IsKeyValuePropertyName(string propName)
-		{
-			return propName.StartsWith('/');
-		}
-
-		/// <summary>
-		/// return false if the property name is not a keyValue property name (does not start with "/")
-		/// </summary>
-		/// <param name="propName"></param>
-		/// <returns></returns>
-		/// <exception cref="Exception"></exception>
-		public static DissectedPropertyName DissectKeyValuePropertyName(string propName)
-		{
-			//list = null!;
-
-			if (propName.StartsWith('/'))
-			{
-				var parts = propName.Split('/');
-
-				// make sure first part is empty
-
-				//KeyValuePair<string, object?>[] res = new KeyValuePair<string, object?>[parts.Length - 1];
-
-				//DissectedName res = new();
-
-				List<KeyValuePair<string, string?>> ilist = new();
-				string? finaleKey = null;
-
-				for (int i = 0; i < parts.Length; i++)
-				{
-					var keyVal = parts[i].Split(':');
-					if (keyVal.Length == 0)
-						throw new Exception();
-					else if (keyVal.Length == 1) // only ok for the last ele
-					{
-						if (i < parts.Length)
-							throw new Exception("Key alone only valid for last element");
-						finaleKey = Unescape(keyVal[0]);
-					}
-					else if (keyVal.Length == 2)
-					{
-						ilist.Add(new KeyValuePair<string, string?>(Unescape(keyVal[0]), keyVal[1] == "?" ? null : Unescape(keyVal[1])));
-					}
-					else
-						throw new Exception("more than 2 parts");
-				}
-
-				return new DissectedPropertyName { FinalKey = finaleKey, KeyValues = ilist.Any() ? ilist.ToArray() : null };
-				//return true;
-			}
-
-			//return false;
-			throw new FormatException("Not a keyValue property name (does not start with '/')");
-		}
-
-
-
-
-
 	}
-
-
 }

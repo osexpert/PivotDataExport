@@ -47,14 +47,10 @@ namespace PivotExpert
 				throw new Exception("Invalid: neither Field not IsRoot is set correctly");
 			}
 		}
-		
-			
 
 		public Group<T>? ParentGroup;
 
 		public Dictionary<Group<T>, object?[]> IntersectData { get; internal set; }
-
-//		public object?[] FastIntersect_RowData { get; internal set; }
 
 		internal object? GetKeyByField(Field colField)
 		{

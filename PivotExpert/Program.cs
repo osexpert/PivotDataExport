@@ -166,7 +166,7 @@ namespace PivotExpert
 
 
 
-			var tblll = new Presentation<CsvRow>(fast).GetTable_DictArrNested();
+			var tblll = new Presentation<CsvRow>(fast).GetTable_NestedDict_NG_TODO();
 
 			using (var f = File.Open(@"d:\testdt5mill2_fast_nested_min.json", FileMode.Create))
 			{
@@ -174,7 +174,7 @@ namespace PivotExpert
 			}
 
 			
-			var tbl = new Presentation<CsvRow>(fast).GetTable_DictArr_WithZip(); // WithZIP???
+			var tbl = new Presentation<CsvRow>(fast).GetTable_FlatDict();
 			
 			using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
 			{
@@ -185,7 +185,7 @@ namespace PivotExpert
 
 			datat.WriteXml(@"d:\testdt5mill2_fast.xml");
 
-			var dt = new Presentation<CsvRow>(fast).GetTable_objectArr();
+			var dt = new Presentation<CsvRow>(fast).GetTable_Array();
 //			dt.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();
@@ -200,7 +200,7 @@ namespace PivotExpert
 
 			dt = null;
 
-			var dtF = new Presentation<CsvRow>(fast).GetTable_objectArr();
+			var dtF = new Presentation<CsvRow>(fast).GetTable_Array();
 	//		dtF.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace PivotExpert
 {
-	class WrapperObj : IDictionary<string, object?>
+	class FakeDict : IDictionary<string, object?>
 	{
 		object?[] _row;
 		List<TableColumn> _tcols;
 
-		public WrapperObj(object?[] row, List<TableColumn> tcols)
+		public FakeDict(object?[] row, List<TableColumn> tcols)
 		{
 			_row = row;
 			_tcols = tcols;

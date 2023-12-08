@@ -14,7 +14,7 @@ namespace PivotExpert
 		public List<TableColumn> Columns { get; set; }
 
 		public List<TRow> Rows { get; set; }
-		public TRow? GrandTotalRow { get; set; }
+//		public TRow? GrandTotalRow { get; set; }
 
 		//public void ChangeTypeToName(bool fullName = false)
 		//{

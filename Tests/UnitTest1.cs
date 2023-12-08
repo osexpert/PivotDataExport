@@ -2,6 +2,7 @@ using PivotExpert;
 using System.ComponentModel;
 using System.Data;
 using System.Text;
+using System.Text.Json;
 
 namespace Tests
 {
@@ -48,6 +49,224 @@ namespace Tests
   </row>
 </DocumentElement>";
 
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_json = @"{
+  ""RowGroups"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""ColumnGroups"": [],
+  ""Columns"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 1,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Rows"": [
+    [
+      ""Site1"",
+      ""Unit1, Unit2"",
+      ""Group1, Group2"",
+      ""Name1, Name3"",
+      7,
+      3.6999999999999997,
+      3
+    ],
+    [
+      ""Site3"",
+      ""Unit1"",
+      ""Group1"",
+      ""Name1"",
+      5,
+      2.1,
+      1
+    ],
+    [
+      ""Site5"",
+      ""Unit6"",
+      ""Group1"",
+      ""Name1"",
+      6,
+      5.1,
+      1
+    ]
+  ]
+}";
+
+		const string str_TestCompareFastAndSlow_GetTable_DictArr = @"{
+  ""RowGroups"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""ColumnGroups"": [],
+  ""Columns"": [
+    {
+      ""Name"": ""Site"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 1,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Unit"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Group"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Name"",
+      ""TypeName"": ""String"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Number"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 1,
+      ""SortIndex"": 1,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""Weight"",
+      ""TypeName"": ""Double"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    },
+    {
+      ""Name"": ""RowCount"",
+      ""TypeName"": ""Int32"",
+      ""FieldType"": 0,
+      ""GroupIndex"": 0,
+      ""Sorting"": 0,
+      ""SortIndex"": 0,
+      ""GroupValues"": null
+    }
+  ],
+  ""Rows"": [
+    {
+      ""Site"": ""Site1"",
+      ""Unit"": ""Unit1, Unit2"",
+      ""Group"": ""Group1, Group2"",
+      ""Name"": ""Name1, Name3"",
+      ""Number"": 7,
+      ""Weight"": 3.6999999999999997,
+      ""RowCount"": 3
+    },
+    {
+      ""Site"": ""Site3"",
+      ""Unit"": ""Unit1"",
+      ""Group"": ""Group1"",
+      ""Name"": ""Name1"",
+      ""Number"": 5,
+      ""Weight"": 2.1,
+      ""RowCount"": 1
+    },
+    {
+      ""Site"": ""Site5"",
+      ""Unit"": ""Unit6"",
+      ""Group"": ""Group1"",
+      ""Name"": ""Name1"",
+      ""Number"": 6,
+      ""Weight"": 5.1,
+      ""RowCount"": 1
+    }
+  ]
+}";
+
 		[Fact]
 		public void TestCompareFastAndSlow_RowGroupOnSite()
 		{
@@ -75,8 +294,22 @@ namespace Tests
 
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite, sFast);
 			Assert.Equal(sFast, sSlow);
+
+			string slowJson = ToJson(slowData.GetTable_Array());
+			string fastJson = ToJson(fastData.GetTable_Array());
+			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_json, slowJson);
+			Assert.Equal(slowJson, fastJson);
+
+			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArrStr = ToJson(slowTblDictArr);
+			Assert.Equal(str_TestCompareFastAndSlow_GetTable_DictArr, slowTblDictArrStr);
+			
 		}
 
+		private static string ToJson<T>(T table)
+		{
+			return JsonSerializer.Serialize<T>(table, new JsonSerializerOptions() { WriteIndented = true });
+		}
 
 		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = @"<DocumentElement>
   <row>

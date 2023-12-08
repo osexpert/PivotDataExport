@@ -45,27 +45,13 @@ namespace PivotExpert
 
 		public Pivoter(IEnumerable<TRow> rows, IEnumerable<PropertyDescriptor> props, IEnumerable<Field> fields)
 		{
-
-			//if (props.Cast<PropertyDescriptor>().Any(p => p.Name.StartsWith('/')))
-			//	throw new ArgumentException("Can not sort on data field if grouping on columns");
-
-
-
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
 
 			//	_list = (IEnumerable<T>)list;
 			_rows = rows;
-
 			_fields = fields.ToList();
-
-			// pdc: aggregator\data getter
 			_props = props.ToDictionary(pd => pd.Name);
-
-			//foreach (var field in _fields)
-			//{
-			//	var prop = _props[field.FieldName];
-			//}
 		}
 
 		private void Validate()
@@ -79,6 +65,8 @@ namespace PivotExpert
 			if (_props.Values.Any(p => p.Name.StartsWith('/')))
 				throw new ArgumentException("Property.Name can not start with reserved char '/'");
 
+			if (_fields.GroupBy(f => f.FieldName).Any(g => g.Count() > 1))
+				throw new ArgumentException("More than one field with same fieldName (duplicate field names)");
 		}
 
 		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType, bool sort = false)
@@ -224,8 +212,8 @@ namespace PivotExpert
 				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
 				allRowGroups = allRowGroups,
 				allColGroups = allColGroups,
-				_fields = _fields,
-				_props = _props
+				fields = _fields,
+				props = _props
 			};
 		}
 
@@ -310,8 +298,8 @@ namespace PivotExpert
 				dataFields = dataFields,
 				allRowGroups = allRowGroups,
 				allColGroups = allColGroups,
-				_fields = _fields,
-				_props = _props
+				fields = _fields,
+				props = _props
 			};
 		}
 
@@ -408,7 +396,7 @@ namespace PivotExpert
 		public List<List<Group<TRow>>> allRowGroups;
 		public List<List<Group<TRow>>> allColGroups;
 
-		public List<Field> _fields;
-		public Dictionary<string, PropertyDescriptor> _props;
+		public List<Field> fields;
+		public Dictionary<string, PropertyDescriptor> props;
 	}
 }
