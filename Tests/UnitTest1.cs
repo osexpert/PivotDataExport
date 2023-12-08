@@ -64,8 +64,8 @@ namespace Tests
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
 
-			var slowData = new DataPresentor<Test1Row>(slow);
-			var fastData = new DataPresentor<Test1Row>(fast);
+			var slowData = new Presentation<Test1Row>(slow);
+			var fastData = new Presentation<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -138,8 +138,8 @@ namespace Tests
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
 
-			var slowData = new DataPresentor<Test1Row>(slow);
-			var fastData = new DataPresentor<Test1Row>(fast);
+			var slowData = new Presentation<Test1Row>(slow);
+			var fastData = new Presentation<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -183,8 +183,8 @@ namespace Tests
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
 
-			var slowData = new DataPresentor<Test1Row>(slow);
-			var fastData = new DataPresentor<Test1Row>(fast);
+			var slowData = new Presentation<Test1Row>(slow);
+			var fastData = new Presentation<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -219,8 +219,8 @@ namespace Tests
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
 
-			var slowData = new DataPresentor<Test1Row>(slow);
-			var fastData = new DataPresentor<Test1Row>(fast);
+			var slowData = new Presentation<Test1Row>(slow);
+			var fastData = new Presentation<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -242,13 +242,13 @@ namespace Tests
 			var r5 = new Test1Row { Site = "Site5", Unit = "Unit6", Group = "Group1", Name = "Name1", Number = 6, Weight = 5.1 };
 			var rows = new[] { r1, r2, r3, r4, r5 };
 
-			var p1 = new PropertyColumn<Test1Row, string>(nameof(Test1Row.Site), rows => Aggregators.CommaList(rows, r => r.Site));
-			var p2 = new PropertyColumn<Test1Row, string>(nameof(Test1Row.Unit), rows => Aggregators.CommaList(rows, r => r.Unit));
-			var p3 = new PropertyColumn<Test1Row, string>(nameof(Test1Row.Group), rows => Aggregators.CommaList(rows, r => r.Group));
-			var p4 = new PropertyColumn<Test1Row, string>(nameof(Test1Row.Name), rows => Aggregators.CommaList(rows, r => r.Name));
-			var p5 = new PropertyColumn<Test1Row, int>(nameof(Test1Row.Number), rows => rows.Sum(r => r.Number));
-			var p6 = new PropertyColumn<Test1Row, double>(nameof(Test1Row.Weight), rows => rows.Sum(r => r.Weight));
-			var p7 = new PropertyColumn<Test1Row, int>("RowCount", rows => rows.Count());
+			var p1 = new Property<Test1Row, string>(nameof(Test1Row.Site), rows => Aggregators.CommaList(rows, r => r.Site));
+			var p2 = new Property<Test1Row, string>(nameof(Test1Row.Unit), rows => Aggregators.CommaList(rows, r => r.Unit));
+			var p3 = new Property<Test1Row, string>(nameof(Test1Row.Group), rows => Aggregators.CommaList(rows, r => r.Group));
+			var p4 = new Property<Test1Row, string>(nameof(Test1Row.Name), rows => Aggregators.CommaList(rows, r => r.Name));
+			var p5 = new Property<Test1Row, int>(nameof(Test1Row.Number), rows => rows.Sum(r => r.Number));
+			var p6 = new Property<Test1Row, double>(nameof(Test1Row.Weight), rows => rows.Sum(r => r.Weight));
+			var p7 = new Property<Test1Row, int>("RowCount", rows => rows.Count());
 			var props = new PropertyDescriptor[] { p1, p2, p3, p4, p5, p6, p7 };
 
 			var p = new Pivoter<Test1Row>(rows, props);

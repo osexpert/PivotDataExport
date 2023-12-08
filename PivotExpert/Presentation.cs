@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace PivotExpert
 {
-	public class DataPresentor<TRow> where TRow : class
+	public class Presentation<TRow> where TRow : class
 	{
 
 		GroupedData<TRow> _s1d;
 
-		public DataPresentor(GroupedData<TRow> s1d)
+		public Presentation(GroupedData<TRow> s1d)
 		{
 			_s1d = s1d;			
 		}
@@ -130,16 +130,13 @@ namespace PivotExpert
 							// write values
 							Array.Copy(values, 0, row, startIdx, values.Length);
 						}
-						else
+						else // for FastIntersect
 						{
 							// write default values
-							// no...there is nothign to write...why write anything?
 							if (defaultValues == null)
 							{
-								//	throw new NotImplementedException();
-								// Den riktige måten å simulere på er å bruke aggregering med ingen rader...
+								// aggregate with no rows = default value
 								var defVals = new object?[dataFields.Length];
-
 								int i = 0;
 								foreach (var df in dataFields)
 								{
@@ -148,16 +145,13 @@ namespace PivotExpert
 								defaultValues = defVals;
 							}
 							Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
-							//Array.Fill(row, DBNull.Value, startIdx, dataFields.Length);
-
-							
 						}
-
 					}
 				}
 				else
 				{
-					Array.Copy(lastRowGroup.RowData, 0, row, totalStartIdx, lastRowGroup.RowData.Length);
+					throw new Exception("hit test");
+//					Array.Copy(lastRowGroup.FastIntersect_RowData, 0, row, totalStartIdx, lastRowGroup.FastIntersect_RowData.Length);
 				}
 
 				rows.Add(row);
@@ -409,7 +403,8 @@ namespace PivotExpert
 			}
 			else
 			{
-				tablecols.AddRange(dataFields.Select(df => df.ToTableColumn()));
+				throw new Exception("hit test");
+		//		tablecols.AddRange(dataFields.Select(df => df.ToTableColumn()));
 			}
 
 			return tablecols;
@@ -456,7 +451,7 @@ namespace PivotExpert
 
 			Dictionary<Group<TRow>, string> groupNameLookup = new();
 
-			object?[] defaultValues = null;// new object?[dataFields.Length];
+			//object?[] defaultValues = null;// new object?[dataFields.Length];
 
 			foreach (var lastRowGroup in lastRowGroups)
 			{
@@ -551,6 +546,65 @@ namespace PivotExpert
 			return rows;
 		}
 
+		private KeyValueClass<TRow> GetCreateSubRow(Group<TRow> lastColGrp, KeyValueClass<TRow> row)
+		{
+			Stack<Group<TRow>> st = new();
+
+			var current = lastColGrp;
+			do
+			{
+				st.Push(current);
+				current = current.ParentGroup;
+			} while (current != null && !current.IsRoot);
+
+
+			while (st.Any())
+			{
+				var grp = st.Pop();
+				//Pivoter<T>.KeyValueClass<T>  sr = GetCreateSingleSubRow(pop, row);
+
+
+				if (row.Group == null)
+				{
+					// root
+					//					row.TryGetSubRow(grp.Field.f)
+				}
+				else if (row.Group == grp)
+				{
+
+				}
+				else
+				{
+					var srow = new KeyValueClass<TRow>();
+					srow.Group = grp;
+					//srow.Add(grp.Key.ToString(), );
+					//row.Add(grp.Field.FieldName, srow);
+					row.Add(grp.Key?.ToString() ?? "", srow);
+
+				}
+
+
+			}
+
+			//var last = row.Last();
+			//while (last != null && st.Any())
+			//{
+			//	var p = st.Pop();
+			//	if (p.Field.FieldName == last.Value.Key)
+			//	{
+			//		//last = ((KeyValueClass)last.Value.Value!).Last();
+			//		continue;
+			//	}
+			//}
+
+			throw new NotImplementedException();
+		}
+
+		private KeyValueClass<TRow> GetCreateSingleSubRow(Group<TRow> grp, KeyValueClass<TRow> row)
+		{
+			//return row.GetOrCreate(grp);
+			throw new NotImplementedException();
+		}
 
 		private string GetGroupNamePath(Group<TRow> lastColGroup, Dictionary<Group<TRow>, string> dict)
 		{

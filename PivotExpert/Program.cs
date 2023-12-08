@@ -130,21 +130,21 @@ namespace PivotExpert
 
 			var props = new List<PropertyDescriptor>();
 
-			props.Add(new PropertyColumn<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region)));
-			props.Add(new PropertyColumn<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country)));
-			props.Add(new PropertyColumn<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType)));
-			props.Add(new PropertyColumn<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel)));
-			props.Add(new PropertyColumn<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
-			props.Add(new PropertyColumn<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
-			props.Add(new PropertyColumn<CsvRow, string>(nameof(CsvRow.OrderID), rows => Aggregators.SingleOrCount(rows, row => row.OrderID)));
-			props.Add(new PropertyColumn<CsvRow, int>("RowCount", rows => rows.Count()));
-			props.Add(new PropertyColumn<CsvRow, DateTime>(nameof(CsvRow.ShipDate), rows => rows.Max(r => r.ShipDate)));
-			props.Add(new PropertyColumn<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
-			props.Add(new PropertyColumn<CsvRow, double>(nameof(CsvRow.UnitPrice), rows => rows.Sum(r => r.UnitPrice)));
-			props.Add(new PropertyColumn<CsvRow, double>(nameof(CsvRow.UnitCost), rows => rows.Sum(r => r.UnitCost)));
-			props.Add(new PropertyColumn<CsvRow, double>(nameof(CsvRow.TotalRevenue), rows => rows.Sum(r => r.TotalRevenue)));
-			props.Add(new PropertyColumn<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
-			props.Add(new PropertyColumn<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
+			props.Add(new Property<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region)));
+			props.Add(new Property<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country)));
+			props.Add(new Property<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType)));
+			props.Add(new Property<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel)));
+			props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
+			props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
+			props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderID), rows => Aggregators.SingleOrCount(rows, row => row.OrderID)));
+			props.Add(new Property<CsvRow, int>("RowCount", rows => rows.Count()));
+			props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.ShipDate), rows => rows.Max(r => r.ShipDate)));
+			props.Add(new Property<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
+			props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitPrice), rows => rows.Sum(r => r.UnitPrice)));
+			props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitCost), rows => rows.Sum(r => r.UnitCost)));
+			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalRevenue), rows => rows.Sum(r => r.TotalRevenue)));
+			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
+			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
 
 			
 
@@ -158,15 +158,15 @@ namespace PivotExpert
 
 			sw.Stop();
 
-			sw.Restart();
+			var sw2 = Stopwatch.StartNew();
 
 			var slow = pp.GetGroupedData_SlowIntersect();
 
-			sw.Stop();
+			sw2.Stop();
 
 
 
-			var tblll = new DataPresentor<CsvRow>(fast).GetTable_DictArrNested();
+			var tblll = new Presentation<CsvRow>(fast).GetTable_DictArrNested();
 
 			using (var f = File.Open(@"d:\testdt5mill2_fast_nested_min.json", FileMode.Create))
 			{
@@ -174,18 +174,18 @@ namespace PivotExpert
 			}
 
 			
-			var tbl = new DataPresentor<CsvRow>(fast).GetTable_DictArr_WithZip(); // WithZIP???
+			var tbl = new Presentation<CsvRow>(fast).GetTable_DictArr_WithZip(); // WithZIP???
 			
 			using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
 			{
 				JsonSerializer.Serialize(f, tbl, new JsonSerializerOptions { WriteIndented = true });
 			}
 
-			var datat = new DataPresentor<CsvRow>(fast).GetDataTable();
+			var datat = new Presentation<CsvRow>(fast).GetDataTable();
 
 			datat.WriteXml(@"d:\testdt5mill2_fast.xml");
 
-			var dt = new DataPresentor<CsvRow>(fast).GetTable_objectArr();
+			var dt = new Presentation<CsvRow>(fast).GetTable_objectArr();
 //			dt.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();
@@ -200,7 +200,7 @@ namespace PivotExpert
 
 			dt = null;
 
-			var dtF = new DataPresentor<CsvRow>(fast).GetTable_objectArr();
+			var dtF = new Presentation<CsvRow>(fast).GetTable_objectArr();
 	//		dtF.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();

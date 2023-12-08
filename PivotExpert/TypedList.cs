@@ -21,19 +21,35 @@ namespace PivotExpert
 		public string GetListName(PropertyDescriptor[] listAccessors) => string.Empty;
 	}
 
+	//public abstract class PropertyColumn : PropertyDescriptor
+	//{
+	//	public PropertyColumn(string name, Attribute[] attrs) : base(name, attrs)
+	//	{
+	//	}
+	//}
 
-	public class PropertyColumn<TRow, TProp> : PropertyDescriptor
+	/// <summary>
+	/// rename DataField ?
+	/// FieldProperty? _props
+	/// FieldData _datas
+	/// FieldStore _Stores
+	/// _props
+	/// _datas
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	/// <typeparam name="TProp"></typeparam>
+	public class Property<TRow, TProp> : PropertyDescriptor
 	{
 		readonly Func<IEnumerable<TRow>, TProp> _getValue;
 
-		public PropertyColumn(string propName, Func<IEnumerable<TRow>, TProp> getValue)
-			: base(propName, null)
+		public Property(string fieldName, Func<IEnumerable<TRow>, TProp> getValue)
+			: base(fieldName, null)
 		{
 			_getValue = getValue;
 		}
 
-		public PropertyColumn(string propName)
-			: base(propName, null)
+		public Property(string fieldName)
+			: base(fieldName, null)
 		{
 			_getValue = GetValue;
 		}

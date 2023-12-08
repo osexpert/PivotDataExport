@@ -22,7 +22,7 @@ namespace PivotExpert
 		public IReadOnlyDictionary<string, PropertyDescriptor> Props => _props;
 
 		public Pivoter(IEnumerable<TRow> rows, IEnumerable<PropertyDescriptor> props)
-		: this(rows, props, Field.CreateFieldsFromProps(props))
+		: this(rows, props, Field.CreateFieldsFromProperties(props))
 		{
 
 		}
@@ -81,60 +81,14 @@ namespace PivotExpert
 
 		}
 
-		//public static IEnumerable<Field> CreateDefaultFields(IEnumerable<PropertyDescriptor> props)
-		//{
-		//	return props.Select(p => new Field
-		//	{
-		//		FieldName = p.Name,
-		//		DataType = p.PropertyType
-		//	});
-		//}
-
-		//private GroupingKey<object?> GetAllColGroupLevels(Group<T> lg)
-		//{
-		//	// while parent
-		//	Stack<object?> st = new();
-
-		//	var parent = lg;//.ParentGroup;
-		//	do
-		//	{
-		//		st.Push(parent.Key);
-
-		//		parent = parent.ParentGroup;
-		//	} while (parent != null && !parent.IsRoot && parent.Field.FieldType == FieldType.ColGroup);
-
-		//	return new GroupingKey<object?>(st.ToArray());
-		//}
-
-		//private void SortRows(ref List<object?[]> rows)
-		//{
-		//	var sortFields = _fields.Where(f => f.Sorting != Sorting.None).OrderBy(f => f.SortIndex);
-		//	if (sortFields.Any())
-		//	{
-		//		IOrderedEnumerable<object?[]> sorter = null!;
-		//		foreach (var sf in sortFields)
-		//		{
-		//			if (sorter == null)
-		//				sorter = sf.Sorting == Sorting.Asc ? rows.OrderBy(r => r[sf.idx]) : rows.OrderByDescending(r => r[sf.idx]);
-		//			else
-		//				sorter = sf.Sorting == Sorting.Asc ? sorter.ThenBy(r => r[sf.idx]) : sorter.ThenByDescending(r => r[sf.idx]);
-		//		}
-		//		rows = sorter.ToList();
-		//	}
-		//}
-
-
-
-
-
 		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType, bool sort = false)
 		{
 			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
 			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
 
 			var res = GroupRows(lastGroups, fields, sort: sort);
-			if (!res.Any())
-				return new List<List<Group<TRow>>>() { lastGroups };
+//			if (!res.Any())
+	//			return new List<List<Group<TRow>>>() { lastGroups };
 			return res;
 		}
 
@@ -192,6 +146,8 @@ namespace PivotExpert
 			}
 
 			//return lastGroups;
+			if (!listRes.Any())
+				listRes.Add(originalLastGroups);
 			return listRes;
 		}
 
@@ -209,6 +165,11 @@ namespace PivotExpert
 
 
 
+		/// <summary>
+		/// For a 5 million rows example, this takes 4 min 19sec. So 13 times slower than FastIntersect.
+		/// Used only for testing\benchmarking, as this code is shorter and easier than FastIntersect.
+		/// </summary>
+		/// <returns></returns>
 		public GroupedData<TRow> GetGroupedData_SlowIntersect()
 		{
 			Validate();
@@ -221,7 +182,6 @@ namespace PivotExpert
 			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, enRootType.Row);
 			List<List<Group<TRow>>> allColGroups = GroupRows(colFieldsInGroupOrder, enRootType.Col);
 
-
 			if (!allRowGroups.Any())
 			{
 				var list = new List<Group<TRow>>();
@@ -229,72 +189,38 @@ namespace PivotExpert
 				allRowGroups.Add( list);
 			}
 
-			List<Group<TRow>> lastRowGroups = allRowGroups.Last();// OrDefault();// ?? new() { new Group<TRow>() { RootType = true, Rows = _rows } };
-			
-
-			List<Group<TRow>> lastColGroups = allColGroups.LastOrDefault();
+			List<Group<TRow>> lastRowGroups = allRowGroups.Last();
+			List<Group<TRow>> lastColGroups = allColGroups.Last();
 
 			foreach (var lastRowGroup in lastRowGroups)
 			{
-				if (lastColGroups == null)
-				{
-					// no col groups
+				lastRowGroup.IntersectData = new();
 
+				foreach (var lastColGroup in lastColGroups)
+				{
 					var data = new object?[dataFields.Length];
+
+					var intersectRows = lastRowGroup.Rows.Intersect(lastColGroup.Rows).ToList();
 
 					int dataFieldIdx = 0;
 					foreach (var dataField in dataFields)
 					{
 						var prop = _props[dataField.FieldName];
-						var theValue = prop.GetValue(lastRowGroup.Rows);
+						var theValue = prop.GetValue(intersectRows);
 
 						data[dataFieldIdx] = theValue;
 						dataFieldIdx++;
 					}
 
-					lastRowGroup.RowData = data; 
-				}
-				else
-				{
-					// has col groups
-
-					lastRowGroup.IntersectData = new();
-
-					foreach (var lastColGroup in lastColGroups)
-					{
-						//var lastG_groupKey = GetAllColGroupLevels(lastColGroup);
-
-						var data = new object?[dataFields.Length];
-
-						var intersectRows = lastRowGroup.Rows.Intersect(lastColGroup.Rows).ToList();
-
-						int dataFieldIdx = 0;
-						foreach (var dataField in dataFields)
-						{
-							var prop = _props[dataField.FieldName];
-							var theValue = prop.GetValue(intersectRows);
-
-							data[dataFieldIdx] = theValue;
-							dataFieldIdx++;
-						}
-
-						lastRowGroup.IntersectData.Add(lastColGroup, data);
-					}
+					lastRowGroup.IntersectData.Add(lastColGroup, data);
 				}
 			}
 
-			//var colFieldsInSortOrder = _fields.Where(f => f.FieldType == FieldType.ColGroup)
-			//	.Where(f => f.Sorting != Sorting.None)
-			//	.OrderBy(f => f.SortIndex).ToArray();
-
-			//var lastColGroupsSorted = SortColGroups(lastColGroups, colFieldsInSortOrder).ToList();
 
 			return new GroupedData<TRow>()
 			{
 				colFieldsInGroupOrder = colFieldsInGroupOrder,
 				dataFields = dataFields,
-				//lastColGroupsSorted = lastColGroupsSorted,
-				//lastRowGroups = lastRowGroups,
 				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
 				allRowGroups = allRowGroups,
 				allColGroups = allColGroups,
@@ -303,23 +229,10 @@ namespace PivotExpert
 			};
 		}
 
-
-
-
-
-		
-
-	
-
-
-
-
-
-
-
-
-
-
+		/// <summary>
+		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
+		/// </summary>
+		/// <returns></returns>
 		public GroupedData<TRow> GetGroupedData_FastIntersect()
 		{
 			Validate();
@@ -330,42 +243,27 @@ namespace PivotExpert
 			var colFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.ColGroup).OrderBy(f => f.GroupIndex).ToArray();
 
 			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, enRootType.Row);
-			List<List<Group<TRow>>> allRowThenColGroups = colFieldsInGroupOrder.Any() ? GroupRows(allRowGroups.Last(), colFieldsInGroupOrder)
-				: allRowGroups;
+			List<List<Group<TRow>>> allRowThenColGroups = GroupRows(allRowGroups.Last(), colFieldsInGroupOrder);
 
-//			List<Group<TRow>> lastRowGroups = allRowGroups.Last();// GroupRows(rowFieldsInGroupOrder);
-			List<Group<TRow>> lastRowThenColGroups = allRowThenColGroups.Last();// GroupRows(lastRowGroups, colFieldsInGroupOrder);
-
-			// ha like mangle slike som vi har grouping levels
-			//Dictionary<GroupingKey<object?>, Group<T>> htSynthMergedLastColGroups = new();
+			List<Group<TRow>> lastRowThenColGroups = allRowThenColGroups.Last();
 
 			Dictionary<(Group<TRow>?, object?), Group<TRow>>[] htSynthMergedAllColGroups = new Dictionary<(Group<TRow>?, object?), Group<TRow>>[colFieldsInGroupOrder.Length];
 
+			var rootColGroup = new Group<TRow> { Rows = _rows, RootType = enRootType.Col };
 
 			foreach (var lastRowThenColGroup in lastRowThenColGroups)
 			{
 				Group<TRow> lastColGroup = null;
-				if (!colFieldsInGroupOrder.Any())//lastRowAndColGroups == lastRowGroups)
+				if (!colFieldsInGroupOrder.Any())
 				{
-					// no col grouping
-					lastRowThenColGroup.RowData = new object?[dataFields.Length];
+					// no col grouping, use root
+					lastColGroup = rootColGroup;
 				}
 				else
 				{
 					// has col grouping
 					lastColGroup = CloneColGroups(lastRowThenColGroup, htSynthMergedAllColGroups);
 				}
-
-				//if (allRowGroups.Any())
-				//{
-				//	// need to strip off row groups?
-				//	lastColGroup = CloneColGroups(lastRowThenColGroup, htSynthMergedAllColGroups);
-				//}
-				//else
-				//{
-				//	// no need to do anything?
-				//	lastColGroup = lastRowThenColGroup;
-				//}
 
 				int dataFieldIdx = 0;
 				foreach (var dataField in dataFields)
@@ -374,29 +272,19 @@ namespace PivotExpert
 
 					var theValue = getter.GetValue(lastRowThenColGroup.Rows);
 
-					//					if (lastRowG == lastG)
-					if (!colFieldsInGroupOrder.Any())//lastRowAndColGroups == lastRowGroups)
+					Group<TRow> lastRowG = GetLastRowGroup(lastRowThenColGroup);
+
+					lastRowG.IntersectData ??= new();
+
+					if (!lastRowG.IntersectData.TryGetValue(lastColGroup, out var idata))
 					{
-						// no col grouping
-						lastRowThenColGroup.RowData[dataFieldIdx] = theValue;
+						idata = new object?[dataFields.Length];
+						lastRowG.IntersectData.Add(lastColGroup, idata);
 					}
-					else
-					{
-						// has col groups
-						Group<TRow> lastRowG = GetLastRowGroup(lastRowThenColGroup);
 
-						lastRowG.IntersectData ??= new();
+					idata[dataFieldIdx] = theValue;
 
-						if (!lastRowG.IntersectData.TryGetValue(lastColGroup, out var idata))
-						{
-							idata = new object?[dataFields.Length];
-							lastRowG.IntersectData.Add(lastColGroup, idata);
-						}
-
-						idata[dataFieldIdx] = theValue;
-
-						// theValue is the intersect of lastRowG (eg /site/Site1) and lastG (eg /feedType/type1)
-					}
+					// theValue is the intersect of lastRowG (eg /site/Site1) and lastG (eg /feedType/type1)
 
 					dataFieldIdx++;
 				}
@@ -406,7 +294,14 @@ namespace PivotExpert
 			var allColGroups = htSynthMergedAllColGroups
 				.Select(g => g == null ? new List<Group<TRow>>() : g.Values.ToList()).ToList();
 
+			var b1 = colFieldsInGroupOrder.Any();
+			var b2 = allColGroups.Any();
+			if (b1 != b2) throw new Exception("they should be the same...");
 
+			if (!b2)
+			{
+				allColGroups.Add(new List<Group<TRow>>() { rootColGroup }); 
+			}
 
 			return new GroupedData<TRow>()
 			{
@@ -417,9 +312,6 @@ namespace PivotExpert
 				allColGroups = allColGroups,
 				_fields = _fields,
 				_props = _props
-				//lastColGroupsSorted = lastColGroupsSorted,
-				//lastRowGroups = lastRowGroups,
-
 			};
 		}
 
@@ -492,112 +384,6 @@ namespace PivotExpert
 			return curr!;
 		}
 
-
-
-
-
-		private KeyValueClass<TRow> GetCreateSubRow(Group<TRow> lastColGrp, KeyValueClass<TRow> row)
-		{
-			Stack<Group<TRow>> st = new();
-
-			var current = lastColGrp;
-			do
-			{
-				st.Push(current);
-				current = current.ParentGroup;
-			} while (current != null && !current.IsRoot);
-
-
-			while (st.Any())
-			{
-				var grp = st.Pop();
-				//Pivoter<T>.KeyValueClass<T>  sr = GetCreateSingleSubRow(pop, row);
-
-
-				if (row.Group == null)
-				{
-					// root
-					//					row.TryGetSubRow(grp.Field.f)
-				}
-				else if (row.Group == grp)
-				{
-
-				}
-				else
-				{
-					var srow = new KeyValueClass<TRow>();
-					srow.Group = grp;
-					//srow.Add(grp.Key.ToString(), );
-					//row.Add(grp.Field.FieldName, srow);
-					row.Add(grp.Key?.ToString() ?? "", srow);
-
-				}
-
-
-			}
-
-			//var last = row.Last();
-			//while (last != null && st.Any())
-			//{
-			//	var p = st.Pop();
-			//	if (p.Field.FieldName == last.Value.Key)
-			//	{
-			//		//last = ((KeyValueClass)last.Value.Value!).Last();
-			//		continue;
-			//	}
-			//}
-
-			throw new NotImplementedException();
-		}
-
-		private KeyValueClass<TRow> GetCreateSingleSubRow(Group<TRow> grp, KeyValueClass<TRow> row)
-		{
-			//return row.GetOrCreate(grp);
-			throw new NotImplementedException();
-		}
-
-
-	
-
-		//private List<Group<T>> SortColGroupsOrg(List<Group<T>> colGrops, Field[] colFields)
-		//{
-		//	//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
-
-		//	//var sortFields = _fields.Where(f => f.Grouping == Grouping.Col)
-		//	//	.Where(f => f.Sorting != Sorting.None)
-		//	//	.OrderBy(f => f.SortIndex)
-		//	//	.ToArray();
-
-		//	if (colFields.Any())
-		//	{
-		//		IOrderedEnumerable<Pivot.Group<T>> sorter = null!;
-
-		//		int colFieldIdx = 0;
-		//		foreach (var colField in colFields)
-		//		{
-		//			int colFieldIdx_local_capture = colFieldIdx;
-
-		//			if (sorter == null)
-		//				sorter = colField.Sorting == Sorting.Asc ?
-		//					colGrops.OrderBy(r => r.GetKeyByField(colField))//.Key.Groups[colFieldIdx_local_capture]) 
-		//					: colGrops.OrderByDescending(r => r.GetKeyByField(colField));
-		//			else
-		//				sorter = colField.Sorting == Sorting.Asc ?
-		//					sorter.ThenBy(r => r.GetKeyByField(colField))
-		//					: sorter.ThenByDescending(r => r.GetKeyByField(colField));
-
-		//			colFieldIdx++;
-		//		}
-
-		//		colGrops = sorter.ToList(); // tolist needed?
-		//	}
-
-		//	return colGrops;
-
-		//}
-
-	
-
 		private Group<TRow> GetLastRowGroup(Group<TRow> lastG)
 		{
 			// FIXME: handle IsRoot
@@ -610,9 +396,6 @@ namespace PivotExpert
 
 			return current;
 		}
-
-
-
 	}
 
 	public class GroupedData<TRow> where TRow : class
@@ -622,18 +405,10 @@ namespace PivotExpert
 
 		public Field[] dataFields;
 
-		//			public List<Group<T>> lastRowGroups;
-		//		public List<Group<T>> lastColGroupsSorted;
-
 		public List<List<Group<TRow>>> allRowGroups;
 		public List<List<Group<TRow>>> allColGroups;
 
 		public List<Field> _fields;
 		public Dictionary<string, PropertyDescriptor> _props;
 	}
-
-
-
-
-
 }

@@ -79,7 +79,7 @@ namespace PivotExpert
 			return typeof(T).GetProperties().Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
 		}
 
-		public static List<Field> CreateFieldsFromProps(IEnumerable<PropertyDescriptor> props)
+		public static List<Field> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
 		{
 			return props.Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
 		}

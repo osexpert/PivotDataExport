@@ -54,7 +54,7 @@ namespace PivotExpert
 
 		public Dictionary<Group<T>, object?[]> IntersectData { get; internal set; }
 
-		public object?[] RowData { get; internal set; }
+//		public object?[] FastIntersect_RowData { get; internal set; }
 
 		internal object? GetKeyByField(Field colField)
 		{

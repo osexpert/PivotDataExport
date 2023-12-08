@@ -43,8 +43,4 @@ namespace PivotExpert.CsvTest
 	}
 
 
-
-	internal class CsvTest
-	{
-	}
 }
