@@ -135,6 +135,7 @@ namespace PivotExpert
 						}
 						else // for FastIntersect
 						{
+							throw new NotImplementedException("done in Pivoter now");
 							// write default values
 							if (defaultValues == null)
 							{

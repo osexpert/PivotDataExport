@@ -25,14 +25,17 @@ namespace Tests
 			fields[nameof(Test1Row.Country)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Country)].GroupIndex = 0;
 			fields[nameof(Test1Row.Country)].Sorting = Sorting.Asc;
+			fields[nameof(Test1Row.Country)].SortIndex = 1;
 
 			fields[nameof(Test1Row.Company)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Company)].GroupIndex = 1;
 			fields[nameof(Test1Row.Company)].Sorting = Sorting.Desc;
+			fields[nameof(Test1Row.Company)].SortIndex = 0;
 
 			// TODO: gir det noen mening med SortIndex på kolonnegrupper???? Må ikke sortIndex i dette tilfellet alltid følge groupindeksen???
 			// TEST!!
 
+			var sdata = pivoter.GetGroupedData_SlowIntersect();
 			var gdata = pivoter.GetGroupedData_FastIntersect();
 
 			var pres = new Presentation<Test1Row>(gdata);
@@ -88,7 +91,7 @@ namespace Tests
 			var p5 = new Property<Test1Row, string>(nameof(Test1Row.Country), rows => Aggregators.CommaList(rows, r => r.Country));
 			var p6 = new Property<Test1Row, string>(nameof(Test1Row.Company), rows => Aggregators.CommaList(rows, r => r.Company));
 			var p7 = new Property<Test1Row, int>(nameof(Test1Row.Number), rows => rows.Sum(r => r.Number));
-			var p8 = new Property<Test1Row, double>(nameof(Test1Row.Weight), rows => rows.Average(r => r.Weight));
+			var p8 = new Property<Test1Row, double>(nameof(Test1Row.Weight), rows => Aggregators.AverageOr(rows, r => r.Weight, _ => 0d));
 			var p9 = new Property<Test1Row, int>("RowCount", rows => rows.Count());
 			var props = new PropertyDescriptor[] { p1, p2, p3, p4, p5, p6, p7, p8, p9 };
 

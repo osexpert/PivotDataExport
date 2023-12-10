@@ -10,6 +10,7 @@ namespace PivotExpert
 	{
 		public static string CommaList<TRow>(IEnumerable<TRow> rows, Func<TRow, string> value)
 		{
+			// https://stackoverflow.com/a/6059711/2671330
 			int constrainedCount = rows.Take(2).Count();
 			if (constrainedCount == 0)
 				return "";
@@ -34,6 +35,13 @@ namespace PivotExpert
 				return value(rows.Single());
 			else
 				return orValue(rows);
+		}
+		public static double AverageOr<TRow>(IEnumerable<TRow> rows, Func<TRow, double> value, Func<IEnumerable<TRow>, double> orValue)
+		{
+			if (!rows.Any())
+				return orValue(rows);
+			else
+				return rows.Average(value);
 		}
 	}
 }

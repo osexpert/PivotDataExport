@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PivotExpert
 {
@@ -253,14 +254,14 @@ namespace PivotExpert
 					lastColGroup = CloneColGroups(lastRowThenColGroup, htSynthMergedAllColGroups);
 				}
 
+				Group<TRow> lastRowG = GetLastRowGroup(lastRowThenColGroup);
+
 				int dataFieldIdx = 0;
 				foreach (var dataField in dataFields)
 				{
 					var getter = _props[dataField.FieldName];
 
 					var theValue = getter.GetValue(lastRowThenColGroup.Rows);
-
-					Group<TRow> lastRowG = GetLastRowGroup(lastRowThenColGroup);
 
 					lastRowG.IntersectData ??= new();
 
@@ -289,6 +290,32 @@ namespace PivotExpert
 			if (!b2)
 			{
 				allColGroups.Add(new List<Group<TRow>>() { rootColGroup }); 
+			}
+
+			// because of the was we group, groups without rows are not intersected. So fill these groups with default data here.
+			object?[] defaultValues = null;
+			foreach (var lastRowGroup in allRowGroups.Last())
+			{
+				foreach (var lastColGroup in allColGroups.Last())
+				{
+					if (!lastRowGroup.IntersectData.ContainsKey(lastColGroup))
+					{
+						// write default values
+						if (defaultValues == null)
+						{
+							// aggregate with no rows = default value
+							var defVals = new object?[dataFields.Length];
+							int i = 0;
+							foreach (var df in dataFields)
+							{
+								defVals[i++] = _props[df.FieldName].GetValue(Enumerable.Empty<TRow>());
+							}
+							defaultValues = defVals;
+						}
+						//Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
+						lastRowGroup.IntersectData.Add(lastColGroup, defaultValues);
+					}
+				}
 			}
 
 			return new GroupedData<TRow>()

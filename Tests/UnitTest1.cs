@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace Tests
 {
@@ -725,6 +726,7 @@ namespace Tests
     }
   ]
 }";
+
 
 		[Fact]
 		public void TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName()
