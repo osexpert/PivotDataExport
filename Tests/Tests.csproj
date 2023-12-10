@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PivotExpert\PivotExpert.csproj" />
+    <ProjectReference Include="..\PivotTable\PivotTable.csproj" />
   </ItemGroup>
 
 </Project>
