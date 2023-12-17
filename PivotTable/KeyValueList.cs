@@ -8,7 +8,12 @@ using System.Threading.Tasks;
 
 namespace PivotExpert
 {
-	public class KeyValueClass<T> : IDictionary<string, object?>
+	/// <summary>
+	/// Pro: write dynamically to json since IDictionary
+	/// Pro: backed by a list, so it is ordered, even if IDictionary
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public class KeyValueList<T> : IDictionary<string, object?>
 		where T : class
 	{
 		public Group<T> Group = null!;

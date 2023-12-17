@@ -743,8 +743,8 @@ namespace Tests
 			fields[nameof(Test1Row.Name)].SortIndex = 0;
 
 
-			var slow = p.GetGroupedData_SlowIntersect();
-			var fast = p.GetGroupedData_FastIntersect();
+			var slow = p.GetGroupedData_SlowIntersect(createEmptyIntersects: true);
+			var fast = p.GetGroupedData_FastIntersect(createEmptyIntersects: true);
 
 			var slowData = new Presentation<Test1Row>(slow);
 			var fastData = new Presentation<Test1Row>(fast);

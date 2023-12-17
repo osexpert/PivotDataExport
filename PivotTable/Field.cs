@@ -27,6 +27,13 @@ namespace PivotExpert
 		public FieldType FieldType { get; set; } // Group, Data, etc.?
 
 		public Sorting Sorting;
+
+		/// <summary>
+		/// Not sure if sort index make sense...
+		/// For groups, sorting should just follow the group index...
+		/// If col grouping, then there data cols are replicated, so then what field are we talking about?
+		/// Sorting need to be figured out..
+		/// </summary>
 		public int SortIndex;
 
 		public int GroupIndex;

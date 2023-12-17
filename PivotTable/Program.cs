@@ -176,7 +176,7 @@ namespace PivotExpert
 
 
 
-			var tblll = new Presentation<CsvRow>(fast).GetTable_NestedDict_NG_TODO();
+			var tblll = new Presentation<CsvRow>(fast).GetTable_NestedDict();
 
 			using (var f = File.Open(@"d:\testdt5mill2_fast_nested_min.json", FileMode.Create))
 			{

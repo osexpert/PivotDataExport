@@ -67,7 +67,11 @@ namespace PivotExpert
 				throw new ArgumentException("Property.Name can not start with reserved char '/'");
 
 			if (_fields.GroupBy(f => f.FieldName).Any(g => g.Count() > 1))
-				throw new ArgumentException("More than one field with same fieldName (duplicate field names)");
+				throw new ArgumentException("More than one field with same fieldName");
+
+
+
+
 		}
 
 		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType, bool sort = false)
@@ -124,7 +128,10 @@ namespace PivotExpert
 					}
 
 					if (sort)
+					{
+						throw new Exception("never called");
 						allSubGroups.AddRange(subGroups.OrderBy(sg => sg.Key)); // displayText or value?
+					}
 					else
 						allSubGroups.AddRange(subGroups);
 				}
@@ -159,7 +166,7 @@ namespace PivotExpert
 		/// Used only for testing\benchmarking, as this code is shorter and easier than FastIntersect.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow> GetGroupedData_SlowIntersect()
+		public GroupedData<TRow> GetGroupedData_SlowIntersect(bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -187,21 +194,24 @@ namespace PivotExpert
 
 				foreach (var lastColGroup in lastColGroups)
 				{
-					var data = new object?[dataFields.Length];
-
 					var intersectRows = lastRowGroup.Rows.Intersect(lastColGroup.Rows).ToList();
 
-					int dataFieldIdx = 0;
-					foreach (var dataField in dataFields)
+					if (intersectRows.Any() || createEmptyIntersects)
 					{
-						var prop = _props[dataField.FieldName];
-						var theValue = prop.GetValue(intersectRows);
+						var data = new object?[dataFields.Length];
 
-						data[dataFieldIdx] = theValue;
-						dataFieldIdx++;
+						int dataFieldIdx = 0;
+						foreach (var dataField in dataFields)
+						{
+							var prop = _props[dataField.FieldName];
+							var theValue = prop.GetValue(intersectRows);
+
+							data[dataFieldIdx] = theValue;
+							dataFieldIdx++;
+						}
+
+						lastRowGroup.IntersectData.Add(lastColGroup, data);
 					}
-
-					lastRowGroup.IntersectData.Add(lastColGroup, data);
 				}
 			}
 
@@ -222,7 +232,7 @@ namespace PivotExpert
 		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow> GetGroupedData_FastIntersect()
+		public GroupedData<TRow> GetGroupedData_FastIntersect(bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -251,7 +261,7 @@ namespace PivotExpert
 				else
 				{
 					// has col grouping
-					lastColGroup = CloneColGroups(lastRowThenColGroup, htSynthMergedAllColGroups);
+					lastColGroup = CloneColGroups(rootColGroup, lastRowThenColGroup, htSynthMergedAllColGroups);
 				}
 
 				Group<TRow> lastRowG = GetLastRowGroup(lastRowThenColGroup);
@@ -293,27 +303,30 @@ namespace PivotExpert
 			}
 
 			// because of the was we group, groups without rows are not intersected. So fill these groups with default data here.
-			object?[] defaultValues = null;
-			foreach (var lastRowGroup in allRowGroups.Last())
+			if (createEmptyIntersects)
 			{
-				foreach (var lastColGroup in allColGroups.Last())
+				object?[] defaultValues = null;
+				foreach (var lastRowGroup in allRowGroups.Last())
 				{
-					if (!lastRowGroup.IntersectData.ContainsKey(lastColGroup))
+					foreach (var lastColGroup in allColGroups.Last())
 					{
-						// write default values
-						if (defaultValues == null)
+						if (!lastRowGroup.IntersectData.ContainsKey(lastColGroup))
 						{
-							// aggregate with no rows = default value
-							var defVals = new object?[dataFields.Length];
-							int i = 0;
-							foreach (var df in dataFields)
+							// write default values
+							if (defaultValues == null)
 							{
-								defVals[i++] = _props[df.FieldName].GetValue(Enumerable.Empty<TRow>());
+								// aggregate with no rows = default value
+								var defVals = new object?[dataFields.Length];
+								int i = 0;
+								foreach (var df in dataFields)
+								{
+									defVals[i++] = _props[df.FieldName].GetValue(Enumerable.Empty<TRow>());
+								}
+								defaultValues = defVals;
 							}
-							defaultValues = defVals;
+							//Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
+							lastRowGroup.IntersectData.Add(lastColGroup, defaultValues);
 						}
-						//Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
-						lastRowGroup.IntersectData.Add(lastColGroup, defaultValues);
 					}
 				}
 			}
@@ -334,7 +347,7 @@ namespace PivotExpert
 		/// <summary>
 		/// Return only col groups, so need to strip off the row groups in front.
 		/// </summary>
-		private Group<TRow> CloneColGroups(Group<TRow> lastRowThenColGroup, Dictionary<(Group<TRow>?, object?), Group<TRow>>[] lookupGroups)
+		private Group<TRow> CloneColGroups(Group<TRow> rootColGroup, Group<TRow> lastRowThenColGroup, Dictionary<(Group<TRow>?, object?), Group<TRow>>[] lookupGroups)
 		{
 			Stack<Group<TRow>> st = new();
 
@@ -347,7 +360,7 @@ namespace PivotExpert
 			} while (current != null && current.FieldType == FieldType.ColGroup);
 
 			//return new GroupingKey<object>(st.ToArray());
-			Group<TRow>? curr = null;
+			Group<TRow>? curr = rootColGroup;
 			int lvl = 0;
 			while (st.Any())
 			{
@@ -411,6 +424,21 @@ namespace PivotExpert
 
 			return current;
 		}
+
+		//public void Sort(GroupedData<TRow> data)
+		//{
+		//	//			data.rowFieldsInGroupOrder
+		//	var comparer = Comparer<object>.Default;
+		//	foreach (var grpLevel in data.allRowGroups)
+		//	{
+		//		var first = grpLevel.First();
+		//		if (first.Field.Sorting != Sorting.None)
+		//		{
+		//			bool asc = first.Field.Sorting == Sorting.Asc;
+		//			grpLevel.Sort((a, b) => asc ? comparer.Compare(a.Key, b.Key) : comparer.Compare(b.Key, a.Key));
+		//		}
+		//	}
+		//}
 	}
 
 	public class GroupedData<TRow> where TRow : class

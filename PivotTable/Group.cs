@@ -65,5 +65,28 @@ namespace PivotExpert
 
 			throw new Exception("Bug");
 		}
+
+		//internal IEnumerable<Group<T>> GetParents()
+		//{
+		//	throw new NotImplementedException();
+		//}
+
+		/// <summary>
+		/// Get top parent first and me last
+		/// </summary>
+		internal IEnumerable<Group<T>> GetParentsAndMe()
+		{
+			var st = new Stack<Group<T>>();
+
+			var current = this;
+			do
+			{
+				st.Push(current);
+				current = current.ParentGroup;
+			} while (!current.IsRoot);
+
+			return st;
+
+		}
 	}
 }

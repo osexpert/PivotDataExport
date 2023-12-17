@@ -9,8 +9,13 @@ namespace PivotExpert
 {
 	public class Table<TRow>
 	{
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 		public List<TableColumn> RowGroups { get; set; }
+
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 		public List<TableColumn> ColumnGroups { get; set; }
+
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 		public List<TableColumn> Columns { get; set; }
 
 		public List<TRow> Rows { get; set; }

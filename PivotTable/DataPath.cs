@@ -128,6 +128,7 @@ namespace PivotExpert
 			return sb.ToString();
 		}
 
+#if false
 		public class DissectedPropertyName
 		{
 			public KeyValuePair<string, string?>[]? KeyValues;
@@ -188,6 +189,6 @@ namespace PivotExpert
 			//return false;
 			throw new FormatException("Not a keyValue property name (does not start with '/')");
 		}
-
+#endif
 	}
 }
