@@ -253,22 +253,22 @@ namespace Tests
 			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
 			fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
 			fields[nameof(Test1Row.Site)].GroupIndex = 0;
-			fields[nameof(Test1Row.Site)].SortIndex = 0;
+			//fields[nameof(Test1Row.Site)].SortIndex = 0;
 
 			fields[nameof(Test1Row.Unit)].FieldType = FieldType.RowGroup;
 			fields[nameof(Test1Row.Unit)].Sorting = Sorting.Desc;
 			fields[nameof(Test1Row.Unit)].GroupIndex = 1;
-			fields[nameof(Test1Row.Unit)].SortIndex = 1;
+			//fields[nameof(Test1Row.Unit)].SortIndex = 1;
 
 			fields[nameof(Test1Row.Country)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Country)].GroupIndex = 0;
 			fields[nameof(Test1Row.Country)].Sorting = Sorting.Asc;
-			fields[nameof(Test1Row.Country)].SortIndex = 1;
+			//fields[nameof(Test1Row.Country)].SortIndex = 1;
 
 			fields[nameof(Test1Row.Company)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Company)].GroupIndex = 1;
 			fields[nameof(Test1Row.Company)].Sorting = Sorting.Desc;
-			fields[nameof(Test1Row.Company)].SortIndex = 0;
+			//fields[nameof(Test1Row.Company)].SortIndex = 0;
 
 			fields[nameof(Test1Row.Group)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Group)].GroupIndex = 2;

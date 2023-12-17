@@ -58,7 +58,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -70,7 +69,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -79,7 +77,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -88,7 +85,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -97,7 +93,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -106,7 +101,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 1,
       ""GroupValues"": null
     },
     {
@@ -115,7 +109,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -124,7 +117,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -167,7 +159,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -179,7 +170,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -188,7 +178,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -197,7 +186,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -206,7 +194,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -215,7 +202,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 1,
       ""GroupValues"": null
     },
     {
@@ -224,7 +210,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -233,7 +218,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -276,10 +260,10 @@ namespace Tests
 			var fields = p.Fields.ToDictionary(k => k.FieldName);
 			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
 			fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
-			fields[nameof(Test1Row.Site)].SortIndex = 0;
+			//fields[nameof(Test1Row.Site)].SortIndex = 0;
 
 			fields[nameof(Test1Row.Number)].Sorting = Sorting.Asc;
-			fields[nameof(Test1Row.Number)].SortIndex = 1;
+	//		fields[nameof(Test1Row.Number)].SortIndex = 1;
 
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
@@ -362,7 +346,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -373,7 +356,6 @@ namespace Tests
       ""FieldType"": 2,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -384,7 +366,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -393,7 +374,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -404,7 +384,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -415,7 +394,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -426,7 +404,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -437,7 +414,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -448,7 +424,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -459,7 +434,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -470,7 +444,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -481,7 +454,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -492,7 +464,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -548,7 +519,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -559,7 +529,6 @@ namespace Tests
       ""FieldType"": 2,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -570,7 +539,6 @@ namespace Tests
       ""FieldType"": 1,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -579,7 +547,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -590,7 +557,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -601,7 +567,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -612,7 +577,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -623,7 +587,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -634,7 +597,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -645,7 +607,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -656,7 +617,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -667,7 +627,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -678,7 +637,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -736,11 +694,11 @@ namespace Tests
 			var fields = p.Fields.ToDictionary(k => k.FieldName);
 			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
 			fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
-			fields[nameof(Test1Row.Site)].SortIndex = 0;
+			//fields[nameof(Test1Row.Site)].SortIndex = 0;
 
 			fields[nameof(Test1Row.Name)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Name)].Sorting = Sorting.Asc;
-			fields[nameof(Test1Row.Name)].SortIndex = 0;
+			//fields[nameof(Test1Row.Name)].SortIndex = 0;
 
 
 			var slow = p.GetGroupedData_SlowIntersect(createEmptyIntersects: true);
@@ -794,7 +752,6 @@ namespace Tests
       ""FieldType"": 2,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -805,7 +762,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -816,7 +772,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -827,7 +782,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -838,7 +792,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -849,7 +802,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -860,7 +812,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -871,7 +822,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -882,7 +832,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -893,7 +842,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -904,7 +852,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -915,7 +862,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -926,7 +872,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -958,7 +903,6 @@ namespace Tests
       ""FieldType"": 2,
       ""GroupIndex"": 0,
       ""Sorting"": 1,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -969,7 +913,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -980,7 +923,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -991,7 +933,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -1002,7 +943,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -1013,7 +953,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -1024,7 +963,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -1035,7 +973,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1046,7 +983,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1057,7 +993,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1068,7 +1003,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1079,7 +1013,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1090,7 +1023,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1124,7 +1056,7 @@ namespace Tests
 
 			fields[nameof(Test1Row.Name)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Name)].Sorting = Sorting.Asc;
-			fields[nameof(Test1Row.Name)].SortIndex = 0;
+			//fields[nameof(Test1Row.Name)].SortIndex = 0;
 
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
@@ -1173,7 +1105,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1182,7 +1113,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1191,7 +1121,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1200,7 +1129,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1209,7 +1137,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1218,7 +1145,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1227,7 +1153,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],
@@ -1253,7 +1178,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1262,7 +1186,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1271,7 +1194,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1280,7 +1202,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1289,7 +1210,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1298,7 +1218,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     },
     {
@@ -1307,7 +1226,6 @@ namespace Tests
       ""FieldType"": 0,
       ""GroupIndex"": 0,
       ""Sorting"": 0,
-      ""SortIndex"": 0,
       ""GroupValues"": null
     }
   ],

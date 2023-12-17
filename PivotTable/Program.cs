@@ -104,21 +104,21 @@ namespace PivotExpert
 			GetField(fieldsss, "Region").FieldType = FieldType.RowGroup;
 			GetField(fieldsss, "Region").GroupIndex = 1;
 			GetField(fieldsss, "Region").Sorting = Sorting.Asc;
-			GetField(fieldsss, "Region").SortIndex = 1;
+//			GetField(fieldsss, "Region").SortIndex = 1;
 
 			GetField(fieldsss, "Country").FieldType = FieldType.RowGroup;
 			GetField(fieldsss, "Country").GroupIndex = 2;
 			GetField(fieldsss, "Country").Sorting = Sorting.Asc;
-			GetField(fieldsss, "Country").SortIndex = 2;
+	//		GetField(fieldsss, "Country").SortIndex = 2;
 
 			GetField(fieldsss, "SalesChannel").FieldType = FieldType.ColGroup;
 			GetField(fieldsss, "SalesChannel").Sorting = Sorting.Asc;
-			GetField(fieldsss, "SalesChannel").SortIndex = 1;
+		//	GetField(fieldsss, "SalesChannel").SortIndex = 1;
 			GetField(fieldsss, "SalesChannel").GroupIndex = 3;
 
 			GetField(fieldsss, "ItemType").FieldType = FieldType.ColGroup;
 			GetField(fieldsss, "ItemType").Sorting = Sorting.Asc;
-			GetField(fieldsss, "ItemType").SortIndex = 0;
+			//GetField(fieldsss, "ItemType").SortIndex = 0;
 			GetField(fieldsss, "ItemType").GroupIndex = 0;
 
 			//GetField(fieldsss, "Country").Area = Area.Group;
@@ -126,7 +126,7 @@ namespace PivotExpert
 
 			//GetField(fieldsss, "ShipDate").Sort = Sort.Desc;
 
-			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", Sorting = Sorting.None, DataType = typeof(int), SortIndex = 0 });
+			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", Sorting = Sorting.None, DataType = typeof(int) });
 
 			var props = new List<PropertyDescriptor>();
 
@@ -255,12 +255,12 @@ namespace PivotExpert
 			//list.Add(new Row() { IndCount = 444, SiteName = "S3", UnitName = "U11", SpecName = "Human" });
 
 
-			var siteF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SiteName", Sorting = Sorting.Asc, SortIndex = 0 };
+			var siteF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SiteName", Sorting = Sorting.Asc };
 
 			
 
 //			var unitF = new FieldGen<string>() { Area = Area.Group, FieldName = "UnitName"  };
-			var specF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SpeciesName", Sorting = Sorting.Desc, SortIndex = 1 };
+			var specF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SpeciesName", Sorting = Sorting.Desc };
 			var indF = new Field<int>() { FieldType = FieldType.Data, FieldName = "IndCount" };
 			var ff = new Field[] { specF,   indF, siteF };
 

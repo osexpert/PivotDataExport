@@ -50,7 +50,7 @@ namespace PivotExpert
 		public int GroupIndex { get; set; }
 
 		public Sorting Sorting { get; set; }
-		public int SortIndex { get; set; }
+	//	public int SortIndex { get; set; }
 
 		public object?[]? GroupValues { get; set; }
 	}

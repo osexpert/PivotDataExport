@@ -26,7 +26,7 @@ namespace PivotExpert
 
 			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
 				.Where(f => f.Sorting != Sorting.None)
-				.OrderBy(f => f.SortIndex).ToArray();
+				.OrderBy(f => f.GroupIndex).ToArray();
 
 			var lastColGroupsSorted = SortColGroups(lastColGroups, colFieldsInSortOrder).ToList();
 
@@ -144,7 +144,7 @@ namespace PivotExpert
 			var sortFields = _data.fields
 				.Where(f => f.FieldType != FieldType.ColGroup) // sorting col groups mean sorting the columns themself (the labels)
 				.Where(f => f.Sorting != Sorting.None)
-				.OrderBy(f => f.SortIndex);
+				.OrderBy(f => f.GroupIndex);
 
 			if (sortFields.Any())
 			{

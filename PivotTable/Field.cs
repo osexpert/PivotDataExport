@@ -34,7 +34,7 @@ namespace PivotExpert
 		/// If col grouping, then there data cols are replicated, so then what field are we talking about?
 		/// Sorting need to be figured out..
 		/// </summary>
-		public int SortIndex;
+//		public int SortIndex;
 
 		public int GroupIndex;
 
@@ -46,7 +46,7 @@ namespace PivotExpert
 				DataType = DataType,
 				FieldType = FieldType,
 				Sorting = Sorting,
-				SortIndex = SortIndex,
+			//	SortIndex = SortIndex,
 				GroupIndex = GroupIndex
 			};
 
@@ -60,7 +60,7 @@ namespace PivotExpert
 				FieldType = FieldType,
 				DataType = DataType,
 				GroupIndex = GroupIndex,
-				SortIndex = SortIndex,
+				//SortIndex = SortIndex,
 				Sorting = Sorting,
 				GroupValues = groupVals
 			};
