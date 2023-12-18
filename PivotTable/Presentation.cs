@@ -156,9 +156,9 @@ namespace osexpert.PivotTable
 					var idx = tableCols.IndexOf(sortCol);
 
 					if (sorter == null)
-						sorter = sf.SortOrder == SortOrder.Asc ? rows.OrderBy(r => r[idx]) : rows.OrderByDescending(r => r[idx]);
+						sorter = sf.SortOrder == SortOrder.Asc ? rows.OrderBy(r => r[idx], sf.SortComparer) : rows.OrderByDescending(r => r[idx], sf.SortComparer);
 					else
-						sorter = sf.SortOrder == SortOrder.Asc ? sorter.ThenBy(r => r[idx]) : sorter.ThenByDescending(r => r[idx]);
+						sorter = sf.SortOrder == SortOrder.Asc ? sorter.ThenBy(r => r[idx], sf.SortComparer) : sorter.ThenByDescending(r => r[idx], sf.SortComparer);
 				}
 				rows = sorter.ToList();
 			}
@@ -421,12 +421,12 @@ namespace osexpert.PivotTable
 
 					if (sorter == null)
 						sorter = colField.SortOrder == SortOrder.Asc ?
-							grops.OrderBy(r => getGroup(r).GetKeyByField(colField))//.Key.Groups[colFieldIdx_local_capture]) 
-							: grops.OrderByDescending(r => getGroup(r).GetKeyByField(colField));
+							grops.OrderBy(r => getGroup(r).GetKeyByField(colField), colField.SortComparer)
+							: grops.OrderByDescending(r => getGroup(r).GetKeyByField(colField), colField.SortComparer);
 					else
 						sorter = colField.SortOrder == SortOrder.Asc ?
-							sorter.ThenBy(r => getGroup(r).GetKeyByField(colField))
-							: sorter.ThenByDescending(r => getGroup(r).GetKeyByField(colField));
+							sorter.ThenBy(r => getGroup(r).GetKeyByField(colField), colField.SortComparer)
+							: sorter.ThenByDescending(r => getGroup(r).GetKeyByField(colField), colField.SortComparer);
 
 					colFieldIdx++;
 				}

@@ -15,7 +15,9 @@ namespace osexpert.PivotTable
 	/// </summary>
 	public class Field
 	{
-		public IEqualityComparer<object?> Comparer = EqualityComparer<object?>.Default;
+		public IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
+
+		public IComparer<object?> SortComparer = Comparer<object?>.Default;
 
 		// FIXME: kind of pointless...could simply used passed order
 		//public int Index { get; set; }  // 0, 1, 2
@@ -43,11 +45,11 @@ namespace osexpert.PivotTable
 
 		}
 
-		internal TableColumn ToTableColumn(string combNAme, object?[] groupVals)
+		internal TableColumn ToTableColumn(string combName, object?[] groupVals)
 		{
 			return new()
 			{
-				Name = combNAme,
+				Name = combName,
 				FieldType = FieldType,
 				DataType = DataType,
 				GroupIndex = GroupIndex,

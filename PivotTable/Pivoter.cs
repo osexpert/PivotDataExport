@@ -105,7 +105,7 @@ namespace osexpert.PivotTable
 
 				foreach (var go in lastGroups)
 				{
-					var subGroups = go.Rows.GroupBy(r => getter.GetValue(r.Yield()), gf.Comparer).Select(g => new Group<TRow>()
+					var subGroups = go.Rows.GroupBy(r => getter.GetValue(r.Yield()), gf.GroupComparer).Select(g => new Group<TRow>()
 					{
 						Key = g.Key,
 						Rows = g,
