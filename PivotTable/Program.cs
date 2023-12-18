@@ -19,11 +19,11 @@ using CsvHelper;
 using CsvHelper.Configuration.Attributes;
 using NotVisualBasic;
 using NotVisualBasic.FileIO;
-using PivotExpert.CsvTest;
+using osexpert.PivotTable.CsvTest;
 //using static PivotExpert.Pivoter;
 using NReco.PivotData;
 
-namespace PivotExpert
+namespace osexpert.PivotTable
 {
 
 

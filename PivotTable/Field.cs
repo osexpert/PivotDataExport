@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PivotExpert
+namespace osexpert.PivotTable
 {
 	/// <summary>
 	/// Field is the display part of the system.

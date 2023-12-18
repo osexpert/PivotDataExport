@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PivotExpert
+namespace osexpert.PivotTable
 {
 	/// <summary>
 	/// Pro: write dynamically to json since IDictionary

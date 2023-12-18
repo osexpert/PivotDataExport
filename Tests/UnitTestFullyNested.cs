@@ -1,4 +1,4 @@
-﻿using PivotExpert;
+﻿using osexpert.PivotTable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

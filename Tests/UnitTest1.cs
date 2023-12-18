@@ -1,4 +1,4 @@
-using PivotExpert;
+using osexpert.PivotTable;
 using System.ComponentModel;
 using System.Data;
 using System.Text;
@@ -1046,6 +1046,33 @@ namespace Tests
   ]
 }";
 
+		const string nested_TestCompareFastAndSlow_ColGroupOnName = @"{
+  ""Rows"": [
+    {
+      ""NameList"": [
+        {
+          ""Name"": ""Name1"",
+          ""Site"": ""Site1, Site3, Site5"",
+          ""Unit"": ""Unit1, Unit6"",
+          ""Group"": ""Group1, Group2"",
+          ""Number"": 14,
+          ""Weight"": 9.5,
+          ""RowCount"": 4
+        },
+        {
+          ""Name"": ""Name3"",
+          ""Site"": ""Site1"",
+          ""Unit"": ""Unit2"",
+          ""Group"": ""Group1"",
+          ""Number"": 4,
+          ""Weight"": 1.4,
+          ""RowCount"": 1
+        }
+      ]
+    }
+  ]
+}";
+
 		[Fact]
 	// Expected: when only group in col, 1 row in the result with only totalt
 		public void TestCompareFastAndSlow_ColGroupOnName()
@@ -1081,6 +1108,9 @@ namespace Tests
 			var slowTblDictArr = slowData.GetTable_FlatDict();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_DictArr, slowTblDictArrStr);
+
+			var nest = ToJson(slowData.GetTable_NestedDict());
+			Assert.Equal(nested_TestCompareFastAndSlow_ColGroupOnName, nest);
 		}
 
 		const string str_TestCompareFastAndSlow_NoGroup = @"<DocumentElement>

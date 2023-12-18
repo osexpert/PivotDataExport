@@ -1,16 +1,12 @@
-﻿using CsvHelper;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace PivotExpert
+namespace osexpert.PivotTable
 {
+	/// <summary>
+	/// Group and aggregate rows
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
 	public class Pivoter<TRow> where TRow : class // notnull
 	{
 		List<Field> _fields;
@@ -74,18 +70,18 @@ namespace PivotExpert
 
 		}
 
-		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType)//, bool sort = false)
 		{
 			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
 			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
 
-			var res = GroupRows(lastGroups, fields, sort: sort);
+			var res = GroupRows(lastGroups, fields);//, sort: sort);
 //			if (!res.Any())
 	//			return new List<List<Group<TRow>>>() { lastGroups };
 			return res;
 		}
 
-		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field> fields, bool freeOriginalLastGroupsMem = true, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
 		{
 			List<List<Group<TRow>>> listRes = new();
 
@@ -127,13 +123,13 @@ namespace PivotExpert
 						go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
 					}
 
-					if (sort)
-					{
-						throw new Exception("never called");
-						allSubGroups.AddRange(subGroups.OrderBy(sg => sg.Key)); // displayText or value?
-					}
-					else
-						allSubGroups.AddRange(subGroups);
+					//if (sort)
+					//{
+					//	throw new Exception("never called");
+					//	allSubGroups.AddRange(subGroups.OrderBy(sg => sg.Key)); // displayText or value?
+					//}
+					//else
+					allSubGroups.AddRange(subGroups);
 				}
 
 				listRes.Add(allSubGroups);

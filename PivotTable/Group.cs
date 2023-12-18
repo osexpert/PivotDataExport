@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PivotExpert
+namespace osexpert.PivotTable
 {
 	public enum enRootType
 	{
@@ -76,6 +76,11 @@ namespace PivotExpert
 		/// </summary>
 		internal IEnumerable<Group<T>> GetParentsAndMe()
 		{
+			if (this.IsRoot)
+			{
+				return Enumerable.Empty<Group<T>>();
+			}
+
 			var st = new Stack<Group<T>>();
 
 			var current = this;
@@ -86,7 +91,6 @@ namespace PivotExpert
 			} while (!current.IsRoot);
 
 			return st;
-
 		}
 	}
 }
