@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace osexpert.PivotTable
 {
-	class FakeDict : IDictionary<string, object?>
+	public class KeyValueZip : IDictionary<string, object?>
 	{
 		object?[] _row;
 		List<TableColumn> _tcols;
 
-		public FakeDict(object?[] row, List<TableColumn> tcols)
+		public KeyValueZip(object?[] row, List<TableColumn> tcols)
 		{
 			_row = row;
 			_tcols = tcols;

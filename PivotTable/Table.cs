@@ -49,8 +49,7 @@ namespace osexpert.PivotTable
 		public FieldType FieldType { get; set; }
 		public int GroupIndex { get; set; }
 
-		public Sorting Sorting { get; set; }
-	//	public int SortIndex { get; set; }
+		public SortOrder SortOrder { get; set; }
 
 		public object?[]? GroupValues { get; set; }
 	}

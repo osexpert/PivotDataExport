@@ -57,7 +57,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -68,7 +68,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     },
     {
@@ -76,7 +76,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -84,7 +84,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -92,7 +92,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -100,7 +100,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     },
     {
@@ -108,7 +108,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -116,7 +116,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     }
   ],
@@ -158,7 +158,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -169,7 +169,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     },
     {
@@ -177,7 +177,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -185,7 +185,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -193,7 +193,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -201,7 +201,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     },
     {
@@ -209,7 +209,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -217,10 +217,42 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     }
   ],
+  ""Rows"": [
+    {
+      ""Site"": ""Site1"",
+      ""Unit"": ""Unit1, Unit2"",
+      ""Group"": ""Group1, Group2"",
+      ""Name"": ""Name1, Name3"",
+      ""Number"": 7,
+      ""Weight"": 3.6999999999999997,
+      ""RowCount"": 3
+    },
+    {
+      ""Site"": ""Site3"",
+      ""Unit"": ""Unit1"",
+      ""Group"": ""Group1"",
+      ""Name"": ""Name1"",
+      ""Number"": 5,
+      ""Weight"": 2.1,
+      ""RowCount"": 1
+    },
+    {
+      ""Site"": ""Site5"",
+      ""Unit"": ""Unit6"",
+      ""Group"": ""Group1"",
+      ""Name"": ""Name1"",
+      ""Number"": 6,
+      ""Weight"": 5.1,
+      ""RowCount"": 1
+    }
+  ]
+}";
+
+		const string nested_TestCompareFastAndSlow_RowGroupOnSite = @"{
   ""Rows"": [
     {
       ""Site"": ""Site1"",
@@ -259,11 +291,9 @@ namespace Tests
 
 			var fields = p.Fields.ToDictionary(k => k.FieldName);
 			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
-			fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
-			//fields[nameof(Test1Row.Site)].SortIndex = 0;
+			fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
 
-			fields[nameof(Test1Row.Number)].Sorting = Sorting.Asc;
-	//		fields[nameof(Test1Row.Number)].SortIndex = 1;
+			fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Asc;
 
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
@@ -288,7 +318,10 @@ namespace Tests
 			var slowTblDictArr = slowData.GetTable_FlatDict();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_GetTable_DictArr, slowTblDictArrStr);
-			
+
+			// same as GetTable_FlatDict in this case
+			var nest = ToJson(slowData.GetTable_NestedDict());
+			Assert.Equal(nested_TestCompareFastAndSlow_RowGroupOnSite, nest);
 		}
 
 		private static string ToJson<T>(T table)
@@ -345,7 +378,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -355,7 +388,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 2,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -365,7 +398,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     },
     {
@@ -373,7 +406,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -383,7 +416,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -393,7 +426,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -403,7 +436,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -413,7 +446,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -423,7 +456,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -433,7 +466,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -443,7 +476,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -453,7 +486,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -463,7 +496,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -518,7 +551,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -528,7 +561,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 2,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -538,7 +571,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 1,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     },
     {
@@ -546,7 +579,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -556,7 +589,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -566,7 +599,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -576,7 +609,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -586,7 +619,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -596,7 +629,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -606,7 +639,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -616,7 +649,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -626,7 +659,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -636,7 +669,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -685,6 +718,73 @@ namespace Tests
   ]
 }";
 
+		const string nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = @"{
+  ""Rows"": [
+    {
+      ""Site"": ""Site1"",
+      ""NameList"": [
+        {
+          ""Name"": ""Name1"",
+          ""Unit"": ""Unit1"",
+          ""Group"": ""Group1, Group2"",
+          ""Number"": 3,
+          ""Weight"": 2.3,
+          ""RowCount"": 2
+        },
+        {
+          ""Name"": ""Name3"",
+          ""Unit"": ""Unit2"",
+          ""Group"": ""Group1"",
+          ""Number"": 4,
+          ""Weight"": 1.4,
+          ""RowCount"": 1
+        }
+      ]
+    },
+    {
+      ""Site"": ""Site3"",
+      ""NameList"": [
+        {
+          ""Name"": ""Name1"",
+          ""Unit"": ""Unit1"",
+          ""Group"": ""Group1"",
+          ""Number"": 5,
+          ""Weight"": 2.1,
+          ""RowCount"": 1
+        },
+        {
+          ""Name"": ""Name3"",
+          ""Unit"": """",
+          ""Group"": """",
+          ""Number"": 0,
+          ""Weight"": 0,
+          ""RowCount"": 0
+        }
+      ]
+    },
+    {
+      ""Site"": ""Site5"",
+      ""NameList"": [
+        {
+          ""Name"": ""Name1"",
+          ""Unit"": ""Unit6"",
+          ""Group"": ""Group1"",
+          ""Number"": 6,
+          ""Weight"": 5.1,
+          ""RowCount"": 1
+        },
+        {
+          ""Name"": ""Name3"",
+          ""Unit"": """",
+          ""Group"": """",
+          ""Number"": 0,
+          ""Weight"": 0,
+          ""RowCount"": 0
+        }
+      ]
+    }
+  ]
+}";
 
 		[Fact]
 		public void TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName()
@@ -693,13 +793,10 @@ namespace Tests
 
 			var fields = p.Fields.ToDictionary(k => k.FieldName);
 			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
-			fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
-			//fields[nameof(Test1Row.Site)].SortIndex = 0;
+			fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
 
 			fields[nameof(Test1Row.Name)].FieldType = FieldType.ColGroup;
-			fields[nameof(Test1Row.Name)].Sorting = Sorting.Asc;
-			//fields[nameof(Test1Row.Name)].SortIndex = 0;
-
+			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
 			var slow = p.GetGroupedData_SlowIntersect(createEmptyIntersects: true);
 			var fast = p.GetGroupedData_FastIntersect(createEmptyIntersects: true);
@@ -724,6 +821,9 @@ namespace Tests
 			var slowTblDictArr = slowData.GetTable_FlatDict();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
+
+			var nest = ToJson(slowData.GetTable_NestedDict());
+			Assert.Equal(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nest);
 		}
 
 		const string str_TestCompareFastAndSlow_ColGroupOnName = @"<DocumentElement>
@@ -751,7 +851,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 2,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -761,7 +861,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -771,7 +871,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -781,7 +881,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -791,7 +891,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -801,7 +901,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -811,7 +911,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -821,7 +921,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -831,7 +931,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -841,7 +941,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -851,7 +951,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -861,7 +961,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -871,7 +971,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -902,7 +1002,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 2,
       ""GroupIndex"": 0,
-      ""Sorting"": 1,
+      ""SortOrder"": 1,
       ""GroupValues"": null
     }
   ],
@@ -912,7 +1012,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -922,7 +1022,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -932,7 +1032,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -942,7 +1042,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -952,7 +1052,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -962,7 +1062,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name1""
       ]
@@ -972,7 +1072,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -982,7 +1082,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -992,7 +1092,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1002,7 +1102,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1012,7 +1112,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1022,7 +1122,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": [
         ""Name3""
       ]
@@ -1082,8 +1182,7 @@ namespace Tests
 			var fields = p.Fields.ToDictionary(k => k.FieldName);
 
 			fields[nameof(Test1Row.Name)].FieldType = FieldType.ColGroup;
-			fields[nameof(Test1Row.Name)].Sorting = Sorting.Asc;
-			//fields[nameof(Test1Row.Name)].SortIndex = 0;
+			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
 			var slow = p.GetGroupedData_SlowIntersect();
 			var fast = p.GetGroupedData_FastIntersect();
@@ -1134,7 +1233,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1142,7 +1241,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1150,7 +1249,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1158,7 +1257,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1166,7 +1265,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1174,7 +1273,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1182,7 +1281,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     }
   ],
@@ -1207,7 +1306,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1215,7 +1314,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1223,7 +1322,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1231,7 +1330,7 @@ namespace Tests
       ""TypeName"": ""String"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1239,7 +1338,7 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1247,7 +1346,7 @@ namespace Tests
       ""TypeName"": ""Double"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     },
     {
@@ -1255,10 +1354,24 @@ namespace Tests
       ""TypeName"": ""Int32"",
       ""FieldType"": 0,
       ""GroupIndex"": 0,
-      ""Sorting"": 0,
+      ""SortOrder"": 0,
       ""GroupValues"": null
     }
   ],
+  ""Rows"": [
+    {
+      ""Site"": ""Site1, Site3, Site5"",
+      ""Unit"": ""Unit1, Unit2, Unit6"",
+      ""Group"": ""Group1, Group2"",
+      ""Name"": ""Name1, Name3"",
+      ""Number"": 18,
+      ""Weight"": 10.9,
+      ""RowCount"": 5
+    }
+  ]
+}";
+
+		const string nested_TestCompareFastAndSlow_NoGroup = @"{
   ""Rows"": [
     {
       ""Site"": ""Site1, Site3, Site5"",
@@ -1303,6 +1416,10 @@ namespace Tests
 			var slowTblDictArr = slowData.GetTable_FlatDict();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_DictArr, slowTblDictArrStr);
+
+			// this produce same result as GetTable_FlatDict in this case (no col groups)
+			var nest = ToJson(slowData.GetTable_NestedDict());
+			Assert.Equal(nested_TestCompareFastAndSlow_NoGroup, nest);
 		}
 
 

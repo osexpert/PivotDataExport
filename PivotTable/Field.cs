@@ -26,15 +26,7 @@ namespace osexpert.PivotTable
 
 		public FieldType FieldType { get; set; } // Group, Data, etc.?
 
-		public Sorting Sorting;
-
-		/// <summary>
-		/// Not sure if sort index make sense...
-		/// For groups, sorting should just follow the group index...
-		/// If col grouping, then there data cols are replicated, so then what field are we talking about?
-		/// Sorting need to be figured out..
-		/// </summary>
-//		public int SortIndex;
+		public SortOrder SortOrder;
 
 		public int GroupIndex;
 
@@ -45,8 +37,7 @@ namespace osexpert.PivotTable
 				Name = FieldName,
 				DataType = DataType,
 				FieldType = FieldType,
-				Sorting = Sorting,
-			//	SortIndex = SortIndex,
+				SortOrder = SortOrder,
 				GroupIndex = GroupIndex
 			};
 
@@ -60,8 +51,7 @@ namespace osexpert.PivotTable
 				FieldType = FieldType,
 				DataType = DataType,
 				GroupIndex = GroupIndex,
-				//SortIndex = SortIndex,
-				Sorting = Sorting,
+				SortOrder = SortOrder,
 				GroupValues = groupVals
 			};
 
@@ -72,7 +62,7 @@ namespace osexpert.PivotTable
 
 		// datavalue (groupin)
 		// displayvalue
-		// sorting value
+		// SortOrder value
 
 		// TOTAL value stored here?
 
@@ -112,7 +102,7 @@ namespace osexpert.PivotTable
 	}
 
 
-	public enum Sorting
+	public enum SortOrder
 	{
 		None = 0,
 		Asc = 1,

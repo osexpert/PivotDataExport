@@ -53,7 +53,7 @@ namespace osexpert.PivotTable
 
 		private void Validate()
 		{
-			if (_fields.Any(f => f.FieldType == FieldType.ColGroup) && _fields.Any(f => f.FieldType == FieldType.Data && f.Sorting != Sorting.None))
+			if (_fields.Any(f => f.FieldType == FieldType.ColGroup) && _fields.Any(f => f.FieldType == FieldType.Data && f.SortOrder != SortOrder.None))
 				throw new ArgumentException("Can not sort on data fields if grouping on columns");
 
 			if (_fields.Any(f => f.FieldName.StartsWith('/')))
@@ -428,9 +428,9 @@ namespace osexpert.PivotTable
 		//	foreach (var grpLevel in data.allRowGroups)
 		//	{
 		//		var first = grpLevel.First();
-		//		if (first.Field.Sorting != Sorting.None)
+		//		if (first.Field.SortOrder != SortOrder.None)
 		//		{
-		//			bool asc = first.Field.Sorting == Sorting.Asc;
+		//			bool asc = first.Field.SortOrder == SortOrder.Asc;
 		//			grpLevel.Sort((a, b) => asc ? comparer.Compare(a.Key, b.Key) : comparer.Compare(b.Key, a.Key));
 		//		}
 		//	}

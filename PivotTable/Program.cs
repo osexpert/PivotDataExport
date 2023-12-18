@@ -103,22 +103,18 @@ namespace osexpert.PivotTable
 
 			GetField(fieldsss, "Region").FieldType = FieldType.RowGroup;
 			GetField(fieldsss, "Region").GroupIndex = 1;
-			GetField(fieldsss, "Region").Sorting = Sorting.Asc;
-//			GetField(fieldsss, "Region").SortIndex = 1;
+			GetField(fieldsss, "Region").SortOrder = SortOrder.Asc;
 
 			GetField(fieldsss, "Country").FieldType = FieldType.RowGroup;
 			GetField(fieldsss, "Country").GroupIndex = 2;
-			GetField(fieldsss, "Country").Sorting = Sorting.Asc;
-	//		GetField(fieldsss, "Country").SortIndex = 2;
+			GetField(fieldsss, "Country").SortOrder = SortOrder.Asc;
 
 			GetField(fieldsss, "SalesChannel").FieldType = FieldType.ColGroup;
-			GetField(fieldsss, "SalesChannel").Sorting = Sorting.Asc;
-		//	GetField(fieldsss, "SalesChannel").SortIndex = 1;
+			GetField(fieldsss, "SalesChannel").SortOrder = SortOrder.Asc;
 			GetField(fieldsss, "SalesChannel").GroupIndex = 3;
 
 			GetField(fieldsss, "ItemType").FieldType = FieldType.ColGroup;
-			GetField(fieldsss, "ItemType").Sorting = Sorting.Asc;
-			//GetField(fieldsss, "ItemType").SortIndex = 0;
+			GetField(fieldsss, "ItemType").SortOrder = SortOrder.Asc;
 			GetField(fieldsss, "ItemType").GroupIndex = 0;
 
 			//GetField(fieldsss, "Country").Area = Area.Group;
@@ -126,7 +122,7 @@ namespace osexpert.PivotTable
 
 			//GetField(fieldsss, "ShipDate").Sort = Sort.Desc;
 
-			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", Sorting = Sorting.None, DataType = typeof(int) });
+			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", SortOrder = SortOrder.None, DataType = typeof(int) });
 
 			var props = new List<PropertyDescriptor>();
 
@@ -255,18 +251,18 @@ namespace osexpert.PivotTable
 			//list.Add(new Row() { IndCount = 444, SiteName = "S3", UnitName = "U11", SpecName = "Human" });
 
 
-			var siteF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SiteName", Sorting = Sorting.Asc };
+			var siteF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SiteName", SortOrder = SortOrder.Asc };
 
 			
 
 //			var unitF = new FieldGen<string>() { Area = Area.Group, FieldName = "UnitName"  };
-			var specF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SpeciesName", Sorting = Sorting.Desc };
+			var specF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SpeciesName", SortOrder = SortOrder.Desc };
 			var indF = new Field<int>() { FieldType = FieldType.Data, FieldName = "IndCount" };
 			var ff = new Field[] { specF,   indF, siteF };
 
 			//var p = new Pivoter<Row>(ff, list, new PropertyDescriptorCollection(props.ToArray()));
 			//p.GetTable();
-			// TODO: dt can be slow? add option to use different construct? and then need different sorting?
+			// TODO: dt can be slow? add option to use different construct? and then need different SortOrder?
 		}
 
 		private void NRecoTest(List<CsvRow> allRTows, List<PropertyDescriptor> props, List<Field> fieldsss)

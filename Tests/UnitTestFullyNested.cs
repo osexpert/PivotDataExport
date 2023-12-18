@@ -251,38 +251,31 @@ namespace Tests
 			var fields = pivoter.Fields.ToDictionary(k => k.FieldName);
 
 			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
-			fields[nameof(Test1Row.Site)].Sorting = Sorting.Asc;
+			fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
 			fields[nameof(Test1Row.Site)].GroupIndex = 0;
-			//fields[nameof(Test1Row.Site)].SortIndex = 0;
 
 			fields[nameof(Test1Row.Unit)].FieldType = FieldType.RowGroup;
-			fields[nameof(Test1Row.Unit)].Sorting = Sorting.Desc;
+			fields[nameof(Test1Row.Unit)].SortOrder = SortOrder.Desc;
 			fields[nameof(Test1Row.Unit)].GroupIndex = 1;
-			//fields[nameof(Test1Row.Unit)].SortIndex = 1;
 
 			fields[nameof(Test1Row.Country)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Country)].GroupIndex = 0;
-			fields[nameof(Test1Row.Country)].Sorting = Sorting.Asc;
-			//fields[nameof(Test1Row.Country)].SortIndex = 1;
+			fields[nameof(Test1Row.Country)].SortOrder = SortOrder.Asc;
 
 			fields[nameof(Test1Row.Company)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Company)].GroupIndex = 1;
-			fields[nameof(Test1Row.Company)].Sorting = Sorting.Desc;
-			//fields[nameof(Test1Row.Company)].SortIndex = 0;
+			fields[nameof(Test1Row.Company)].SortOrder = SortOrder.Desc;
 
 			fields[nameof(Test1Row.Group)].FieldType = FieldType.ColGroup;
 			fields[nameof(Test1Row.Group)].GroupIndex = 2;
 
-			// TODO: gir det noen mening med SortIndex på kolonnegrupper???? Må ikke sortIndex i dette tilfellet alltid følge groupindeksen???
-			// TEST!!
 
 			var sdata = pivoter.GetGroupedData_SlowIntersect();
 			var gdata = pivoter.GetGroupedData_FastIntersect();
 
-//			pivoter.Sort(gdata);
 
 			var pres = new Presentation<Test1Row>(gdata);
-			// FIXME: currently no supporty for sorting
+			// FIXME: currently no supporty for SortOrder
 			var nested = pres.GetTable_NestedDict();
 
 			nested.Columns = null;

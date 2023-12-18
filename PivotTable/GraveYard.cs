@@ -10,7 +10,7 @@
 			List<KeyValueClass<TRow>> rows = new();
 
 			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
-				.Where(f => f.Sorting != Sorting.None)
+				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.SortIndex).ToArray();
 
 			Dictionary<Group<TRow>, string> groupNameLookup = new();
@@ -131,7 +131,7 @@
 			var lastColGroups = _data.allColGroups.Last();
 
 			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
-				.Where(f => f.Sorting != Sorting.None)
+				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.SortIndex).ToArray();
 
 			var lastColGroupsSorted = SortColGroups(lastColGroups, colFieldsInSortOrder, ele => ele).ToList();

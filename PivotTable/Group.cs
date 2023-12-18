@@ -74,10 +74,13 @@ namespace osexpert.PivotTable
 		/// <summary>
 		/// Get top parent first and me last
 		/// </summary>
-		internal IEnumerable<Group<T>> GetParentsAndMe()
+		internal IEnumerable<Group<T>> GetParentsAndMe()//bool includeMeIfRoot)
 		{
 			if (this.IsRoot)
 			{
+				//if (includeMeIfRoot)
+				//	return this.Yield();
+				//else
 				return Enumerable.Empty<Group<T>>();
 			}
 

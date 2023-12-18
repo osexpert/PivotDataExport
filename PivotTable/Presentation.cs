@@ -25,7 +25,7 @@ namespace osexpert.PivotTable
 			var lastColGroups = _data.allColGroups.Last();// OrDefault() ?? [];
 
 			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
-				.Where(f => f.Sorting != Sorting.None)
+				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
 			var lastColGroupsSorted = SortGroups(lastColGroups, colFieldsInSortOrder).ToList();
@@ -142,8 +142,8 @@ namespace osexpert.PivotTable
 		private List<object?[]> SortRows(List<object?[]> rows, List<TableColumn> tableCols)
 		{
 			var sortFields = _data.fields
-				.Where(f => f.FieldType != FieldType.ColGroup) // sorting col groups mean sorting the columns themself (the labels)
-				.Where(f => f.Sorting != Sorting.None)
+				.Where(f => f.FieldType != FieldType.ColGroup) // SortOrder col groups mean SortOrder the columns themself (the labels)
+				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex);
 
 			if (sortFields.Any())
@@ -156,9 +156,9 @@ namespace osexpert.PivotTable
 					var idx = tableCols.IndexOf(sortCol);
 
 					if (sorter == null)
-						sorter = sf.Sorting == Sorting.Asc ? rows.OrderBy(r => r[idx]) : rows.OrderByDescending(r => r[idx]);
+						sorter = sf.SortOrder == SortOrder.Asc ? rows.OrderBy(r => r[idx]) : rows.OrderByDescending(r => r[idx]);
 					else
-						sorter = sf.Sorting == Sorting.Asc ? sorter.ThenBy(r => r[idx]) : sorter.ThenByDescending(r => r[idx]);
+						sorter = sf.SortOrder == SortOrder.Asc ? sorter.ThenBy(r => r[idx]) : sorter.ThenByDescending(r => r[idx]);
 				}
 				rows = sorter.ToList();
 			}
@@ -214,7 +214,7 @@ namespace osexpert.PivotTable
 					//	dictRow.Add(v.Second.Name, v.First);
 
 					// perf: to avoid creating one dict per row
-					var dictRow = new FakeDict(row, tcols);
+					var dictRow = new KeyValueZip(row, tcols);
 
 					dictRows.Add(dictRow);
 				}
@@ -257,7 +257,7 @@ namespace osexpert.PivotTable
 				KeyValueList<TRow> r = new();
 				rows.Add(r);
 
-				foreach (Group<TRow> parentG in rg.GetParentsAndMe())
+				foreach (Group<TRow> parentG in rg.GetParentsAndMe())//includeMeIfRoot: false))
 				{
 					r.Add(parentG.Field.FieldName, parentG.Key);
 				}
@@ -286,9 +286,14 @@ namespace osexpert.PivotTable
 
 		private KeyValueList<TRow> GetCreateKeyVals(Group<TRow> cg, KeyValueList<TRow> r, ref Dictionary<Group<TRow>, KeyValueList<TRow>> groupToKeyVals, Dictionary<Group<TRow>, List<KeyValueList<TRow>>> groupToLists)
 		{
+			if (cg.IsRoot)
+			{
+				return r;
+			}
+
 			KeyValueList<TRow> keyVals = null;
 
-			foreach (var colGrp in cg.GetParentsAndMe())
+			foreach (var colGrp in cg.GetParentsAndMe())//includeMeIfRoot: true))
 			{
 				// add the root group
 				if (groupToKeyVals == null)
@@ -399,11 +404,11 @@ namespace osexpert.PivotTable
 			//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
 
 			//var sortFields = _fields.Where(f => f.Grouping == Grouping.Col)
-			//	.Where(f => f.Sorting != Sorting.None)
+			//	.Where(f => f.SortOrder != SortOrder.None)
 			//	.OrderBy(f => f.SortIndex)
 			//	.ToArray();
 
-			var sortedGroupFields = groupFields.Where(f => f.Sorting != Sorting.None);
+			var sortedGroupFields = groupFields.Where(f => f.SortOrder != SortOrder.None);
 
 			if (sortedGroupFields.Any())
 			{
@@ -415,11 +420,11 @@ namespace osexpert.PivotTable
 					int colFieldIdx_local_capture = colFieldIdx;
 
 					if (sorter == null)
-						sorter = colField.Sorting == Sorting.Asc ?
+						sorter = colField.SortOrder == SortOrder.Asc ?
 							grops.OrderBy(r => getGroup(r).GetKeyByField(colField))//.Key.Groups[colFieldIdx_local_capture]) 
 							: grops.OrderByDescending(r => getGroup(r).GetKeyByField(colField));
 					else
-						sorter = colField.Sorting == Sorting.Asc ?
+						sorter = colField.SortOrder == SortOrder.Asc ?
 							sorter.ThenBy(r => getGroup(r).GetKeyByField(colField))
 							: sorter.ThenByDescending(r => getGroup(r).GetKeyByField(colField));
 
