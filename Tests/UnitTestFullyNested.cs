@@ -16,6 +16,29 @@ namespace Tests
   ""Rows"": [
     {
       ""Site"": ""Site1"",
+      ""Unit"": ""Unit2"",
+      ""CountryList"": [
+        {
+          ""Country"": ""USA"",
+          ""CompanyList"": [
+            {
+              ""Company"": ""Evil corp"",
+              ""GroupList"": [
+                {
+                  ""Group"": ""Group1"",
+                  ""Name"": ""Name3"",
+                  ""Number"": 4,
+                  ""Weight"": 1.4,
+                  ""RowId"": ""5""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      ""Site"": ""Site1"",
       ""Unit"": ""Unit1"",
       ""CountryList"": [
         {
@@ -42,29 +65,6 @@ namespace Tests
                   ""Number"": 2,
                   ""Weight"": 1.2,
                   ""RowId"": ""2""
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit2"",
-      ""CountryList"": [
-        {
-          ""Country"": ""USA"",
-          ""CompanyList"": [
-            {
-              ""Company"": ""Evil corp"",
-              ""GroupList"": [
-                {
-                  ""Group"": ""Group1"",
-                  ""Name"": ""Name3"",
-                  ""Number"": 4,
-                  ""Weight"": 1.4,
-                  ""RowId"": ""5""
                 }
               ]
             }
@@ -120,29 +120,6 @@ namespace Tests
     },
     {
       ""Site"": ""Site5"",
-      ""Unit"": ""Unit123"",
-      ""CountryList"": [
-        {
-          ""Country"": ""Nan"",
-          ""CompanyList"": [
-            {
-              ""Company"": ""none"",
-              ""GroupList"": [
-                {
-                  ""Group"": ""Group1000"",
-                  ""Name"": ""NameLol"",
-                  ""Number"": 666,
-                  ""Weight"": 5.91,
-                  ""RowId"": ""10""
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site5"",
       ""Unit"": ""Unit4"",
       ""CountryList"": [
         {
@@ -157,6 +134,29 @@ namespace Tests
                   ""Number"": 69,
                   ""Weight"": 5.5,
                   ""RowId"": ""11""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      ""Site"": ""Site5"",
+      ""Unit"": ""Unit123"",
+      ""CountryList"": [
+        {
+          ""Country"": ""Nan"",
+          ""CompanyList"": [
+            {
+              ""Company"": ""none"",
+              ""GroupList"": [
+                {
+                  ""Group"": ""Group1000"",
+                  ""Name"": ""NameLol"",
+                  ""Number"": 666,
+                  ""Weight"": 5.91,
+                  ""RowId"": ""10""
                 }
               ]
             }

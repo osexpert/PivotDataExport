@@ -149,7 +149,7 @@ namespace PivotExpert
 
 			var sw3 = Stopwatch.StartNew();
 
-			NRecoTest(allRTows, props, fieldsss);
+			//NRecoTest(allRTows, props, fieldsss);
 
 			sw3.Stop();
 

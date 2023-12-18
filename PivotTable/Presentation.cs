@@ -28,7 +28,7 @@ namespace PivotExpert
 				.Where(f => f.Sorting != Sorting.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
-			var lastColGroupsSorted = SortColGroups(lastColGroups, colFieldsInSortOrder).ToList();
+			var lastColGroupsSorted = SortGroups(lastColGroups, colFieldsInSortOrder).ToList();
 
 
 			// TODO: when writing to json, instead of writing full rows we could write objects........
@@ -272,12 +272,12 @@ namespace PivotExpert
 
 			List<KeyValueList<TRow>> rows = new List<KeyValueList<TRow>>();
 
-			foreach (var g in _data.allRowGroups.Last())
+			foreach (var rg in SortGroups(_data.allRowGroups.Last(), _data.rowFieldsInGroupOrder))
 			{
 				KeyValueList<TRow> r = new();
 				rows.Add(r);
 
-				foreach (Group<TRow> parentG in g.GetParentsAndMe())
+				foreach (Group<TRow> parentG in rg.GetParentsAndMe())
 				{
 					r.Add(parentG.Field.FieldName, parentG.Key);
 				}
@@ -286,9 +286,9 @@ namespace PivotExpert
 				Dictionary<Group<TRow>, List<KeyValueList<TRow>>> groupToLists = new();
 
 				// Add the data
-				foreach (var cg in _data.allColGroups.Last())
+				foreach (var cg in SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
 				{
-					if (g.IntersectData.TryGetValue(cg, out var data))
+					if (rg.IntersectData.TryGetValue(cg, out var data))
 					{
 						KeyValueList<TRow> keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
 
@@ -300,6 +300,8 @@ namespace PivotExpert
 					}
 				}
 			}
+
+			
 
 //			var rows = SortRows(rows);
 
@@ -412,13 +414,16 @@ namespace PivotExpert
 		}
 
 
-		private IEnumerable<TEle> SortColGroups<TEle>(IEnumerable<TEle> colGrops, Field[] colFields) where TEle : Group<TRow>
+		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field[] groupFields) where TEle : Group<TRow>
 		{
-			return SortColGroups<TEle>(colGrops, colFields, ele => ele);
+			return SortGroups<TEle>(grops, groupFields, ele => ele);
 		}
 
-		//KeyValuePair<Group<T>, object?[]>
-		private IEnumerable<TEle> SortColGroups<TEle>(IEnumerable<TEle> colGrops, Field[] colFields, Func<TEle, Group<TRow>> getGroup)
+		/// <summary>
+		/// Sort the last group level.
+		/// Sort by checking parent values
+		/// </summary>
+		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field[] groupFields, Func<TEle, Group<TRow>> getGroup)
 		{
 			//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
 
@@ -427,19 +432,21 @@ namespace PivotExpert
 			//	.OrderBy(f => f.SortIndex)
 			//	.ToArray();
 
-			if (colFields.Any())
+			var sortedGroupFields = groupFields.Where(f => f.Sorting != Sorting.None);
+
+			if (sortedGroupFields.Any())
 			{
 				IOrderedEnumerable<TEle> sorter = null!;
 
 				int colFieldIdx = 0;
-				foreach (var colField in colFields)
+				foreach (var colField in sortedGroupFields)
 				{
 					int colFieldIdx_local_capture = colFieldIdx;
 
 					if (sorter == null)
 						sorter = colField.Sorting == Sorting.Asc ?
-							colGrops.OrderBy(r => getGroup(r).GetKeyByField(colField))//.Key.Groups[colFieldIdx_local_capture]) 
-							: colGrops.OrderByDescending(r => getGroup(r).GetKeyByField(colField));
+							grops.OrderBy(r => getGroup(r).GetKeyByField(colField))//.Key.Groups[colFieldIdx_local_capture]) 
+							: grops.OrderByDescending(r => getGroup(r).GetKeyByField(colField));
 					else
 						sorter = colField.Sorting == Sorting.Asc ?
 							sorter.ThenBy(r => getGroup(r).GetKeyByField(colField))
@@ -448,10 +455,10 @@ namespace PivotExpert
 					colFieldIdx++;
 				}
 
-				colGrops = sorter.ToList(); // tolist needed?
+				grops = sorter;//.ToList(); // tolist needed?
 			}
 
-			return colGrops;
+			return grops;
 		}
 	}
 }
