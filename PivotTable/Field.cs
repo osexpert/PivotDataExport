@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace osexpert.PivotTable
 {
@@ -15,16 +10,19 @@ namespace osexpert.PivotTable
 	/// </summary>
 	public class Field
 	{
+		// TODO: need both?
 		public IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
-
 		public IComparer<object?> SortComparer = Comparer<object?>.Default;
+
+		public Func<object?, object?> GetDisplayValue => (o) => o;
+		
 
 		// FIXME: kind of pointless...could simply used passed order
 		//public int Index { get; set; }  // 0, 1, 2
 
-		public Type DataType;
+		public Type DataType = null!;
 
-		public string FieldName { get; set; }
+		public string FieldName { get; set; } = null!;
 
 		public FieldType FieldType { get; set; } // Group, Data, etc.?
 
@@ -83,6 +81,7 @@ namespace osexpert.PivotTable
 			return props.Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
 		}
 
+
 	}
 
 
@@ -112,3 +111,4 @@ namespace osexpert.PivotTable
 	}
 
 }
+

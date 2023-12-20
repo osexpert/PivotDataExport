@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace osexpert.PivotTable
 {
 	public class Table<TRow>
 	{
 		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-		public List<TableColumn> RowGroups { get; set; }
+		public List<TableColumn> RowGroups { get; set; } = null!;
 
 		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-		public List<TableColumn> ColumnGroups { get; set; }
+		public List<TableColumn> ColumnGroups { get; set; } = null!;
 
 		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-		public List<TableColumn> Columns { get; set; }
+		public List<TableColumn> Columns { get; set; } = null!;
 
-		public List<TRow> Rows { get; set; }
-//		public TRow? GrandTotalRow { get; set; }
+		public List<TRow> Rows { get; set; } = null!;
+		//		public TRow? GrandTotalRow { get; set; }
 
 		//public void ChangeTypeToName(bool fullName = false)
 		//{
@@ -37,12 +34,15 @@ namespace osexpert.PivotTable
 
 	}
 
+
+
+
 	public class TableColumn
 	{
-		public string Name { get; set; }
+		public string Name { get; set; } = null!;
 
 		[JsonIgnore]
-		public Type DataType { get; set; }
+		public Type DataType { get; set; } = null!;
 
 		public string TypeName => DataType.Name;
 

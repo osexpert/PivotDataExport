@@ -248,7 +248,7 @@ namespace osexpert.PivotTable
 
 			foreach (var lastRowThenColGroup in lastRowThenColGroups)
 			{
-				Group<TRow> lastColGroup = null;
+				Group<TRow> lastColGroup = null!;
 				if (!colFieldsInGroupOrder.Any())
 				{
 					// no col grouping, use root
@@ -301,7 +301,7 @@ namespace osexpert.PivotTable
 			// because of the was we group, groups without rows are not intersected. So fill these groups with default data here.
 			if (createEmptyIntersects)
 			{
-				object?[] defaultValues = null;
+				object?[] defaultValues = null!;
 				foreach (var lastRowGroup in allRowGroups.Last())
 				{
 					foreach (var lastColGroup in allColGroups.Last())
@@ -439,15 +439,15 @@ namespace osexpert.PivotTable
 
 	public class GroupedData<TRow> where TRow : class
 	{
-		public Field[] rowFieldsInGroupOrder;
-		public Field[] colFieldsInGroupOrder;
+		public Field[] rowFieldsInGroupOrder = null!;
+		public Field[] colFieldsInGroupOrder = null!;
 
-		public Field[] dataFields;
+		public Field[] dataFields = null!;
 
-		public List<List<Group<TRow>>> allRowGroups;
-		public List<List<Group<TRow>>> allColGroups;
+		public List<List<Group<TRow>>> allRowGroups = null!;
+		public List<List<Group<TRow>>> allColGroups = null!;
 
-		public List<Field> fields;
-		public Dictionary<string, PropertyDescriptor> props;
+		public List<Field> fields = null!;
+		public Dictionary<string, PropertyDescriptor> props = null!;
 	}
 }

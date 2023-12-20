@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace osexpert.PivotTable
 {
 	public enum enRootType
@@ -27,9 +22,9 @@ namespace osexpert.PivotTable
 
 		//public IEnumerable<Group<T>> Groups;
 
-		public IEnumerable<T> Rows;
+		public IEnumerable<T> Rows = null!;
 
-		public Field Field;
+		public Field Field = null!;
 
 		/// <summary>
 		/// 
@@ -50,7 +45,7 @@ namespace osexpert.PivotTable
 
 		public Group<T>? ParentGroup;
 
-		public Dictionary<Group<T>, object?[]> IntersectData { get; internal set; }
+		public Dictionary<Group<T>, object?[]> IntersectData { get; internal set; } = null!;
 
 		internal object? GetKeyByField(Field colField)
 		{
@@ -90,10 +85,11 @@ namespace osexpert.PivotTable
 			do
 			{
 				st.Push(current);
-				current = current.ParentGroup;
+				current = current.ParentGroup!;
 			} while (!current.IsRoot);
 
 			return st;
 		}
 	}
 }
+

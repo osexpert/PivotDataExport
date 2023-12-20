@@ -1,9 +1,4 @@
 ﻿using CsvHelper.Configuration.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osexpert.PivotTable.CsvTest
 {
@@ -12,19 +7,19 @@ namespace osexpert.PivotTable.CsvTest
 	public class CsvRow
 	{
 		[Index(0)]
-		public string Region { get; set; }
+		public string Region { get; set; } = null!;
 		[Index(1)]
-		public string Country { get; set; }
+		public string Country { get; set; } = null!;
 		[Index(2)]
-		public string ItemType { get; set; }
+		public string ItemType { get; set; } = null!;
 		[Index(3)]
-		public string SalesChannel { get; set; }
+		public string SalesChannel { get; set; } = null!;
 		[Index(4)]
-		public string OrderPriority { get; set; }
+		public string OrderPriority { get; set; } = null!;
 		[Index(5)]
 		public DateTime OrderDate { get; set; }
 		[Index(6)]
-		public string OrderID { get; set; }
+		public string OrderID { get; set; } = null!;
 		[Index(7)]
 		public DateTime ShipDate { get; set; }
 		[Index(8)]

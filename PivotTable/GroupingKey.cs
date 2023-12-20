@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace osexpert.PivotTable
 {
 	public class GroupingKey<T> : IEquatable<GroupingKey<T>>
@@ -59,3 +54,4 @@ namespace osexpert.PivotTable
 		}
 	}
 }
+

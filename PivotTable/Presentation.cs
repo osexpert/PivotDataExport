@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace osexpert.PivotTable
 {
@@ -37,25 +30,6 @@ namespace osexpert.PivotTable
 			// But some other code could produce json nested objects...
 
 			List<object?[]> rowsss = CreateFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroups, lastColGroupsSorted);
-
-			//}
-			// else...a mode for output 1:1?
-			//{
-			//	foreach (var l in _list)
-			//	{
-			//		var r = res.NewRow();
-
-			//		foreach (Field dataField in GetDataFields())
-			//		{
-			//			var getter = _props[dataField.FieldName];
-			//			// TODO: get value from multiple ROWS
-			//			var theValue = getter.GetValue(l.Yield());
-
-			//			r[dataField.FieldName] = theValue;
-			//		}
-			//	}
-			//}
-
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 
@@ -259,10 +233,10 @@ namespace osexpert.PivotTable
 
 				foreach (Group<TRow> parentG in rg.GetParentsAndMe())//includeMeIfRoot: false))
 				{
-					r.Add(parentG.Field.FieldName, parentG.Key);
+					r.Add(parentG.Field.FieldName, parentG.Field.GetDisplayValue(parentG.Key));
 				}
 
-				Dictionary<Group<TRow>, KeyValueList<TRow>> groupToKeyVals = null;
+				Dictionary<Group<TRow>, KeyValueList<TRow>> groupToKeyVals = null!;
 				Dictionary<Group<TRow>, List<KeyValueList<TRow>>> groupToLists = new();
 
 				// Add the data
@@ -275,7 +249,7 @@ namespace osexpert.PivotTable
 						// dataField order
 						foreach (var z in _data.dataFields.Zip(data))
 						{
-							keyVals.Add(z.First.FieldName, z.Second);
+							keyVals.Add(z.First.FieldName, z.First.GetDisplayValue(z.Second));
 						}
 					}
 				}
@@ -291,7 +265,7 @@ namespace osexpert.PivotTable
 				return r;
 			}
 
-			KeyValueList<TRow> keyVals = null;
+			KeyValueList<TRow> keyVals = null!;
 
 			foreach (var colGrp in cg.GetParentsAndMe())//includeMeIfRoot: true))
 			{
@@ -299,24 +273,24 @@ namespace osexpert.PivotTable
 				if (groupToKeyVals == null)
 				{
 					groupToKeyVals = new();
-					groupToKeyVals.Add(colGrp.ParentGroup, r);
-					if (!colGrp.ParentGroup.IsRoot)
+					groupToKeyVals.Add(colGrp.ParentGroup!, r);
+					if (!colGrp.ParentGroup!.IsRoot)
 						throw new Exception("not root");
 				}
 
-				if (!groupToLists.TryGetValue(colGrp.ParentGroup, out var list))
+				if (!groupToLists.TryGetValue(colGrp.ParentGroup!, out var list))
 				{
 					list = new();
-					groupToLists.Add(colGrp.ParentGroup, list);
+					groupToLists.Add(colGrp.ParentGroup!, list);
 
-					var parKeyVals = groupToKeyVals[colGrp.ParentGroup];
+					var parKeyVals = groupToKeyVals[colGrp.ParentGroup!];
 					parKeyVals.Add(colGrp.Field.FieldName + "List", list);
 				}
 
-				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals))
+				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals!))
 				{
 					keyVals = new KeyValueList<TRow>();
-					keyVals.Add(colGrp.Field.FieldName, colGrp.Key);
+					keyVals.Add(colGrp.Field.FieldName, colGrp.Field.GetDisplayValue(colGrp.Key));
 
 					list.Add(keyVals);
 
@@ -328,14 +302,49 @@ namespace osexpert.PivotTable
 			return keyVals;
 		}
 
-		class TableGroup
+		public class TableGroup
 		{
-			public string Name { get; set; }
+			public string Name { get; set; } = null!;
 			//public object DataType { get; set; }
 
 			public object? Value { get; set; }
 
 			//public TableGroup Parent { get; set; }
+		}
+
+
+		public Func<Stack<TableGroup>, string, string> ColumnNameGenerator = SlashedColumnNameGeneratorWithFieldNames;
+
+		public static string SlashedColumnNameGeneratorWithFieldNames(Stack<TableGroup> tgs, string dataField)
+		{
+			// /Country:USA/Region:Florida/CarCount
+			var middle = string.Join('/', tgs.Select(tg => $"{Escaper.Escape(tg.Name)}:{Escaper.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
+			var combName = $"/{middle}/{Escaper.Escape(dataField)}";
+			return combName;
+		}
+
+		public static string SlashedColumnNameGenerator(Stack<TableGroup> tgs, string dataField)
+		{
+			// TODO: escape?
+			// /USA/Florida/CarCount
+			var middle = string.Join('/', tgs.Select(tg => tg.Value));
+			var combName = $"/{middle}.{dataField}";
+			return combName;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tgs"></param>
+		/// <param name="dataField"></param>
+		/// <returns></returns>
+		public static string DottedColumnNameGenerator(Stack<TableGroup> tgs, string dataField)
+		{
+			// TODO: escape?
+			// USA.Florida.CarCount
+			var middle = string.Join('.', tgs.Select(tg => tg.Value));
+			var combName = $"{middle}.{dataField}";
+			return combName;
 		}
 
 		private List<TableColumn> CreateTableCols(Field[] dataFields, Field[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
@@ -373,11 +382,9 @@ namespace osexpert.PivotTable
 
 					foreach (var dataField in dataFields)
 					{
-						// /fdfd:34/gfgfg:fdfd/gfgfgfggf
-						var middle = string.Join('/', tgs.Select(tg => $"{DataPath.Escape(tg.Name)}:{DataPath.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
-						var combNAme = $"/{middle}/{DataPath.Escape(dataField.FieldName)}";
+						var combName = ColumnNameGenerator(tgs, dataField.FieldName);
 
-						tablecols_after.Add(dataField.ToTableColumn(combNAme, tgs.Select(tg => tg.Value).ToArray()));
+						tablecols_after.Add(dataField.ToTableColumn(combName, tgs.Select(tg => tg.Value).ToArray()));
 					}
 				}
 			}

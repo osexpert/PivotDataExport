@@ -389,3 +389,105 @@ namespace PivotExpert
 
 }
 #endif
+
+
+//}
+// else...a mode for output 1:1?
+//{
+//	foreach (var l in _list)
+//	{
+//		var r = res.NewRow();
+
+//		foreach (Field dataField in GetDataFields())
+//		{
+//			var getter = _props[dataField.FieldName];
+//			// TODO: get value from multiple ROWS
+//			var theValue = getter.GetValue(l.Yield());
+
+//			r[dataField.FieldName] = theValue;
+//		}
+//	}
+//}
+
+//public class PathElement
+//{
+//	public string Name;
+//	public object Value;
+//}
+
+//public static PathElement[] SplitPathName(string str)
+//{
+//	if (!str.StartsWith('/'))
+//		throw new ArgumentException("Must start with '/'");
+
+//	var parts = str.Split('/');
+//	// make sure first part is empty
+
+//	PathElement[] res = new PathElement[parts.Length - 1];
+
+
+
+//}
+
+#if false
+		public class DissectedPropertyName
+		{
+			public KeyValuePair<string, string?>[]? KeyValues;
+			public string? FinalKey;
+		}
+
+		public static bool IsKeyValuePropertyName(string propName)
+		{
+			return propName.StartsWith('/');
+		}
+
+		/// <summary>
+		/// return false if the property name is not a keyValue property name (does not start with "/")
+		/// </summary>
+		/// <param name="propName"></param>
+		/// <returns></returns>
+		/// <exception cref="Exception"></exception>
+		public static DissectedPropertyName DissectKeyValuePropertyName(string propName)
+		{
+			//list = null!;
+
+			if (propName.StartsWith('/'))
+			{
+				var parts = propName.Split('/');
+
+				// make sure first part is empty
+
+				//KeyValuePair<string, object?>[] res = new KeyValuePair<string, object?>[parts.Length - 1];
+
+				//DissectedName res = new();
+
+				List<KeyValuePair<string, string?>> ilist = new();
+				string? finaleKey = null;
+
+				for (int i = 0; i < parts.Length; i++)
+				{
+					var keyVal = parts[i].Split(':');
+					if (keyVal.Length == 0)
+						throw new Exception();
+					else if (keyVal.Length == 1) // only ok for the last ele
+					{
+						if (i < parts.Length)
+							throw new Exception("Key alone only valid for last element");
+						finaleKey = Unescape(keyVal[0]);
+					}
+					else if (keyVal.Length == 2)
+					{
+						ilist.Add(new KeyValuePair<string, string?>(Unescape(keyVal[0]), keyVal[1] == "?" ? null : Unescape(keyVal[1])));
+					}
+					else
+						throw new Exception("more than 2 parts");
+				}
+
+				return new DissectedPropertyName { FinalKey = finaleKey, KeyValues = ilist.Any() ? ilist.ToArray() : null };
+				//return true;
+			}
+
+			//return false;
+			throw new FormatException("Not a keyValue property name (does not start with '/')");
+		}
+#endif

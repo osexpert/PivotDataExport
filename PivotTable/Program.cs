@@ -1,36 +1,14 @@
-﻿#define WRITE_OA
-
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Dynamic;
 using System.Globalization;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using CsvHelper;
-using CsvHelper.Configuration.Attributes;
-using NotVisualBasic;
-using NotVisualBasic.FileIO;
 using osexpert.PivotTable.CsvTest;
-//using static PivotExpert.Pivoter;
 using NReco.PivotData;
 
 namespace osexpert.PivotTable
 {
-
-
-
-
-
-
 	public class Program
 	{
 		public static void Main()
@@ -41,28 +19,8 @@ namespace osexpert.PivotTable
 			t.Test();
 		}
 
-
-		//public static void Main()
-		//{
-		//	Version v = null;
-
-		//	string fff = "" + v;
-
-		//	var t = new Pivoter();
-		//	t.Test();
-		//}
-
 		public void Test()
 		{
-
-
-			//			select CAST((CAST(cast('27AAF6A9-6531-4B6E-8E9F-B17C74CFE419' as uniqueidentifier) as varbinary(12)) +CAST(42 AS varbinary(4))) AS uniqueidentifier ) AS[ActionID]
-			//27AAF6A9 - 6531 - 4B6E - 8E9F - B17C0000002A
-
-			var g = new Guid("27AAF6A9-6531-4B6E-8E9F-B17C74CFE419");
-			var b = g.ToByteArray().Take(12).Concat(BitConverter.GetBytes(42)).ToArray();
-			var gg = new Guid(b);
-
 
 			//using (var f = File.Open(@"d:\testwrite.json", FileMode.Create))
 			//{
@@ -79,7 +37,7 @@ namespace osexpert.PivotTable
 
 			
 
-			List<CsvRow> allRTows = null;
+			List<CsvRow> allRTows = null!;
 
 			using (var reader = new StreamReader(@"d:\5m Sales Records.csv"))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
@@ -272,7 +230,7 @@ namespace osexpert.PivotTable
 			var fieldNames = new string[] { "Region", "Country", "SalesChannel", "ItemType" };
 			var pd = new PivotData(fieldNames, new CountAggregatorFactory());
 
-			object Lol(object s, string o)
+			object? Lol(object s, string o)
 			{
 
 
