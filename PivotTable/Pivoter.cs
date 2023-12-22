@@ -211,6 +211,11 @@ namespace osexpert.PivotTable
 				}
 			}
 
+			// free mem
+			foreach (var lastColGroup in lastColGroups)
+			{
+				lastColGroup.Rows = null!;
+			}
 
 			return new GroupedData<TRow>()
 			{
@@ -283,6 +288,9 @@ namespace osexpert.PivotTable
 
 					dataFieldIdx++;
 				}
+
+				// free mem
+				lastRowThenColGroup.Rows = null!;
 			}
 
 			//var syntLastColGroups = htSynthMergedLastColGroups.Values.ToList(); // TOLIST needed?

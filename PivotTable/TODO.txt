@@ -1,1 +1,5 @@
-﻿
+﻿total row?
+
+subtotal groups?
+
+merge props and fields?

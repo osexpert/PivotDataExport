@@ -313,9 +313,9 @@ namespace osexpert.PivotTable
 		}
 
 
-		public Func<Stack<TableGroup>, string, string> ColumnNameGenerator = SlashedColumnNameGeneratorWithFieldNames;
+		public Func<IEnumerable<TableGroup>, string, string> ColumnNameGenerator = SlashedColumnNameGeneratorWithFieldNames;
 
-		public static string SlashedColumnNameGeneratorWithFieldNames(Stack<TableGroup> tgs, string dataField)
+		public static string SlashedColumnNameGeneratorWithFieldNames(IEnumerable<TableGroup> tgs, string dataField)
 		{
 			// /Country:USA/Region:Florida/CarCount
 			var middle = string.Join('/', tgs.Select(tg => $"{Escaper.Escape(tg.Name)}:{Escaper.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
@@ -323,7 +323,7 @@ namespace osexpert.PivotTable
 			return combName;
 		}
 
-		public static string SlashedColumnNameGenerator(Stack<TableGroup> tgs, string dataField)
+		public static string SlashedColumnNameGenerator(IEnumerable<TableGroup> tgs, string dataField)
 		{
 			// TODO: escape?
 			// /USA/Florida/CarCount
@@ -338,7 +338,7 @@ namespace osexpert.PivotTable
 		/// <param name="tgs"></param>
 		/// <param name="dataField"></param>
 		/// <returns></returns>
-		public static string DottedColumnNameGenerator(Stack<TableGroup> tgs, string dataField)
+		public static string DottedColumnNameGenerator(IEnumerable<TableGroup> tgs, string dataField)
 		{
 			// TODO: escape?
 			// USA.Florida.CarCount
