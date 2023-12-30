@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	public class Presentation<TRow> where TRow : class
 	{
@@ -198,7 +198,7 @@ namespace osexpert.PivotTable
 				{
 					//Dictionary<string, object?> dictRow = new();
 					var dictRow = new KeyValueList();
-					foreach (var v in row.Zip(tcols))
+					foreach (var v in row.Zip(tcols, (f, s) => new { First = f, Second = s }))
 						dictRow.Add(v.Second.Name, v.First);
 
 					// perf: to avoid creating one dict per row
@@ -261,7 +261,7 @@ namespace osexpert.PivotTable
 						KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
 
 						// dataField order
-						foreach (var z in _data.dataFields.Zip(data))
+						foreach (var z in _data.dataFields.Zip(data, (f, s) => new { First = f, Second = s }))
 						{
 							keyVals.Add(z.First.Name, z.First.GetDisplayValue(z.Second));
 						}
@@ -332,7 +332,7 @@ namespace osexpert.PivotTable
 		public static string SlashedColumnNameGeneratorWithFieldNames(IEnumerable<TableGroup> tgs, string dataField)
 		{
 			// /Country:USA/Region:Florida/CarCount
-			var middle = string.Join('/', tgs.Select(tg => $"{Escaper.Escape(tg.Name)}:{Escaper.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
+			var middle = string.Join("/", tgs.Select(tg => $"{Escaper.Escape(tg.Name)}:{Escaper.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
 			var combName = $"/{middle}/{Escaper.Escape(dataField)}";
 			return combName;
 		}
@@ -341,7 +341,7 @@ namespace osexpert.PivotTable
 		{
 			// TODO: escape?
 			// /USA/Florida/CarCount
-			var middle = string.Join('/', tgs.Select(tg => tg.Value));
+			var middle = string.Join("/", tgs.Select(tg => tg.Value));
 			var combName = $"/{middle}.{dataField}";
 			return combName;
 		}
@@ -356,7 +356,7 @@ namespace osexpert.PivotTable
 		{
 			// TODO: escape?
 			// USA.Florida.CarCount
-			var middle = string.Join('.', tgs.Select(tg => tg.Value));
+			var middle = string.Join(".", tgs.Select(tg => tg.Value));
 			var combName = $"{middle}.{dataField}";
 			return combName;
 		}

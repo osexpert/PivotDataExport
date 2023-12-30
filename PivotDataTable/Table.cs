@@ -1,13 +1,9 @@
-﻿using CsvHelper;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	[XmlRoot("Table")]
 	public class Table<TRow> : IXmlSerializable

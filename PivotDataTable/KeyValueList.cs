@@ -1,18 +1,12 @@
-﻿using CsvHelper;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	/// <summary>
 	/// Pro: write dynamically to json since IDictionary
 	/// Pro: backed by a list, so it is ordered, even if IDictionary
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
 	public class KeyValueList : IDictionary<string, object?>
 //		where T : class
 	{
@@ -32,7 +26,7 @@ namespace osexpert.PivotTable
 		public void CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex) => throw new NotImplementedException();
 		public bool Remove(string key) => throw new NotImplementedException();
 		public bool Remove(KeyValuePair<string, object?> item) => throw new NotImplementedException();
-		public bool TryGetValue(string key, [MaybeNullWhen(false)] out object? value) => throw new NotImplementedException();
+		public bool TryGetValue(string key, /*[MaybeNullWhen(false)]*/ out object? value) => throw new NotImplementedException();
 		void IDictionary<string, object?>.Add(string key, object? value) => throw new NotImplementedException();
 
 		public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() 

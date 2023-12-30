@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	public class Field
 	{

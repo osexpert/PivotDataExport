@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	public class KeyValueZipList : IDictionary<string, object?>
 	{

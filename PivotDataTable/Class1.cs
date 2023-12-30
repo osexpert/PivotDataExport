@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	public static class Ext
 	{
@@ -23,7 +23,7 @@ namespace osexpert.PivotTable
 			var rowsName = ((NewExpression)rowSelector.Body).Members.Select(s => s.Name);//.ToArray();
 			var columns = source.Select(columnSelector).Distinct();
 
-			cols = rowsName.Concat(columns.Select(x => x.ToString())).ToList();
+			cols = rowsName.Concat(columns.Select(x => x!.ToString())).ToList();
 
 
 			var rows = source.GroupBy(rowSelector.Compile())
@@ -44,11 +44,11 @@ namespace osexpert.PivotTable
 
 				//items.Insert(0, row.Key);
 
-				string[] keyRow = row.Key.ToString().Split(",");
+				string[] keyRow = row.Key!.ToString().Split(',');
 				int index = 0;
 				foreach (var key in keyRow)
 				{
-					string keyValue = key.Replace("}", "").Split("=")[1].Trim();
+					string keyValue = key.Replace("}", "").Split('=')[1].Trim();
 					items.Insert(index, keyValue);
 					index++;
 				}

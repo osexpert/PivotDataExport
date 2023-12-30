@@ -1,6 +1,6 @@
 ﻿#if false
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	public class GroupingKey<T> : IEquatable<GroupingKey<T>>
 	{

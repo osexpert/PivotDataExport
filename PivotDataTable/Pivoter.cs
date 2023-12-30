@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Data;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	/// <summary>
 	/// Group and aggregate rows

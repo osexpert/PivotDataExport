@@ -1,7 +1,7 @@
 ﻿#if false
 using System.ComponentModel;
 
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 
 	class RowList<TRow> : List<TRow>, ITypedList

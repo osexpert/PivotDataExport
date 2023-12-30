@@ -1,5 +1,5 @@
 ﻿
-namespace osexpert.PivotTable
+namespace PivotDataTable
 {
 	public enum RootType
 	{

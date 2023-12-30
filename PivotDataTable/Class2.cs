@@ -8,7 +8,7 @@
 //using System.Threading.Tasks;
 //using System.Xml.Linq;
 
-//namespace osexpert.PivotTable
+//namespace PivotDataTable
 //{
 //	public static class Class2
 //	{

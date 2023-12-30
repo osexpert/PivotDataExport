@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
-using osexpert.PivotTable.CsvTest;
+using PivotDataTable;
 
-namespace osexpert.PivotTable
+namespace Test
 {
 	public class Program
 	{
@@ -33,7 +33,7 @@ namespace osexpert.PivotTable
 			//}
 
 
-			
+
 
 			List<CsvRow> allRTows = null!;
 
@@ -109,7 +109,7 @@ namespace osexpert.PivotTable
 
 			//NRecoTest(allRTows, props, fieldsss);
 			var res = allRTows.ToPivotArray(cs => new { cs.ItemType, cs.SalesChannel }
-				, rs => new { rs.Region, rs.Country}, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
+				, rs => new { rs.Region, rs.Country }, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
 
 
 			sw3.Stop(); // 6.9sek
@@ -144,9 +144,9 @@ namespace osexpert.PivotTable
 				JsonSerializer.Serialize(f, tblll, new JsonSerializerOptions { WriteIndented = true });
 			}
 
-			
+
 			var tbl = new Presentation<CsvRow>(fast).GetTable_FlatDict();
-			
+
 			using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
 			{
 				JsonSerializer.Serialize(f, tbl, new JsonSerializerOptions { WriteIndented = true });
@@ -157,7 +157,7 @@ namespace osexpert.PivotTable
 			datat.WriteXml(@"d:\testdt5mill2_fast.xml");
 
 			var dt = new Presentation<CsvRow>(fast).GetTable_Array();
-//			dt.ChangeTypeToName();
+			//			dt.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();
 
@@ -166,13 +166,13 @@ namespace osexpert.PivotTable
 			//dt.WriteXml(@"d:\testdt5mill.xml");
 			using (var f = File.Open(@"d:\testdt5mill2_slow.json", FileMode.Create))
 			{
-				JsonSerializer.Serialize(f, dt, new JsonSerializerOptions { WriteIndented=true});
+				JsonSerializer.Serialize(f, dt, new JsonSerializerOptions { WriteIndented = true });
 			}
 
 			dt = null;
 
 			var dtF = new Presentation<CsvRow>(fast).GetTable_Array();
-	//		dtF.ChangeTypeToName();
+			//		dtF.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();
 
@@ -199,7 +199,7 @@ namespace osexpert.PivotTable
 			//	new SpeciesNameCol().Col,
 			//	new IndCountCol().Col
 			//});
-			
+
 			//var list = new Rows<Row>(pdc);
 
 			// TODO: optin: RowNumber auto column? 1 to n?
@@ -216,21 +216,21 @@ namespace osexpert.PivotTable
 			//list.Add(new Row() { IndCount = 444, SiteName = "S3", UnitName = "U11", SpecName = "Human" });
 
 
-//			var siteF = new Field<string>() { FieldArea = Area.Value, FieldName = "SiteName", SortOrder = SortOrder.Asc };
+			//			var siteF = new Field<string>() { FieldArea = Area.Value, FieldName = "SiteName", SortOrder = SortOrder.Asc };
 
-			
 
-////			var unitF = new FieldGen<string>() { Area = Area.Group, FieldName = "UnitName"  };
-//			var specF = new Field<string>() { FieldArea = Area.Value, FieldName = "SpeciesName", SortOrder = SortOrder.Desc };
-//			var indF = new Field<int>() { FieldArea = Area.Value, FieldName = "IndCount" };
-//			var ff = new Field[] { specF,   indF, siteF };
+
+			////			var unitF = new FieldGen<string>() { Area = Area.Group, FieldName = "UnitName"  };
+			//			var specF = new Field<string>() { FieldArea = Area.Value, FieldName = "SpeciesName", SortOrder = SortOrder.Desc };
+			//			var indF = new Field<int>() { FieldArea = Area.Value, FieldName = "IndCount" };
+			//			var ff = new Field[] { specF,   indF, siteF };
 
 			//var p = new Pivoter<Row>(ff, list, new PropertyDescriptorCollection(props.ToArray()));
 			//p.GetTable();
 			// TODO: dt can be slow? add option to use different construct? and then need different SortOrder?
 		}
 
-	
+
 
 		private Field GetField(IEnumerable<Field> fieldsss, string v)
 		{
