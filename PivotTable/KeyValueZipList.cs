@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#if false
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace osexpert.PivotTable
@@ -44,3 +45,4 @@ namespace osexpert.PivotTable
 
 }
 
+#endif

@@ -197,11 +197,12 @@ namespace osexpert.PivotTable
 				foreach (var row in rows)
 				{
 					//Dictionary<string, object?> dictRow = new();
-					//foreach (var v in row.Zip(tcols))
-					//	dictRow.Add(v.Second.Name, v.First);
+					var dictRow = new KeyValueList();
+					foreach (var v in row.Zip(tcols))
+						dictRow.Add(v.Second.Name, v.First);
 
 					// perf: to avoid creating one dict per row
-					var dictRow = new KeyValueZipList(row, tcols);
+					//var dictRow = new KeyValueZipList(row, tcols);
 
 					dictRows.Add(dictRow);
 				}
@@ -234,14 +235,14 @@ namespace osexpert.PivotTable
 		}
 
 
-		public Table<KeyValueList<TRow>> GetTable_NestedDict()
+		public Table<KeyValueList> GetTable_NestedDict()
 		{
 
-			List<KeyValueList<TRow>> rows = new List<KeyValueList<TRow>>();
+			List<KeyValueList> rows = new List<KeyValueList>();
 
 			foreach (var rg in SortGroups(_data.allRowGroups.Last(), _data.rowFieldsInGroupOrder))
 			{
-				KeyValueList<TRow> r = new();
+				KeyValueList r = new();
 				rows.Add(r);
 
 				foreach (Group<TRow> parentG in rg.GetParentsAndMe())//includeMeIfRoot: false))
@@ -249,15 +250,15 @@ namespace osexpert.PivotTable
 					r.Add(parentG.Field.Name, parentG.Field.GetDisplayValue(parentG.Key));
 				}
 
-				Dictionary<Group<TRow>, KeyValueList<TRow>> groupToKeyVals = null!;
-				Dictionary<Group<TRow>, List<KeyValueList<TRow>>> groupToLists = new();
+				Dictionary<Group<TRow>, KeyValueList> groupToKeyVals = null!;
+				Dictionary<Group<TRow>, List<KeyValueList>> groupToLists = new();
 
 				// Add the data
 				foreach (var cg in SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
 				{
 					if (rg.IntersectData.TryGetValue(cg, out var data))
 					{
-						KeyValueList<TRow> keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
+						KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
 
 						// dataField order
 						foreach (var z in _data.dataFields.Zip(data))
@@ -268,17 +269,17 @@ namespace osexpert.PivotTable
 				}
 			}
 
-			return new Table<KeyValueList<TRow>>() { Rows = rows.ToList() };
+			return new Table<KeyValueList>() { Rows = rows.ToList() };
 		}
 
-		private KeyValueList<TRow> GetCreateKeyVals(Group<TRow> cg, KeyValueList<TRow> r, ref Dictionary<Group<TRow>, KeyValueList<TRow>> groupToKeyVals, Dictionary<Group<TRow>, List<KeyValueList<TRow>>> groupToLists)
+		private KeyValueList GetCreateKeyVals(Group<TRow> cg, KeyValueList r, ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, Dictionary<Group<TRow>, List<KeyValueList>> groupToLists)
 		{
 			if (cg.IsRoot)
 			{
 				return r;
 			}
 
-			KeyValueList<TRow> keyVals = null!;
+			KeyValueList keyVals = null!;
 
 			foreach (var colGrp in cg.GetParentsAndMe())//includeMeIfRoot: true))
 			{
@@ -302,7 +303,7 @@ namespace osexpert.PivotTable
 
 				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals!))
 				{
-					keyVals = new KeyValueList<TRow>();
+					keyVals = new KeyValueList();
 					keyVals.Add(colGrp.Field.Name, colGrp.Field.GetDisplayValue(colGrp.Key));
 
 					list.Add(keyVals);

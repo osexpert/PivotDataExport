@@ -13,10 +13,10 @@ namespace osexpert.PivotTable
 	/// Pro: backed by a list, so it is ordered, even if IDictionary
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class KeyValueList<T> : IDictionary<string, object?>
-		where T : class
+	public class KeyValueList : IDictionary<string, object?>
+//		where T : class
 	{
-		public Group<T> Group = null!;
+	//	public Group<T> Group = null!;
 
 		List<KeyValuePair<string, object?>> _list = new();
 
@@ -40,7 +40,7 @@ namespace osexpert.PivotTable
 			return _list.GetEnumerator();
 		}
 
-		internal void Add(string fieldName, object? key)
+		public void Add(string fieldName, object? key)
 		{
 			var kv = new KeyValuePair<string, object?>(fieldName, key);
 			_list.Add(kv);
@@ -55,10 +55,10 @@ namespace osexpert.PivotTable
 
 		//}
 
-		internal KeyValuePair<string, object?>? Last()
-		{
-			return _list.Last();
-		}
+		//internal KeyValuePair<string, object?>? Last()
+		//{
+		//	return _list.Last();
+		//}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		
