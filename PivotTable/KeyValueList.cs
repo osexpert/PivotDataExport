@@ -1,5 +1,10 @@
-﻿using System.Collections;
+﻿using CsvHelper;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace osexpert.PivotTable
 {
@@ -55,28 +60,8 @@ namespace osexpert.PivotTable
 			return _list.Last();
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		
 	}
 
 }

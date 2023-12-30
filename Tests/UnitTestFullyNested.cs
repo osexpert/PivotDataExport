@@ -248,25 +248,25 @@ namespace Tests
 		{
 			var pivoter = GetPivoterTestData();
 
-			var fields = pivoter.Fields.ToDictionary(k => k.FieldName);
+			var fields = pivoter.Fields.ToDictionary(k => k.Name);
 
-			fields[nameof(Test1Row.Site)].FieldType = FieldType.RowGroup;
+			fields[nameof(Test1Row.Site)].Area = Area.Row;
 			fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
 			fields[nameof(Test1Row.Site)].GroupIndex = 0;
 
-			fields[nameof(Test1Row.Unit)].FieldType = FieldType.RowGroup;
+			fields[nameof(Test1Row.Unit)].Area = Area.Row;
 			fields[nameof(Test1Row.Unit)].SortOrder = SortOrder.Desc;
 			fields[nameof(Test1Row.Unit)].GroupIndex = 1;
 
-			fields[nameof(Test1Row.Country)].FieldType = FieldType.ColGroup;
+			fields[nameof(Test1Row.Country)].Area = Area.Column;
 			fields[nameof(Test1Row.Country)].GroupIndex = 0;
 			fields[nameof(Test1Row.Country)].SortOrder = SortOrder.Asc;
 
-			fields[nameof(Test1Row.Company)].FieldType = FieldType.ColGroup;
+			fields[nameof(Test1Row.Company)].Area = Area.Column;
 			fields[nameof(Test1Row.Company)].GroupIndex = 1;
 			fields[nameof(Test1Row.Company)].SortOrder = SortOrder.Desc;
 
-			fields[nameof(Test1Row.Group)].FieldType = FieldType.ColGroup;
+			fields[nameof(Test1Row.Group)].Area = Area.Column;
 			fields[nameof(Test1Row.Group)].GroupIndex = 2;
 
 
@@ -330,19 +330,19 @@ namespace Tests
 			foreach (var r in rows)
 				r.RowId = i++;
 
-			var p1 = new Property<Test1Row, string>(nameof(Test1Row.Site), rows => Aggregators.CommaList(rows, r => r.Site));
-			var p2 = new Property<Test1Row, string>(nameof(Test1Row.Unit), rows => Aggregators.CommaList(rows, r => r.Unit));
-			var p3 = new Property<Test1Row, string>(nameof(Test1Row.Group), rows => Aggregators.CommaList(rows, r => r.Group));
-			var p4 = new Property<Test1Row, string>(nameof(Test1Row.Name), rows => Aggregators.CommaList(rows, r => r.Name));
-			var p5 = new Property<Test1Row, string>(nameof(Test1Row.Country), rows => Aggregators.CommaList(rows, r => r.Country));
-			var p6 = new Property<Test1Row, string>(nameof(Test1Row.Company), rows => Aggregators.CommaList(rows, r => r.Company));
-			var p7 = new Property<Test1Row, int>(nameof(Test1Row.Number), rows => rows.Sum(r => r.Number));
-			var p8 = new Property<Test1Row, double>(nameof(Test1Row.Weight), rows => Aggregators.AverageOr(rows, r => r.Weight, _ => 0d));
-			var p9 = new Property<Test1Row, int>("RowCount", rows => rows.Count());
-			var p10 = new Property<Test1Row, string>(nameof(Test1Row.RowId), rows => Aggregators.CommaList(rows, r => r.RowId.ToString()));
-			var props = new PropertyDescriptor[] { p1, p2, p3, p4, p5, p6, p7, p8, p10 };
+			var p1 = new Field<Test1Row, string>(nameof(Test1Row.Site), rows => Aggregators.CommaList(rows, r => r.Site));
+			var p2 = new Field<Test1Row, string>(nameof(Test1Row.Unit), rows => Aggregators.CommaList(rows, r => r.Unit));
+			var p3 = new Field<Test1Row, string>(nameof(Test1Row.Group), rows => Aggregators.CommaList(rows, r => r.Group));
+			var p4 = new Field<Test1Row, string>(nameof(Test1Row.Name), rows => Aggregators.CommaList(rows, r => r.Name));
+			var p5 = new Field<Test1Row, string>(nameof(Test1Row.Country), rows => Aggregators.CommaList(rows, r => r.Country));
+			var p6 = new Field<Test1Row, string>(nameof(Test1Row.Company), rows => Aggregators.CommaList(rows, r => r.Company));
+			var p7 = new Field<Test1Row, int>(nameof(Test1Row.Number), rows => rows.Sum(r => r.Number));
+			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), rows => Aggregators.AverageOr(rows, r => r.Weight, _ => 0d));
+			var p9 = new Field<Test1Row, int>("RowCount", rows => rows.Count());
+			var p10 = new Field<Test1Row, string>(nameof(Test1Row.RowId), rows => Aggregators.CommaList(rows, r => r.RowId.ToString()));
+			var fields = new Field[] { p1, p2, p3, p4, p5, p6, p7, p8, p10 };
 
-			var p = new Pivoter<Test1Row>(rows, props);
+			var p = new Pivoter<Test1Row>(rows, fields);
 			return p;
 		}
 

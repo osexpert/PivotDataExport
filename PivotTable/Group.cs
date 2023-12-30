@@ -1,51 +1,51 @@
 ﻿
 namespace osexpert.PivotTable
 {
-	public enum enRootType
+	public enum RootType
 	{
 		NotRoot = 0,
 		Row = 1,
 		Col = 2,
 	}
 
-	public class Group<T> where T : class
+	public class Group<TRow> where TRow : class
 	{
 		/// <summary>
 		/// If true, not a group but all the rows
 		/// </summary>
-		public enRootType RootType;
+		public RootType RootType;
 
-		public bool IsRoot => RootType != enRootType.NotRoot;
+		public bool IsRoot => RootType != RootType.NotRoot;
 
 		// I assume this is not set if the group doesn't have IntersectData?
 		public object? Key; // data or display? this is raw value. the field funcs decide the groupings via funcs.
 
 		//public IEnumerable<Group<T>> Groups;
 
-		public IEnumerable<T> Rows = null!;
+		public IEnumerable<TRow> Rows = null!;
 
 		public Field Field = null!;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public FieldType FieldType
+		public Area FieldType
 		{
 			get
 			{
 				if (Field != null)
-					return Field.FieldType;
-				if (RootType == enRootType.Col)
-					return FieldType.ColGroup;
-				if (RootType == enRootType.Row)
-					return FieldType.RowGroup;
+					return Field.Area;
+				if (RootType == RootType.Col)
+					return Area.Column;
+				if (RootType == RootType.Row)
+					return Area.Row;
 				throw new Exception("Invalid: neither Field not IsRoot is set correctly");
 			}
 		}
 
-		public Group<T>? ParentGroup;
+		public Group<TRow>? ParentGroup;
 
-		public Dictionary<Group<T>, object?[]> IntersectData { get; internal set; } = null!;
+		public Dictionary<Group<TRow>, object?[]> IntersectData { get; internal set; } = null!;
 
 		internal object? GetKeyByField(Field colField)
 		{
@@ -58,7 +58,7 @@ namespace osexpert.PivotTable
 
 			} while (current != null);
 
-			throw new Exception("Bug");
+			throw new Exception($"Bug: field '{colField.Name}' not found");
 		}
 
 		//internal IEnumerable<Group<T>> GetParents()
@@ -69,17 +69,17 @@ namespace osexpert.PivotTable
 		/// <summary>
 		/// Get top parent first and me last
 		/// </summary>
-		internal IEnumerable<Group<T>> GetParentsAndMe()//bool includeMeIfRoot)
+		internal IEnumerable<Group<TRow>> GetParentsAndMe()//bool includeMeIfRoot)
 		{
 			if (this.IsRoot)
 			{
 				//if (includeMeIfRoot)
 				//	return this.Yield();
 				//else
-				return Enumerable.Empty<Group<T>>();
+				return Enumerable.Empty<Group<TRow>>();
 			}
 
-			var st = new Stack<Group<T>>();
+			var st = new Stack<Group<TRow>>();
 
 			var current = this;
 			do

@@ -3,3 +3,28 @@
 subtotal groups?
 
 merge props and fields?
+Well...its not that easy. Props are static info that never change. These can be registered at start and reused by concurrent threads.
+Field otoh, are new'ed for every request and customizable (sorting and groping and area), allthou the static parts of field (comparer, GetDisplayValue, datatype) could maybe be in the props...
+So it would be more like DataField and DisplayField...
+
+Make Field a type that can be sent via api.
+
+POST /api/report
+array of Field
+{
+[
+FieldName
+SortOrder
+GroupIndex
+FieldType
+]
+,
+[
+FieldName
+SortOrder
+GroupIndex
+FieldType
+]
+}
+
+result from POST is the report.

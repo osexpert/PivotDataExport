@@ -12,14 +12,20 @@ namespace osexpert.PivotTable
 			_data = data;			
 		}
 
-		public Table<TTableRow> GetTableCore<TTableRow>(Func<List<object?[]>, List<TableColumn>, List<TTableRow>> toRows)
+		public Table<TTableRow> GetTableCore<TTableRow>(Func<List<object?[]>, List<TableColumn>, List<TTableRow>> toRows) where TTableRow : class
 		{
 			var lastRowGroups = _data.allRowGroups.Last();// OrDefault() ?? [];
 			var lastColGroups = _data.allColGroups.Last();// OrDefault() ?? [];
 
-			var colFieldsInSortOrder = _data.fields.Where(f => f.FieldType == FieldType.ColGroup)
+			var colFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Column)
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
+
+			var rowFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Row)
+				.Where(f => f.SortOrder != SortOrder.None)
+				.OrderBy(f => f.GroupIndex).ToArray();
+
+			var lastRowGroupsSorted = SortGroups(lastRowGroups, rowFieldsInSortOrder).ToList();
 
 			var lastColGroupsSorted = SortGroups(lastColGroups, colFieldsInSortOrder).ToList();
 
@@ -29,11 +35,11 @@ namespace osexpert.PivotTable
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rowsss = CreateFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroups, lastColGroupsSorted);
+			List<object?[]> rowsss = CreateFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted);
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 
-			rowsss = SortRows(rowsss, tableCols);
+			//rowsss = SortRows(rowsss, tableCols);
 
 			Table<TTableRow> t = new Table<TTableRow>();
 			t.Rows = toRows(rowsss, tableCols);
@@ -49,7 +55,7 @@ namespace osexpert.PivotTable
 		/// <summary>
 		/// Create rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> CreateFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups, List<Group<TRow>> lastColGroups /* sorted */)
+		private List<object?[]> CreateFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */)
 		{
 			List<object?[]> rows = new();
 
@@ -101,9 +107,16 @@ namespace osexpert.PivotTable
 				{
 					var startIdx = grpStartIdx[lastColGroup];
 
-					var values = lastRowGroup.IntersectData[lastColGroup];
-					// write values
-					Array.Copy(values, 0, row, startIdx, values.Length);
+					if (lastRowGroup.IntersectData.TryGetValue(lastColGroup, out var values))
+					{
+						//var values = lastRowGroup.IntersectData[lastColGroup];
+						// write values
+						Array.Copy(values, 0, row, startIdx, values.Length);
+					}
+					else
+					{
+						// Use createEmptyIntersects = true if you always want data
+					}
 				}
 
 				rows.Add(row);
@@ -112,11 +125,11 @@ namespace osexpert.PivotTable
 			return rows;
 		}
 
-
+#if false
 		private List<object?[]> SortRows(List<object?[]> rows, List<TableColumn> tableCols)
 		{
 			var sortFields = _data.fields
-				.Where(f => f.FieldType != FieldType.ColGroup) // SortOrder col groups mean SortOrder the columns themself (the labels)
+				.Where(f => f.FieldArea != Area.Column) // SortOrder col groups mean SortOrder the columns themself (the labels)
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex);
 
@@ -139,7 +152,7 @@ namespace osexpert.PivotTable
 
 			return rows;
 		}
-
+#endif
 
 		public Table<object?[]> GetTable_Array()
 		{
@@ -188,7 +201,7 @@ namespace osexpert.PivotTable
 					//	dictRow.Add(v.Second.Name, v.First);
 
 					// perf: to avoid creating one dict per row
-					var dictRow = new KeyValueZip(row, tcols);
+					var dictRow = new KeyValueZipList(row, tcols);
 
 					dictRows.Add(dictRow);
 				}
@@ -205,7 +218,7 @@ namespace osexpert.PivotTable
 
 			foreach (var f in t.Columns)
 			{
-				res.Columns.Add(f.Name, (Type)f.DataType);
+				res.Columns.Add(f.Name, f.DataType);
 			}
 
 			res.BeginLoadData();
@@ -233,7 +246,7 @@ namespace osexpert.PivotTable
 
 				foreach (Group<TRow> parentG in rg.GetParentsAndMe())//includeMeIfRoot: false))
 				{
-					r.Add(parentG.Field.FieldName, parentG.Field.GetDisplayValue(parentG.Key));
+					r.Add(parentG.Field.Name, parentG.Field.GetDisplayValue(parentG.Key));
 				}
 
 				Dictionary<Group<TRow>, KeyValueList<TRow>> groupToKeyVals = null!;
@@ -249,7 +262,7 @@ namespace osexpert.PivotTable
 						// dataField order
 						foreach (var z in _data.dataFields.Zip(data))
 						{
-							keyVals.Add(z.First.FieldName, z.First.GetDisplayValue(z.Second));
+							keyVals.Add(z.First.Name, z.First.GetDisplayValue(z.Second));
 						}
 					}
 				}
@@ -284,13 +297,13 @@ namespace osexpert.PivotTable
 					groupToLists.Add(colGrp.ParentGroup!, list);
 
 					var parKeyVals = groupToKeyVals[colGrp.ParentGroup!];
-					parKeyVals.Add(colGrp.Field.FieldName + "List", list);
+					parKeyVals.Add(colGrp.Field.Name + "List", list);
 				}
 
 				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals!))
 				{
 					keyVals = new KeyValueList<TRow>();
-					keyVals.Add(colGrp.Field.FieldName, colGrp.Field.GetDisplayValue(colGrp.Key));
+					keyVals.Add(colGrp.Field.Name, colGrp.Field.GetDisplayValue(colGrp.Key));
 
 					list.Add(keyVals);
 
@@ -372,7 +385,7 @@ namespace osexpert.PivotTable
 					{
 						tgs.Push(new TableGroup
 						{
-							Name = parent.Field.FieldName,
+							Name = parent.Field.Name,
 							//DataType = parent.Field.DataType,
 							Value = parent.Key
 						});
@@ -382,7 +395,7 @@ namespace osexpert.PivotTable
 
 					foreach (var dataField in dataFields)
 					{
-						var combName = ColumnNameGenerator(tgs, dataField.FieldName);
+						var combName = ColumnNameGenerator(tgs, dataField.Name);
 
 						tablecols_after.Add(dataField.ToTableColumn(combName, tgs.Select(tg => tg.Value).ToArray()));
 					}

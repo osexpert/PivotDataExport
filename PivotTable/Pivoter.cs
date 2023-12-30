@@ -7,27 +7,27 @@ namespace osexpert.PivotTable
 	/// Group and aggregate rows
 	/// </summary>
 	/// <typeparam name="TRow"></typeparam>
-	public class Pivoter<TRow> where TRow : class // notnull
+	public class Pivoter<TRow> where TRow : class // class notnull
 	{
 		List<Field> _fields;
 		IEnumerable<TRow> _rows;
-		Dictionary<string, PropertyDescriptor> _props;
+		//Dictionary<string, PropertyDescriptor> _props;
 
 		// TODO: change to dict? the same logic apply here, can only be one field per fieldname
 		public List<Field> Fields => _fields;
 
-		public IReadOnlyDictionary<string, PropertyDescriptor> Props => _props;
+		//public IReadOnlyDictionary<string, PropertyDescriptor> Props => _props;
 
-		public Pivoter(IEnumerable<TRow> rows, IEnumerable<PropertyDescriptor> props)
-		: this(rows, props, Field.CreateFieldsFromProperties(props))
-		{
+		//public Pivoter(IEnumerable<TRow> rows, IEnumerable<PropertyDescriptor> props)
+		//: this(rows, props, Field.CreateFieldsFromProperties(props))
+		//{
 
-		}
+		//}
 
-		public Pivoter(IEnumerable<TRow> rows, PropertyDescriptorCollection props, IEnumerable<Field> fields) 
-			: this(rows, props.Cast<PropertyDescriptor>(), fields)
-		{
-		}
+		//public Pivoter(IEnumerable<TRow> rows, PropertyDescriptorCollection props, IEnumerable<Field> fields) 
+		//	: this(rows, props.Cast<PropertyDescriptor>(), fields)
+		//{
+		//}
 
 
 		//public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields) : this(rows, fields, TypeDescriptor.GetProperties(typeof(TRow)))
@@ -40,7 +40,7 @@ namespace osexpert.PivotTable
 
 		//}
 
-		public Pivoter(IEnumerable<TRow> rows, IEnumerable<PropertyDescriptor> props, IEnumerable<Field> fields)
+		public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields)
 		{
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
@@ -48,21 +48,21 @@ namespace osexpert.PivotTable
 			//	_list = (IEnumerable<T>)list;
 			_rows = rows;
 			_fields = fields.ToList();
-			_props = props.ToDictionary(pd => pd.Name);
+			//_props = props.ToDictionary(pd => pd.Name);
 		}
 
 		private void Validate()
 		{
-			if (_fields.Any(f => f.FieldType == FieldType.ColGroup) && _fields.Any(f => f.FieldType == FieldType.Data && f.SortOrder != SortOrder.None))
+			if (_fields.Any(f => f.Area == Area.Column) && _fields.Any(f => f.Area == Area.Data && f.SortOrder != SortOrder.None))
 				throw new ArgumentException("Can not sort on data fields if grouping on columns");
 
-			if (_fields.Any(f => f.FieldName.StartsWith('/')))
-				throw new ArgumentException("FieldName can not start with reserved char '/'");
+			//if (_fields.Any(f => f.FieldName.StartsWith('/')))
+			//	throw new ArgumentException("FieldName can not start with reserved char '/'");
 
-			if (_props.Values.Any(p => p.Name.StartsWith('/')))
-				throw new ArgumentException("Property.Name can not start with reserved char '/'");
+			//if (_props.Values.Any(p => p.Name.StartsWith('/')))
+				//throw new ArgumentException("Property.Name can not start with reserved char '/'");
 
-			if (_fields.GroupBy(f => f.FieldName).Any(g => g.Count() > 1))
+			if (_fields.GroupBy(f => f.Name).Any(g => g.Count() > 1))
 				throw new ArgumentException("More than one field with same fieldName");
 
 
@@ -70,7 +70,7 @@ namespace osexpert.PivotTable
 
 		}
 
-		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, enRootType rootType)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, RootType rootType)//, bool sort = false)
 		{
 			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
 			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
@@ -99,13 +99,13 @@ namespace osexpert.PivotTable
 
 			foreach (Field gf in fields)
 			{
-				var getter = _props[gf.FieldName];
+				//var getter = _props[gf.FieldName];
 
 				var allSubGroups = new List<Group<TRow>>();
 
 				foreach (var go in lastGroups)
 				{
-					var subGroups = go.Rows.GroupBy(r => getter.GetValue(r.Yield()), gf.GroupComparer).Select(g => new Group<TRow>()
+					var subGroups = go.Rows.GroupBy(r => gf.GetValue(r.Yield()), gf.GroupComparer).Select(g => new Group<TRow>()
 					{
 						Key = g.Key,
 						Rows = g,
@@ -146,7 +146,7 @@ namespace osexpert.PivotTable
 
 		private IEnumerable<Field> GetDataFields()
 		{
-			return _fields.Where(f => f.FieldType == FieldType.Data);//.OrderBy(f => f.Index);
+			return _fields.Where(f => f.Area == Area.Data);//.OrderBy(f => f.Index);
 		}
 
 		//private IEnumerable<Field> GetGroupFields()
@@ -168,16 +168,16 @@ namespace osexpert.PivotTable
 
 			var dataFields = GetDataFields().ToArray();
 
-			var rowFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.RowGroup).OrderBy(f => f.GroupIndex).ToArray();
-			var colFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.ColGroup).OrderBy(f => f.GroupIndex).ToArray();
+			var rowFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Row).OrderBy(f => f.GroupIndex).ToArray();
+			var colFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Column).OrderBy(f => f.GroupIndex).ToArray();
 
-			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, enRootType.Row);
-			List<List<Group<TRow>>> allColGroups = GroupRows(colFieldsInGroupOrder, enRootType.Col);
+			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, RootType.Row);
+			List<List<Group<TRow>>> allColGroups = GroupRows(colFieldsInGroupOrder, RootType.Col);
 
 			if (!allRowGroups.Any())
 			{
 				var list = new List<Group<TRow>>();
-				list.Add(new Group<TRow>() { RootType = enRootType.Row, Rows = _rows });
+				list.Add(new Group<TRow>() { RootType = RootType.Row, Rows = _rows });
 				allRowGroups.Add( list);
 			}
 
@@ -199,8 +199,8 @@ namespace osexpert.PivotTable
 						int dataFieldIdx = 0;
 						foreach (var dataField in dataFields)
 						{
-							var prop = _props[dataField.FieldName];
-							var theValue = prop.GetValue(intersectRows);
+							//var prop = _props[dataField.FieldName];
+							var theValue = dataField.GetValue(intersectRows);
 
 							data[dataFieldIdx] = theValue;
 							dataFieldIdx++;
@@ -225,7 +225,7 @@ namespace osexpert.PivotTable
 				allRowGroups = allRowGroups,
 				allColGroups = allColGroups,
 				fields = _fields,
-				props = _props
+				//props = _props
 			};
 		}
 
@@ -239,17 +239,17 @@ namespace osexpert.PivotTable
 
 			var dataFields = GetDataFields().ToArray();
 
-			var rowFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.RowGroup).OrderBy(f => f.GroupIndex).ToArray();
-			var colFieldsInGroupOrder = _fields.Where(f => f.FieldType == FieldType.ColGroup).OrderBy(f => f.GroupIndex).ToArray();
+			var rowFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Row).OrderBy(f => f.GroupIndex).ToArray();
+			var colFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Column).OrderBy(f => f.GroupIndex).ToArray();
 
-			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, enRootType.Row);
+			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, RootType.Row);
 			List<List<Group<TRow>>> allRowThenColGroups = GroupRows(allRowGroups.Last(), colFieldsInGroupOrder);
 
 			List<Group<TRow>> lastRowThenColGroups = allRowThenColGroups.Last();
 
 			Dictionary<(Group<TRow>?, object?), Group<TRow>>[] htSynthMergedAllColGroups = new Dictionary<(Group<TRow>?, object?), Group<TRow>>[colFieldsInGroupOrder.Length];
 
-			var rootColGroup = new Group<TRow> { Rows = _rows, RootType = enRootType.Col };
+			var rootColGroup = new Group<TRow> { Rows = _rows, RootType = RootType.Col };
 
 			foreach (var lastRowThenColGroup in lastRowThenColGroups)
 			{
@@ -270,9 +270,9 @@ namespace osexpert.PivotTable
 				int dataFieldIdx = 0;
 				foreach (var dataField in dataFields)
 				{
-					var getter = _props[dataField.FieldName];
+					//var getter =  _props[dataField.FieldName];
 
-					var theValue = getter.GetValue(lastRowThenColGroup.Rows);
+					var theValue = dataField.GetValue(lastRowThenColGroup.Rows);
 
 					lastRowG.IntersectData ??= new();
 
@@ -324,7 +324,7 @@ namespace osexpert.PivotTable
 								int i = 0;
 								foreach (var df in dataFields)
 								{
-									defVals[i++] = _props[df.FieldName].GetValue(Enumerable.Empty<TRow>());
+									defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
 								}
 								defaultValues = defVals;
 							}
@@ -343,7 +343,7 @@ namespace osexpert.PivotTable
 				allRowGroups = allRowGroups,
 				allColGroups = allColGroups,
 				fields = _fields,
-				props = _props
+				//props = _props
 			};
 		}
 
@@ -361,7 +361,7 @@ namespace osexpert.PivotTable
 				st.Push(current);
 
 				current = current.ParentGroup;
-			} while (current != null && current.FieldType == FieldType.ColGroup);
+			} while (current != null && current.FieldType == Area.Column);
 
 			//return new GroupingKey<object>(st.ToArray());
 			Group<TRow>? curr = rootColGroup;
@@ -421,7 +421,7 @@ namespace osexpert.PivotTable
 			// FIXME: handle IsRoot
 
 			var current = lastG;
-			while (current.ParentGroup != null && current.FieldType != FieldType.RowGroup)
+			while (current.ParentGroup != null && current.FieldType != Area.Row)
 			{
 				current = current.ParentGroup;
 			}

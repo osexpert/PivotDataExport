@@ -3,12 +3,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace osexpert.PivotTable
 {
-	public class KeyValueZip : IDictionary<string, object?>
+	public class KeyValueZipList : IDictionary<string, object?>
 	{
 		object?[] _row;
 		List<TableColumn> _tcols;
 
-		public KeyValueZip(object?[] row, List<TableColumn> tcols)
+		public KeyValueZipList(object?[] row, List<TableColumn> tcols)
 		{
 			_row = row;
 			_tcols = tcols;

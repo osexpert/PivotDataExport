@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="CsvTextFieldParser" />
-	  <PackageReference Include="NReco.PivotData" />
+
   </ItemGroup>
 
   

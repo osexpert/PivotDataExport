@@ -1,4 +1,5 @@
-﻿
+﻿#if false
+
 namespace osexpert.PivotTable
 {
 	public class GroupingKey<T> : IEquatable<GroupingKey<T>>
@@ -55,3 +56,4 @@ namespace osexpert.PivotTable
 	}
 }
 
+#endif

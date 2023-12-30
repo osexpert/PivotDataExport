@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
 using osexpert.PivotTable.CsvTest;
-using NReco.PivotData;
 
 namespace osexpert.PivotTable
 {
@@ -49,69 +47,78 @@ namespace osexpert.PivotTable
 
 			//var props = TypeDescriptor.GetProperties(typeof(CsvRow));
 
-			var fieldsss = Field.CreateFieldsFromType<CsvRow>();// (props);
+
+
+			var fieldsss = new List<Field>();
+
+			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region)));
+			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country)));
+			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType)));
+			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel)));
+			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
+			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
+			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderID), rows => Aggregators.SingleOrCount(rows, row => row.OrderID)));
+			//props.Add(new Property<CsvRow, int>("RowCount", rows => rows.Count()));
+			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.ShipDate), rows => rows.Max(r => r.ShipDate)));
+			fieldsss.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
+			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitPrice), rows => rows.Sum(r => r.UnitPrice)));
+			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitCost), rows => rows.Sum(r => r.UnitCost)));
+			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalRevenue), rows => rows.Sum(r => r.TotalRevenue)));
+			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
+			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
+
+
+			//var fieldsss = Field.CreateFieldsFromType<CsvRow>();// (props);
+			//var fieldsss = Field.CreateFieldsFromProperties(props);
 
 
 
 			// TODO: Should maybe had a way to set index after all? That was independent of order by ienumerable?
-	//		MoveToTop(fieldsss, "OrderDate");
-//			MoveToTop(fieldsss, "ItemType");
+			//		MoveToTop(fieldsss, "OrderDate");
+			//			MoveToTop(fieldsss, "ItemType");
 			//MoveToTop(fieldsss, "OrderID");
 			//MoveToTop(fieldsss, "ItemType");
 
-			GetField(fieldsss, "Region").FieldType = FieldType.RowGroup;
+			GetField(fieldsss, "Region").Area = Area.Row;
 			GetField(fieldsss, "Region").GroupIndex = 1;
-			GetField(fieldsss, "Region").SortOrder = SortOrder.Asc;
+			//			GetField(fieldsss, "Region").SortOrder = SortOrder.Asc;
 
-			GetField(fieldsss, "Country").FieldType = FieldType.RowGroup;
+			GetField(fieldsss, "Country").Area = Area.Row;
 			GetField(fieldsss, "Country").GroupIndex = 2;
-			GetField(fieldsss, "Country").SortOrder = SortOrder.Asc;
+			//GetField(fieldsss, "Country").SortOrder = SortOrder.Asc;
 
-			GetField(fieldsss, "SalesChannel").FieldType = FieldType.ColGroup;
-			GetField(fieldsss, "SalesChannel").SortOrder = SortOrder.Asc;
+			GetField(fieldsss, "ItemType").Area = Area.Column;
+			//GetField(fieldsss, "ItemType").SortOrder = SortOrder.Asc;
+			GetField(fieldsss, "ItemType").GroupIndex = 0;
+
+			GetField(fieldsss, "SalesChannel").Area = Area.Column;
+			//			GetField(fieldsss, "SalesChannel").SortOrder = SortOrder.Asc;
 			GetField(fieldsss, "SalesChannel").GroupIndex = 3;
 
-			GetField(fieldsss, "ItemType").FieldType = FieldType.ColGroup;
-			GetField(fieldsss, "ItemType").SortOrder = SortOrder.Asc;
-			GetField(fieldsss, "ItemType").GroupIndex = 0;
 
 			//GetField(fieldsss, "Country").Area = Area.Group;
 			//GetField(fieldsss, "Country").Sort = Sort.Asc;
 
 			//GetField(fieldsss, "ShipDate").Sort = Sort.Desc;
 
-			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", SortOrder = SortOrder.None, DataType = typeof(int) });
+			//			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", SortOrder = SortOrder.None, DataType = typeof(int) });
 
-			var props = new List<PropertyDescriptor>();
-
-			props.Add(new Property<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region)));
-			props.Add(new Property<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country)));
-			props.Add(new Property<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType)));
-			props.Add(new Property<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel)));
-			props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
-			props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
-			props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderID), rows => Aggregators.SingleOrCount(rows, row => row.OrderID)));
-			props.Add(new Property<CsvRow, int>("RowCount", rows => rows.Count()));
-			props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.ShipDate), rows => rows.Max(r => r.ShipDate)));
-			props.Add(new Property<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
-			props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitPrice), rows => rows.Sum(r => r.UnitPrice)));
-			props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitCost), rows => rows.Sum(r => r.UnitCost)));
-			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalRevenue), rows => rows.Sum(r => r.TotalRevenue)));
-			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
-			props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
 
 
 			var sw3 = Stopwatch.StartNew();
 
 			//NRecoTest(allRTows, props, fieldsss);
+			var res = allRTows.ToPivotArray(cs => new { cs.ItemType, cs.SalesChannel }
+				, rs => new { rs.Region, rs.Country}, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
 
-			sw3.Stop();
+
+			sw3.Stop(); // 6.9sek
 
 
 
 			//			TypeValue: object, name, fullname
 
-			var pp = new Pivoter<CsvRow>(allRTows, props, fieldsss);//, new PropertyDescriptorCollection(props.ToArray()));
+			var pp = new Pivoter<CsvRow>(allRTows, fieldsss);//, new PropertyDescriptorCollection(props.ToArray()));
 
 			var sw = Stopwatch.StartNew();
 
@@ -209,41 +216,25 @@ namespace osexpert.PivotTable
 			//list.Add(new Row() { IndCount = 444, SiteName = "S3", UnitName = "U11", SpecName = "Human" });
 
 
-			var siteF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SiteName", SortOrder = SortOrder.Asc };
+//			var siteF = new Field<string>() { FieldArea = Area.Value, FieldName = "SiteName", SortOrder = SortOrder.Asc };
 
 			
 
-//			var unitF = new FieldGen<string>() { Area = Area.Group, FieldName = "UnitName"  };
-			var specF = new Field<string>() { FieldType = FieldType.Data, FieldName = "SpeciesName", SortOrder = SortOrder.Desc };
-			var indF = new Field<int>() { FieldType = FieldType.Data, FieldName = "IndCount" };
-			var ff = new Field[] { specF,   indF, siteF };
+////			var unitF = new FieldGen<string>() { Area = Area.Group, FieldName = "UnitName"  };
+//			var specF = new Field<string>() { FieldArea = Area.Value, FieldName = "SpeciesName", SortOrder = SortOrder.Desc };
+//			var indF = new Field<int>() { FieldArea = Area.Value, FieldName = "IndCount" };
+//			var ff = new Field[] { specF,   indF, siteF };
 
 			//var p = new Pivoter<Row>(ff, list, new PropertyDescriptorCollection(props.ToArray()));
 			//p.GetTable();
 			// TODO: dt can be slow? add option to use different construct? and then need different SortOrder?
 		}
 
-		private void NRecoTest(List<CsvRow> allRTows, List<PropertyDescriptor> props, List<Field> fieldsss)
-		{
-			var ht = props.ToDictionary(k => k.Name);
-			//			var fieldNames = fieldsss.Select(f => f.FieldName).ToArray();
-			var fieldNames = new string[] { "Region", "Country", "SalesChannel", "ItemType" };
-			var pd = new PivotData(fieldNames, new CountAggregatorFactory());
-
-			object? Lol(object s, string o)
-			{
-
-
-
-				return ht[o].GetValue(s);
-			}
-			
-			pd.ProcessData(allRTows, Lol);
-		}
+	
 
 		private Field GetField(IEnumerable<Field> fieldsss, string v)
 		{
-			return fieldsss.Where(f => f.FieldName == v).Single();
+			return fieldsss.Where(f => f.Name == v).Single();
 		}
 
 		//private void MoveToTop(List<Field> fieldsss, string field)

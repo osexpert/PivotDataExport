@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#if false
+using System.ComponentModel;
 
 namespace osexpert.PivotTable
 {
@@ -76,8 +77,11 @@ namespace osexpert.PivotTable
 
 		public override Type ComponentType => typeof(IEnumerable<TRow>);
 		public override bool IsReadOnly => true;
+
+
 	}
 
 
 }
 
+#endif
