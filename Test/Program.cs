@@ -137,7 +137,7 @@ namespace Test
 
 
 
-			var tblll = new Presentation<CsvRow>(fast).GetTable_NestedDict();
+			var tblll = new Presentation<CsvRow>(fast).GetTable_NestedKeyValueList_VariableColumns();
 
 			using (var f = File.Open(@"d:\testdt5mill2_fast_nested_min.json", FileMode.Create))
 			{
@@ -145,7 +145,7 @@ namespace Test
 			}
 
 
-			var tbl = new Presentation<CsvRow>(fast).GetTable_FlatDict();
+			var tbl = new Presentation<CsvRow>(fast).GetTable_FlatKeyValueList_CompleteColumns();
 
 			using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
 			{

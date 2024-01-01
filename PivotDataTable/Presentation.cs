@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 
 namespace PivotDataTable
 {
@@ -12,7 +13,14 @@ namespace PivotDataTable
 			_data = data;			
 		}
 
-		public Table<TTableRow> GetTableCore<TTableRow>(Func<List<object?[]>, List<TableColumn>, List<TTableRow>> toRows) where TTableRow : class
+		/// <summary>
+		/// FIXME: List of object, Why not ienumerable?
+		/// </summary>
+		/// <typeparam name="TTableRow"></typeparam>
+		/// <param name="toRows"></param>
+		/// <returns></returns>
+		public Table<TTableRow> GetTableCore<TTableRow>(Func<List<object?[]>, List<TableColumn>, List<TTableRow>> toRows) 
+			where TTableRow : class, IEnumerable
 		{
 			var lastRowGroups = _data.allRowGroups.Last();// OrDefault() ?? [];
 			var lastColGroups = _data.allColGroups.Last();// OrDefault() ?? [];
@@ -35,31 +43,30 @@ namespace PivotDataTable
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rowsss = CreateFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted);
+			List<object?[]> rows = GetFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects);
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
-
 			//rowsss = SortRows(rowsss, tableCols);
 
-			Table<TTableRow> t = new Table<TTableRow>();
-			t.Rows = toRows(rowsss, tableCols);
-
+			Table<TTableRow> t = new Table<TTableRow>() { PartialIntersects = partialIntersects };
+			t.Rows = toRows(rows, tableCols);
 			t.Columns = tableCols;
-			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
-			t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
-
+//			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
+	//		t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
 
 			return t;
 		}
 
 		/// <summary>
-		/// Create rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
+		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> CreateFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */)
+		private List<object?[]> GetFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */, out bool partialIntersects)
 		{
+			partialIntersects = false;
+
 			List<object?[]> rows = new();
 
-			// funke dette uten colGroups?
+			// does this work without colGroups?
 			int colCount = rowFieldsInGroupOrder.Length;
 			if (lastColGroups.Any())
 				colCount += (lastColGroups.Count * dataFields.Length);
@@ -76,7 +83,6 @@ namespace PivotDataTable
 				// produce name for the colGrp
 				// produce starting index in row for colGrp
 			}
-
 			
 			foreach (var lastRowGroup in lastRowGroups)
 			{
@@ -115,7 +121,8 @@ namespace PivotDataTable
 					}
 					else
 					{
-						// Use createEmptyIntersects = true if you always want data
+						// Use createEmptyIntersects = true if you always want data (instead of lack of data)
+						partialIntersects = true;
 					}
 				}
 
@@ -186,19 +193,20 @@ namespace PivotDataTable
 
 		/// <summary>
 		/// Flat = only one level.
+		/// Every row has all columns
 		/// </summary>
 		/// <returns></returns>
-		public Table<IDictionary<string, object?>> GetTable_FlatDict()
+		public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns()
 		{
 			return GetTableCore((rows, tcols) =>
 			{
-				List<IDictionary<string, object?>> dictRows = new();
+				List<KeyValueList> dictRows = new();
 
 				foreach (var row in rows)
 				{
 					//Dictionary<string, object?> dictRow = new();
 					var dictRow = new KeyValueList();
-					foreach (var v in row.Zip(tcols, (f, s) => new { First = f, Second = s }))
+					foreach (var v in row.ZipForceEqual(tcols, (f, s) => new { First = f, Second = s }))
 						dictRow.Add(v.Second.Name, v.First);
 
 					// perf: to avoid creating one dict per row
@@ -208,6 +216,7 @@ namespace PivotDataTable
 				}
 
 				return dictRows;
+
 			});
 		}
 
@@ -234,11 +243,16 @@ namespace PivotDataTable
 			return res;
 		}
 
-
-		public Table<KeyValueList> GetTable_NestedDict()
+		/// <summary>
+		/// Variable columns\every row may  have different columns
+		/// </summary>
+		/// <returns></returns>
+		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()
 		{
-
+			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
+
+			var lastColGroupsSorted = SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder).ToList();
 
 			foreach (var rg in SortGroups(_data.allRowGroups.Last(), _data.rowFieldsInGroupOrder))
 			{
@@ -254,22 +268,28 @@ namespace PivotDataTable
 				Dictionary<Group<TRow>, List<KeyValueList>> groupToLists = new();
 
 				// Add the data
-				foreach (var cg in SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
+				foreach (var cg in lastColGroupsSorted)//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
 				{
 					if (rg.IntersectData.TryGetValue(cg, out var data))
 					{
 						KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
 
 						// dataField order
-						foreach (var z in _data.dataFields.Zip(data, (f, s) => new { First = f, Second = s }))
+						foreach (var z in _data.dataFields.ZipForceEqual(data, (f, s) => new { First = f, Second = s }))
 						{
 							keyVals.Add(z.First.Name, z.First.GetDisplayValue(z.Second));
 						}
 					}
+					else
+					{
+						partialIntersects = true;
+					}
 				}
 			}
 
-			return new Table<KeyValueList>() { Rows = rows.ToList() };
+			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
+
+			return new Table<KeyValueList>() { Rows = rows.ToList(), PartialRows = partialIntersects, PartialIntersects = partialIntersects, Columns = tableCols };
 		}
 
 		private KeyValueList GetCreateKeyVals(Group<TRow> cg, KeyValueList r, ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, Dictionary<Group<TRow>, List<KeyValueList>> groupToLists)

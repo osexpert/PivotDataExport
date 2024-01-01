@@ -276,11 +276,11 @@ namespace Tests
 
 			var pres = new Presentation<Test1Row>(gdata);
 			// FIXME: currently no supporty for SortOrder
-			var nested = pres.GetTable_NestedDict();
+			var nested = pres.GetTable_NestedKeyValueList_VariableColumns();
 
-			nested.Columns = null;
-			nested.ColumnGroups = null;
-			nested.RowGroups = null;
+//			nested.Columns = null;
+	//		nested.ColumnGroups = null;
+		//	nested.RowGroups = null;
 
 			var js = ToJson(nested);
 
@@ -346,16 +346,7 @@ namespace Tests
 			return p;
 		}
 
-		private static string DTToXml(DataTable dt)
-		{
-			using (var writer = new StringWriter())
-			{
-				dt.WriteXml(writer);
-				writer.Flush();
 
-				return writer.GetStringBuilder().ToString();
-			}
-		}
 	}
 
 

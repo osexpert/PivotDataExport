@@ -150,6 +150,22 @@ namespace Tests
   ]
 }";
 
+		const string TestCompareFastAndSlow_RowGroupOnSite_csv_slow = @"Site;Unit;Group;Name;Number;Weight;RowCount
+Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+Site3;Unit1;Group1;Name1;5;2.1;1
+Site5;Unit6;Group1;Name1;6;5.1;1
+";
+		const string TestCompareFastAndSlow_RowGroupOnSite_csv_flat = @"Site;Unit;Group;Name;Number;Weight;RowCount
+Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+Site3;Unit1;Group1;Name1;5;2.1;1
+Site5;Unit6;Group1;Name1;6;5.1;1
+";
+		const string TestCompareFastAndSlow_RowGroupOnSite_nestcsv = @"Site;Unit;Group;Name;Number;Weight;RowCount
+Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+Site3;Unit1;Group1;Name1;5;2.1;1
+Site5;Unit6;Group1;Name1;6;5.1;1
+";
+
 		[Fact]
 		public void TestCompareFastAndSlow_RowGroupOnSite()
 		{
@@ -170,24 +186,33 @@ namespace Tests
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
 
-			string sFast = DTToXml(fastDT);
-			string sSlow = DTToXml(slowDT);
+			string sFast = fastDT.ToXml();
+			string sSlow = slowDT.ToXml();
 
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite, sFast);
 			Assert.Equal(sFast, sSlow);
 
-			string slowJson = ToJson(slowData.GetTable_Array());
+			var slowTable = slowData.GetTable_Array();
+			string slowJson = ToJson(slowTable);
 			string fastJson = ToJson(fastData.GetTable_Array());
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_json, slowJson);
 			Assert.Equal(slowJson, fastJson);
 
-			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowCsv = slowTable.ToCsv();
+			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_csv_slow, slowCsv);
+
+			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_GetTable_DictArr, slowTblDictArrStr);
+			var flatCsv = slowTblDictArr.ToCsv();
+			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_csv_flat, flatCsv);
 
 			// same as GetTable_FlatDict in this case
-			var nest = ToJson(slowData.GetTable_NestedDict());
+			var nested = slowData.GetTable_NestedKeyValueList_VariableColumns();
+			var nest = ToJson(nested);
 			Assert.Equal(nested_TestCompareFastAndSlow_RowGroupOnSite, nest);
+			var nestCsv = nested.ToCsv();
+			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
 		}
 
 		private static string ToJson<T>(T table)
@@ -413,8 +438,8 @@ namespace Tests
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
 
-			string sFast = DTToXml(fastDT);
-			string sSlow = DTToXml(slowDT);
+			string sFast = fastDT.ToXml();
+			string sSlow = slowDT.ToXml();
 
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, sFast);
 			Assert.Equal(sFast, sSlow);
@@ -424,11 +449,11 @@ namespace Tests
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json, slowJson);
 			Assert.Equal(slowJson, fastJson);
 
-			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
 
-			var nest = ToJson(slowData.GetTable_NestedDict());
+			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());
 			Assert.Equal(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nest);
 		}
 
@@ -533,8 +558,8 @@ namespace Tests
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
 
-			string sFast = DTToXml(fastDT);
-			string sSlow = DTToXml(slowDT);
+			string sFast = fastDT.ToXml();
+			string sSlow = slowDT.ToXml();
 
 			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName, sFast);
 			Assert.Equal(sFast, sSlow);
@@ -544,11 +569,11 @@ namespace Tests
 			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_json, slowJson);
 			Assert.Equal(slowJson, fastJson);
 
-			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_DictArr, slowTblDictArrStr);
 
-			var nest = ToJson(slowData.GetTable_NestedDict());
+			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());
 			Assert.Equal(nested_TestCompareFastAndSlow_ColGroupOnName, nest);
 		}
 
@@ -622,8 +647,8 @@ namespace Tests
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
 
-			string sFast = DTToXml(fastDT);
-			string sSlow = DTToXml(slowDT);
+			string sFast = fastDT.ToXml();
+			string sSlow = slowDT.ToXml();
 
 			Assert.Equal(str_TestCompareFastAndSlow_NoGroup, sFast);
 			Assert.Equal(sFast, sSlow);
@@ -633,12 +658,12 @@ namespace Tests
 			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_json, slowJson);
 			Assert.Equal(slowJson, fastJson);
 
-			var slowTblDictArr = slowData.GetTable_FlatDict();
+			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_DictArr, slowTblDictArrStr);
 
 			// this produce same result as GetTable_FlatDict in this case (no col groups)
-			var nest = ToJson(slowData.GetTable_NestedDict());
+			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());
 			Assert.Equal(nested_TestCompareFastAndSlow_NoGroup, nest);
 		}
 
@@ -897,21 +922,21 @@ namespace Tests
 
 			var data = td.GetGroupedData_FastIntersect();
 			var pr = new Presentation<Test1Row>(data);
-			var nest = pr.GetTable_NestedDict();
+			var nest = pr.GetTable_NestedKeyValueList_VariableColumns();
 			var json = ToJson(nest);
 			Assert.Equal(TestGroupSiteThenUnitSortBoth_nested, json);
 
-			var flat = pr.GetTable_FlatDict();
-			flat.Columns = null;
-			flat.ColumnGroups = null;
-			flat.RowGroups = null;
+			var flat = pr.GetTable_FlatKeyValueList_CompleteColumns();
+//			flat.Columns = null;
+//			flat.ColumnGroups = null;
+	//		flat.RowGroups = null;
 			var flat_json = ToJson(flat);
 			Assert.Equal(TestGroupSiteThenUnitSortBoth_flat, flat_json);
 
-			var xml_nest = XmlSerialize(nest);
+			var xml_nest = nest.ToXml();
 			Assert.Equal(TestGroupSiteThenUnitSortBoth_xml_nest, xml_nest);
 
-			var xml_flat = XmlSerialize(flat);
+			var xml_flat = flat.ToXml();
 			Assert.Equal(TestGroupSiteThenUnitSortBoth_xml_flat, xml_flat);
 
 		}
@@ -939,74 +964,8 @@ namespace Tests
 			return p;
 		}
 
-		private static string DTToXml(DataTable dt)
-		{
-			using (var writer = new StringWriter())
-			{
-				dt.WriteXml(writer);
-				writer.Flush();
-
-				return writer.GetStringBuilder().ToString();
-			}
-		}
-
-		public static string XmlSerialize(object obj)
-		{
-			//XmlWriter x = null;
-
-			
-			//return "";
-			//// Using System.Text.Json to parse JSON
-			//JsonDocument jsonDocument = JsonDocument.Parse(jsonData);
-
-			//// Creating XDocument and adding elements and attributes
-			//XDocument xDocument = new XDocument(
-			//	new XElement("Root",
-			//		jsonDocument.RootElement.EnumerateObject()
-			//			.Select(prop => new XElement(prop.Name, prop.Value.ToString()))
-			//	)
-			//);
-
-			//// Output the XML
-			//string xmlOutput = xDocument.ToString();
-			//return xmlOutput;
-
-			XmlSerializer xsSubmit = new XmlSerializer(obj.GetType());
-			using (var sww = new ExtentedStringWriter(Encoding.UTF8))
-			{
-				using (XmlTextWriter writer = new XmlTextWriter(sww) { Formatting = Formatting.Indented })
-				{
-					xsSubmit.Serialize(writer, obj);
-					return sww.ToString();
-				}
-			}
 
 
-		}
 
-		public sealed class ExtentedStringWriter : StringWriter
-		{
-			private readonly Encoding stringWriterEncoding;
-
-			public ExtentedStringWriter(Encoding desiredEncoding)
-				: base()
-			{
-				this.stringWriterEncoding = desiredEncoding;
-			}
-
-			public ExtentedStringWriter(StringBuilder builder, Encoding desiredEncoding)
-				: base(builder)
-			{
-				this.stringWriterEncoding = desiredEncoding;
-			}
-
-			public override Encoding Encoding
-			{
-				get
-				{
-					return this.stringWriterEncoding;
-				}
-			}
-		}
 	}
 }
