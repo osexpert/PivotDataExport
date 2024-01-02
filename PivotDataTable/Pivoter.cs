@@ -18,27 +18,6 @@ namespace PivotDataTable
 
 		//public IReadOnlyDictionary<string, PropertyDescriptor> Props => _props;
 
-		//public Pivoter(IEnumerable<TRow> rows, IEnumerable<PropertyDescriptor> props)
-		//: this(rows, props, Field.CreateFieldsFromProperties(props))
-		//{
-
-		//}
-
-		//public Pivoter(IEnumerable<TRow> rows, PropertyDescriptorCollection props, IEnumerable<Field> fields) 
-		//	: this(rows, props.Cast<PropertyDescriptor>(), fields)
-		//{
-		//}
-
-
-		//public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields) : this(rows, fields, TypeDescriptor.GetProperties(typeof(TRow)))
-		//{
-
-		//}
-
-		//public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields, ITypedList typedList) : this(rows, fields, typedList.GetItemProperties(null!))
-		//{
-
-		//}
 
 		public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields)
 		{
@@ -64,10 +43,6 @@ namespace PivotDataTable
 
 			if (_fields.GroupBy(f => f.Name).Any(g => g.Count() > 1))
 				throw new ArgumentException("More than one field with same fieldName");
-
-
-
-
 		}
 
 		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, RootType rootType)//, bool sort = false)

@@ -62,25 +62,35 @@ namespace PivotDataTable
 		{
 			return $"Name: {Name}, Area: {Area}";
 		}
+
+		public static List<Field> CreateFieldsFromType<T>()
+		{
+			return CreateFieldsFromProperties(TypeDescriptor.GetProperties(typeof(T)));
+		}
+
+		public static List<Field> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
+		{
+			return props.Select(pd => new Field { Name = pd.Name, DataType = pd.PropertyType, GetValue = pd.GetValue }).ToList();
+		}
+
+		public static List<Field> CreateFieldsFromProperties(PropertyDescriptorCollection props)
+		{
+			return CreateFieldsFromProperties(props.Cast<PropertyDescriptor>());
+		}
+
+		public static List<Field> CreateFieldsFromTypedList(ITypedList props)
+		{
+			return CreateFieldsFromProperties(props.GetItemProperties(null));
+		}
+
+		public void SetGetValue<TRow, TProp>(Func<IEnumerable<TRow>, TProp> getValue)
+		{
+			GetValue = rows => getValue(rows.Cast<TRow>());
+		}
 	}
 
 	public class Field<TRow, TProp> : Field
 	{
-
-
-
-
-
-
-		//public static List<Field> CreateFieldsFromType<T>()
-		//{
-		//	return typeof(T).GetProperties().Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
-		//}
-
-		//public static List<Field> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
-		//{
-		//	return props.Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
-		//}
 		public Field(string fieldName, Func<IEnumerable<TRow>, TProp> getValue)
 		{
 			Name = fieldName;
@@ -89,55 +99,6 @@ namespace PivotDataTable
 		}
 	}
 
-	///// <summary>
-	///// Field is the display part of the system.
-	///// Lets imagine we have a data source with 1 million PropertyColumn. Via some api, any of these can be selected for display, and this is done via a Field.
-	///// So if I send in eg. 10 fields, only data for 10 PropertyColumn's will be fetched.
-	///// So the number of Fields and PropertyColumn will always be matched in number.
-	///// </summary>
-	//public class Field<TRow, TData> : Field<TRow>
-	//{
-
-
-
-
-	//	// FUNC to get display text?
-	//	// Compare\equal by value or text?
-
-	//	// datavalue (groupin)
-	//	// displayvalue
-	//	// SortOrder value
-
-	//	// TOTAL value stored here?
-
-	//	// Should we cache the value for every row?
-	//	//internal int idx;
-
-
-
-	//	//public static List<Field> CreateFieldsFromType<T>()
-	//	//{
-	//	//	return typeof(T).GetProperties().Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
-	//	//}
-
-	//	//public static List<Field> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
-	//	//{
-	//	//	return props.Select(pd => new Field { FieldName = pd.Name, DataType = pd.PropertyType }).ToList();
-	//	//}
-
-
-	//}
-
-
-
-
-	//public class Field<T> : Field
-	//{
-	//	public Field()
-	//	{
-	//		DataType = typeof(T);
-	//	}
-	//}
 
 	public enum Area
 	{
