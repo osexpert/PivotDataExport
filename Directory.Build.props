@@ -12,16 +12,16 @@
     <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
     <PackageOutputPath>$(RepoRootPath)bin\Packages\$(Configuration)\NuGet\</PackageOutputPath>
 
-    <PackageProjectUrl>https://github.com/osexpert/PivotExpert</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/osexpert/PivotDataTable</PackageProjectUrl>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/osexpert/PivotExpert.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/osexpert/PivotDataTable.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>osexpert</Company>      
     
     <VersionPrefix>0.0.1</VersionPrefix>
-    <PackageTags>group aggregate sort pivot unpivot json data-table</PackageTags>
+    <PackageTags>group aggregate sort pivot json data-table</PackageTags>
     <Description>Idea: send report definition to an API and get data-table (json) back</Description>        
 		        
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
