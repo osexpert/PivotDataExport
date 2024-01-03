@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Linq;
@@ -20,51 +22,48 @@ namespace PivotDataTable
 		//public List<TableColumn> ColumnGroups { get; set; } = null!;
 
 		[JsonIgnore]//(Condition = JsonIgnoreCondition.WhenWritingNull)]
-		public List<TableColumn> Columns { get; set; } = null!;
+		public IEnumerable<TableColumn> Columns { get; internal set; } = null!;
 
 		/// <summary>
-		/// If PartialRows, the columns in the rows do not necesarely have the same numbers of columns, the same number of columns as in the Columns-list.
+		/// If PartialRows, the rows do not (necesarely) have the same numbers of columns or the same number of columns as in Columns-list.
 		/// This means, we can't use rows for making fixed number of columns formats such as csv.
 		/// </summary>
 		[JsonIgnore]
-		public bool PartialRows;
+		public bool PartialRows { get; internal set; }
 
 
 		/// <summary>
-		/// At least one intersect without data. Means that createEmptyIntersects = false
+		/// At least one intersect without data. Means that createEmptyIntersects = false.
+		/// Used for debug\informational purpose.
 		/// </summary>
 		[JsonIgnore]
-		public bool PartialIntersects;
+		public bool PartialIntersects { get; internal set; }
 
-		public List<TTableRow> Rows { get; set; } = null!;
+		public IEnumerable<TTableRow> Rows { get; internal set; } = null!;
 
-		public XmlSchema? GetSchema()
-		{
-			return null;
-		}
+		internal TTableRow HeaderRow = null!;
 
-		public void ReadXml(XmlReader reader)
-		{
-			throw new NotImplementedException();
-		}
+		XmlSchema? IXmlSerializable.GetSchema() => null;
 
-		public void WriteXml(XmlWriter writer)
+		void IXmlSerializable.ReadXml(XmlReader reader) => throw new NotImplementedException();
+
+		void IXmlSerializable.WriteXml(XmlWriter writer)
 		{
 			writer.WriteStartElement("Rows");
 			foreach (var row in Rows)
 			{
 				writer.WriteStartElement("Row");
-				WriterRow(writer, row);
+				WriterXmlRow(writer, row);
 				writer.WriteEndElement();
 			}
 			writer.WriteEndElement();
 		}
 
-		private void WriterRow(XmlWriter writer, TTableRow row)
+		private void WriterXmlRow(XmlWriter writer, TTableRow row)
 		{
-			if (row is IEnumerable<KeyValuePair<string, object?>> enu)
+			if (row is IEnumerable<KeyValuePair<string, object?>> keyValuePairs)
 			{
-				Write(writer, enu);
+				WriteXmlKeyValuePairs(writer, keyValuePairs);
 			}
 			else
 			{
@@ -77,32 +76,32 @@ namespace PivotDataTable
 			}
 		}
 
-		private static void Write(XmlWriter writer, IEnumerable<KeyValuePair<string, object?>> enu)
+		private static void WriteXmlKeyValuePairs(XmlWriter writer, IEnumerable<KeyValuePair<string, object?>> kvps)
 		{
-			foreach (var ele in enu)
+			foreach (var kvp in kvps)
 			{
-				if (ele is KeyValuePair<string, object?> kvp)
+				//if (keyValuePair is KeyValuePair<string, object?> kvp)
+				//				{
+				writer.WriteStartElement(kvp.Key);
+
+				if (kvp.Value is IEnumerable<KeyValuePair<string, object?>> se)
+					WriteXmlKeyValuePairs(writer, se);
+				else if (kvp.Value is IEnumerable<IEnumerable<KeyValuePair<string, object?>>> lse)
 				{
-					writer.WriteStartElement(kvp.Key);
-
-					if (kvp.Value is IEnumerable<KeyValuePair<string, object?>> se)
-						Write(writer, se);
-					else if (kvp.Value is IEnumerable<IEnumerable<KeyValuePair<string, object?>>> lse)
+					foreach (var lsee in lse)
 					{
-						foreach (var lsee in lse)
-						{
-							writer.WriteStartElement("Entry");
-							Write(writer, lsee);
-							writer.WriteEndElement();
-						}
+						writer.WriteStartElement("Entry");
+						WriteXmlKeyValuePairs(writer, lsee);
+						writer.WriteEndElement();
 					}
-					else if (kvp.Value != null)
-						writer.WriteValue(kvp.Value);
-
-					writer.WriteEndElement();
 				}
-				else
-					writer.WriteValue(ele);
+				else if (kvp.Value != null)
+					writer.WriteValue(kvp.Value);
+
+				writer.WriteEndElement();
+				//				}
+				//				else
+				//				writer.WriteValue(keyValuePair);
 			}
 		}
 
@@ -123,6 +122,39 @@ namespace PivotDataTable
 		//	}
 		//}
 
+		/// <summary>
+		/// First row in Rows is a header row
+		/// </summary>
+		[JsonIgnore]
+		public bool HasHeaderRow { get; private set; }
+
+		public Table<TTableRow> AddHeaderRowClone()
+		{
+			if (HasHeaderRow)
+				return this;
+
+			return new Table<TTableRow>()
+			{
+				Columns = this.Columns,
+				Rows = GetHeaderRow().Concat(this.Rows),
+				HasHeaderRow = true
+			};
+		}
+
+		private IEnumerable<TTableRow> GetHeaderRow()
+		{
+			yield return HeaderRow;
+		}
+
+		public void WriteXml(Stream s)
+		{
+			XmlSerializer xsSubmit = new XmlSerializer(this.GetType());
+
+			using (XmlTextWriter writer = new XmlTextWriter(s, new UTF8Encoding(false)) { Formatting = Formatting.Indented })
+			{
+				xsSubmit.Serialize(writer, this);
+			}
+		}
 
 		public string ToXml()
 		{
@@ -137,7 +169,7 @@ namespace PivotDataTable
 			}
 		}
 
-		public sealed class ExtentedStringWriter : StringWriter
+		sealed class ExtentedStringWriter : StringWriter
 		{
 			private readonly Encoding stringWriterEncoding;
 
@@ -162,6 +194,36 @@ namespace PivotDataTable
 			}
 		}
 
+		public void WriteCsv(Stream s, char separator = ';', bool addHeaderRow = true)
+		{
+			using var w = new StreamWriter(s);
+
+			if (PartialRows)
+				throw new Exception("Can't create cvs with (potentionally) partial rows");
+
+			if (addHeaderRow && !HasHeaderRow)
+			{
+				w.WriteLine(FormatCsvRow(separator, Columns.Select(c => XLinq_GetStringValue(c.Name))));
+			}
+
+			foreach (var row in Rows)
+			{
+				if (row is KeyValueList kvl)
+				{
+					w.WriteLine(FormatCsvRow(separator, kvl.Select(o =>
+					{
+						if (o.Value is KeyValueList)
+							throw new InvalidOperationException("Nested keyValueList. Should never get here, PartialRows should be true in this case");
+
+						return XLinq_GetStringValue(o.Value!);
+					})));
+				}
+				else
+					w.WriteLine(FormatCsvRow(separator, row.Cast<object>().Select(o => XLinq_GetStringValue(o))));
+			}
+		}
+
+
 		public string ToCsv(char separator = ';', bool addHeaderRow = true)
 		{
 			if (PartialRows)
@@ -169,7 +231,7 @@ namespace PivotDataTable
 
 			StringBuilder sb = new();
 
-			if (addHeaderRow)
+			if (addHeaderRow && !HasHeaderRow)
 			{
 				sb.AppendLine(FormatCsvRow(separator, Columns.Select(c => XLinq_GetStringValue(c.Name))));
 			}
@@ -192,7 +254,7 @@ namespace PivotDataTable
 		/// <param name="value"></param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentException"></exception>
-		internal static string XLinq_GetStringValue(object value)
+		private static string XLinq_GetStringValue(object value)
 		{
 			string s;
 			if (value is string)
@@ -239,14 +301,14 @@ namespace PivotDataTable
 			return s;
 		}
 
-		internal static string GetDateTimeString(DateTime value)
+		private static string GetDateTimeString(DateTime value)
 		{
 			return XmlConvert.ToString(value, XmlDateTimeSerializationMode.RoundtripKind);
 		}
 
 		// https://stackoverflow.com/questions/12963117/is-there-a-write-counterpart-to-microsoft-visualbasic-fileio-textfieldparser
 		// https://stackoverflow.com/questions/6377454/escaping-tricky-string-to-csv-format
-		public static string FormatCsvCell(char separator, string cell, bool alwaysQuote = false)
+		private static string FormatCsvCell(char separator, string cell, bool alwaysQuote = false)
 		{
 			bool mustQuote(string str) => str.IndexOfAny(new char[] { separator, '"', '\r', '\n' }) > -1;
 
@@ -267,13 +329,10 @@ namespace PivotDataTable
 			return cell;
 		}
 
-		public static string FormatCsvRow(char separator, IEnumerable<string> cells, bool alwaysQuote = false)
+		private static string FormatCsvRow(char separator, IEnumerable<string> cells, bool alwaysQuote = false)
 		{
 			return string.Join(separator.ToString(), cells.Select(cell => FormatCsvCell(separator, cell, alwaysQuote)));
 		}
-
-
-
 
 	}
 

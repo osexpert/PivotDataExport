@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Data;
+using System.Net;
 
 namespace PivotDataTable
 {
@@ -17,9 +18,9 @@ namespace PivotDataTable
 		/// FIXME: List of object, Why not ienumerable?
 		/// </summary>
 		/// <typeparam name="TTableRow"></typeparam>
-		/// <param name="toRows"></param>
+		/// <param name="toRow"></param>
 		/// <returns></returns>
-		public Table<TTableRow> GetTableCore<TTableRow>(Func<List<object?[]>, List<TableColumn>, List<TTableRow>> toRows) 
+		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow) 
 			where TTableRow : class, IEnumerable
 		{
 			var lastRowGroups = _data.allRowGroups.Last();// OrDefault() ?? [];
@@ -49,8 +50,9 @@ namespace PivotDataTable
 			//rowsss = SortRows(rowsss, tableCols);
 
 			Table<TTableRow> t = new Table<TTableRow>() { PartialIntersects = partialIntersects };
-			t.Rows = toRows(rows, tableCols);
+			t.Rows = rows.Select(r => toRow(r, tableCols));
 			t.Columns = tableCols;
+			t.HeaderRow = toRow(tableCols.Select(c => c.Name).ToArray(), tableCols);
 //			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
 	//		t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
 
@@ -198,24 +200,25 @@ namespace PivotDataTable
 		/// <returns></returns>
 		public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns()
 		{
-			return GetTableCore((rows, tcols) =>
+			return GetTableCore((row, tcols) =>
 			{
-				List<KeyValueList> dictRows = new();
+//				List<KeyValueList> dictRows = new();
 
-				foreach (var row in rows)
-				{
-					//Dictionary<string, object?> dictRow = new();
-					var dictRow = new KeyValueList();
-					foreach (var v in row.ZipForceEqual(tcols, (f, s) => new { First = f, Second = s }))
-						dictRow.Add(v.Second.Name, v.First);
+//				foreach (var row in rows)
+	//			{
+				//Dictionary<string, object?> dictRow = new();
+				var dictRow = new KeyValueList();
+				foreach (var v in row.ZipForceEqual(tcols, (f, s) => new { First = f, Second = s }))
+					dictRow.Add(v.Second.Name, v.First);
 
-					// perf: to avoid creating one dict per row
-					//var dictRow = new KeyValueZipList(row, tcols);
+				// perf: to avoid creating one dict per row
+				//var dictRow = new KeyValueZipList(row, tcols);
 
-					dictRows.Add(dictRow);
-				}
+				return dictRow;
+		//		dictRows.Add(dictRow);
+//				}
 
-				return dictRows;
+	//			return dictRows;
 
 			});
 		}
@@ -289,7 +292,14 @@ namespace PivotDataTable
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 
-			return new Table<KeyValueList>() { Rows = rows.ToList(), PartialRows = partialIntersects, PartialIntersects = partialIntersects, Columns = tableCols };
+			return new Table<KeyValueList>()
+			{
+				Rows = rows.ToList(),
+				PartialRows = true, 
+				PartialIntersects = partialIntersects,
+				Columns = tableCols,
+				HeaderRow = new KeyValueList(tableCols.Select(c => new KeyValuePair<string, object?>(c.Name, null)))
+			};
 		}
 
 		private KeyValueList GetCreateKeyVals(Group<TRow> cg, KeyValueList r, ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, Dictionary<Group<TRow>, List<KeyValueList>> groupToLists)

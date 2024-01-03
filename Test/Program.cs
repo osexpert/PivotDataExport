@@ -35,38 +35,58 @@ namespace Test
 
 
 
-			List<CsvRow> allRTows = null!;
+			List<CsvRow> salesRecords = null!;
 
 			using (var reader = new StreamReader(@"d:\5m Sales Records.csv"))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				var records = csv.GetRecords<CsvRow>();
-
-				allRTows = records.ToList();
+				salesRecords = records.ToList();
 			}
 
 			//var props = TypeDescriptor.GetProperties(typeof(CsvRow));
 
 
+			var fields = new List<Field>();
 
-			var fieldsss = new List<Field>();
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region))
+			{
+				GroupIndex = 0,
+				Area = Area.Row,
+				SortOrder = SortOrder.Asc
+			});
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country))
+			{
+				GroupIndex = 1,
+				Area = Area.Row,
+				SortOrder = SortOrder.Desc
+			});
 
-			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region)));
-			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country)));
-			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType)));
-			fieldsss.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel)));
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType))
+			{
+				GroupIndex = 0,
+				Area = Area.Column,
+				SortOrder = SortOrder.Desc
+			});
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel))
+			{
+				GroupIndex = 1,
+				Area = Area.Column,
+				SortOrder = SortOrder.Asc
+			});
+
+			fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
+
 			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
 			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
 			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderID), rows => Aggregators.SingleOrCount(rows, row => row.OrderID)));
 			//props.Add(new Property<CsvRow, int>("RowCount", rows => rows.Count()));
 			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.ShipDate), rows => rows.Max(r => r.ShipDate)));
-			fieldsss.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
 			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitPrice), rows => rows.Sum(r => r.UnitPrice)));
 			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitCost), rows => rows.Sum(r => r.UnitCost)));
 			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalRevenue), rows => rows.Sum(r => r.TotalRevenue)));
 			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
 			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
-
 
 			//var fieldsss = Field.CreateFieldsFromType<CsvRow>();// (props);
 			//var fieldsss = Field.CreateFieldsFromProperties(props);
@@ -79,21 +99,21 @@ namespace Test
 			//MoveToTop(fieldsss, "OrderID");
 			//MoveToTop(fieldsss, "ItemType");
 
-			GetField(fieldsss, "Region").Area = Area.Row;
-			GetField(fieldsss, "Region").GroupIndex = 1;
-			//			GetField(fieldsss, "Region").SortOrder = SortOrder.Asc;
+			//GetField(fields, "Region").Area = Area.Row;
+			//GetField(fields, "Region").GroupIndex = 1;
+			////			GetField(fieldsss, "Region").SortOrder = SortOrder.Asc;
 
-			GetField(fieldsss, "Country").Area = Area.Row;
-			GetField(fieldsss, "Country").GroupIndex = 2;
-			//GetField(fieldsss, "Country").SortOrder = SortOrder.Asc;
+			//GetField(fields, "Country").Area = Area.Row;
+			//GetField(fields, "Country").GroupIndex = 2;
+			////GetField(fieldsss, "Country").SortOrder = SortOrder.Asc;
 
-			GetField(fieldsss, "ItemType").Area = Area.Column;
-			//GetField(fieldsss, "ItemType").SortOrder = SortOrder.Asc;
-			GetField(fieldsss, "ItemType").GroupIndex = 0;
+			//GetField(fields, "ItemType").Area = Area.Column;
+			////GetField(fieldsss, "ItemType").SortOrder = SortOrder.Asc;
+			//GetField(fields, "ItemType").GroupIndex = 0;
 
-			GetField(fieldsss, "SalesChannel").Area = Area.Column;
-			//			GetField(fieldsss, "SalesChannel").SortOrder = SortOrder.Asc;
-			GetField(fieldsss, "SalesChannel").GroupIndex = 3;
+			//GetField(fields, "SalesChannel").Area = Area.Column;
+			////			GetField(fieldsss, "SalesChannel").SortOrder = SortOrder.Asc;
+			//GetField(fields, "SalesChannel").GroupIndex = 3;
 
 
 			//GetField(fieldsss, "Country").Area = Area.Group;
@@ -105,73 +125,112 @@ namespace Test
 
 
 
-			var sw3 = Stopwatch.StartNew();
+			//var sw3 = Stopwatch.StartNew();
 
-			//NRecoTest(allRTows, props, fieldsss);
-			var res = allRTows.ToPivotArray(cs => new { cs.ItemType, cs.SalesChannel }
-				, rs => new { rs.Region, rs.Country }, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
-
-
-			sw3.Stop(); // 6.9sek
+			////NRecoTest(allRTows, props, fieldsss);
+			//var res = allRTows.ToPivotArray(cs => new { cs.ItemType, cs.SalesChannel }
+			//	, rs => new { rs.Region, rs.Country }, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
 
 
-
-			//			TypeValue: object, name, fullname
-
-			var pp = new Pivoter<CsvRow>(allRTows, fieldsss);//, new PropertyDescriptorCollection(props.ToArray()));
-
-			var sw = Stopwatch.StartNew();
-
-			var fast = pp.GetGroupedData_FastIntersect();
-
-			sw.Stop();
-
-			var sw2 = Stopwatch.StartNew();
-
-			var slow = pp.GetGroupedData_SlowIntersect();
-
-			sw2.Stop();
+			//sw3.Stop(); // 6.9sek
 
 
 
+			////			TypeValue: object, name, fullname
 
+			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
+			var data = pivot.GetGroupedData_FastIntersect();
+			var pres = new Presentation<CsvRow>(data);
+			var nested_kv_tbl = pres.GetTable_NestedKeyValueList_VariableColumns();
 
-			var tblll = new Presentation<CsvRow>(fast).GetTable_NestedKeyValueList_VariableColumns();
-
-			using (var f = File.Open(@"d:\testdt5mill2_fast_nested_min.json", FileMode.Create))
+			using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv.json", FileMode.Create))
 			{
-				JsonSerializer.Serialize(f, tblll, new JsonSerializerOptions { WriteIndented = true });
+				JsonSerializer.Serialize(f, nested_kv_tbl, new JsonSerializerOptions { WriteIndented = true });
+			}
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv.xml", FileMode.Create))
+			{
+				nested_kv_tbl.WriteXml(f);
+			}
+
+			// fails
+			//using (var f = File.Open(@"d:\test5mill_nested_kv.csv", FileMode.Create))
+			//{
+			//	nested_kv_tbl.WriteCsv(f);
+			//}
+
+			var flat_kv_tbl = pres.GetTable_FlatKeyValueList_CompleteColumns();
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_flat_kv.json", FileMode.Create))
+			{
+				JsonSerializer.Serialize(f, flat_kv_tbl, new JsonSerializerOptions { WriteIndented = true });
+			}
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_flat_kv.xml", FileMode.Create))
+			{
+				flat_kv_tbl.WriteXml(f);
+			}
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_flat_kv.csv", FileMode.Create))
+			{
+				flat_kv_tbl.WriteCsv(f);
+			}
+
+			var array_tbl = pres.GetTable_Array();
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_array.json", FileMode.Create))
+			{
+				JsonSerializer.Serialize(f, array_tbl.AddHeaderRowClone(), new JsonSerializerOptions { WriteIndented = true });
+			}
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_array.xml", FileMode.Create))
+			{
+				array_tbl.WriteXml(f);
+			}
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_array.csv", FileMode.Create))
+			{
+				array_tbl.WriteCsv(f);
 			}
 
 
-			var tbl = new Presentation<CsvRow>(fast).GetTable_FlatKeyValueList_CompleteColumns();
 
-			using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
-			{
-				JsonSerializer.Serialize(f, tbl, new JsonSerializerOptions { WriteIndented = true });
-			}
+			//var tblll = new Presentation<CsvRow>(fast).GetTable_NestedKeyValueList_VariableColumns();
 
-			var datat = new Presentation<CsvRow>(fast).GetDataTable();
+			//using (var f = File.Open(@"d:\testdt5mill2_fast_nested_min.json", FileMode.Create))
+			//{
+			//	JsonSerializer.Serialize(f, tblll, new JsonSerializerOptions { WriteIndented = true });
+			//}
 
-			datat.WriteXml(@"d:\testdt5mill2_fast.xml");
 
-			var dt = new Presentation<CsvRow>(fast).GetTable_Array();
-			//			dt.ChangeTypeToName();
+			//var tbl = new Presentation<CsvRow>(fast).GetTable_FlatKeyValueList_CompleteColumns();
 
-			//var dt = pp.GetTableSlowIntersect();
+			//using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
+			//{
+			//	JsonSerializer.Serialize(f, tbl, new JsonSerializerOptions { WriteIndented = true });
+			//}
 
-			sw.Stop();
+			//var datat = new Presentation<CsvRow>(fast).GetDataTable();
 
-			//dt.WriteXml(@"d:\testdt5mill.xml");
-			using (var f = File.Open(@"d:\testdt5mill2_slow.json", FileMode.Create))
-			{
-				JsonSerializer.Serialize(f, dt, new JsonSerializerOptions { WriteIndented = true });
-			}
+			//datat.WriteXml(@"d:\testdt5mill2_fast.xml");
 
-			dt = null;
+			//var dt = new Presentation<CsvRow>(fast).GetTable_Array();
+			////			dt.ChangeTypeToName();
 
-			var dtF = new Presentation<CsvRow>(fast).GetTable_Array();
+			////var dt = pp.GetTableSlowIntersect();
+
+			//sw.Stop();
+
+			////dt.WriteXml(@"d:\testdt5mill.xml");
+			//using (var f = File.Open(@"d:\testdt5mill2_slow.json", FileMode.Create))
+			//{
+			//	JsonSerializer.Serialize(f, dt, new JsonSerializerOptions { WriteIndented = true });
+			//}
+
+			//dt = null;
+
+			//var dtF = new Presentation<CsvRow>(fast).GetTable_Array();
 			//		dtF.ChangeTypeToName();
 
 			//var dt = pp.GetTableSlowIntersect();
@@ -179,10 +238,10 @@ namespace Test
 			//sw.Stop();
 
 			//dt.WriteXml(@"d:\testdt5mill.xml");
-			using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
-			{
-				JsonSerializer.Serialize(f, dtF, new JsonSerializerOptions { WriteIndented = true });
-			}
+			//using (var f = File.Open(@"d:\testdt5mill2_fast.json", FileMode.Create))
+			//{
+			//	JsonSerializer.Serialize(f, dtF, new JsonSerializerOptions { WriteIndented = true });
+			//}
 
 			// 37 sec without DT or object arrays
 			// 35 sec with DT??

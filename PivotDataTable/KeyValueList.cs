@@ -10,9 +10,19 @@ namespace PivotDataTable
 	public class KeyValueList : IDictionary<string, object?>
 //		where T : class
 	{
-	//	public Group<T> Group = null!;
+		//	public Group<T> Group = null!;
 
 		List<KeyValuePair<string, object?>> _list = new();
+
+		public KeyValueList()
+		{
+		}
+
+		public KeyValueList(IEnumerable<KeyValuePair<string, object?>> list)
+		{
+			foreach (var kv in list)
+				_list.Add(kv);
+		}
 
 		public object? this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 		public ICollection<string> Keys => throw new NotImplementedException();
