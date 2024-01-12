@@ -271,10 +271,10 @@ namespace Tests
 
 
 			//var sdata = pivoter.GetGroupedData_SlowIntersect();
-			var gdata = pivoter.GetGroupedData_FastIntersect();
+			var gdata = pivoter.GetGroupedData_FastIntersect2();
 
 
-			var pres = new Presentation<Test1Row>(gdata);
+			var pres = new Presentation2<Test1Row>(gdata);
 			// FIXME: currently no supporty for SortOrder
 			var nested = pres.GetTable_NestedKeyValueList_VariableColumns();
 

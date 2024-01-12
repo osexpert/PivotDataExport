@@ -177,11 +177,11 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 
 			fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Asc;
 
-			var slow = p.GetGroupedData_SlowIntersect();
-			var fast = p.GetGroupedData_FastIntersect();
+			var slow = p.GetGroupedData_FastIntersect();
+			var fast = p.GetGroupedData_FastIntersect2();
 
 			var slowData = new Presentation<Test1Row>(slow);
-			var fastData = new Presentation<Test1Row>(fast);
+			var fastData = new Presentation2<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -382,14 +382,6 @@ Site5;Unit6;Group1;Name1;6;5.1;1
           ""Number"": 5,
           ""Weight"": 2.1,
           ""RowCount"": 1
-        },
-        {
-          ""Name"": ""Name3"",
-          ""Unit"": """",
-          ""Group"": """",
-          ""Number"": 0,
-          ""Weight"": 0,
-          ""RowCount"": 0
         }
       ]
     },
@@ -403,14 +395,6 @@ Site5;Unit6;Group1;Name1;6;5.1;1
           ""Number"": 6,
           ""Weight"": 5.1,
           ""RowCount"": 1
-        },
-        {
-          ""Name"": ""Name3"",
-          ""Unit"": """",
-          ""Group"": """",
-          ""Number"": 0,
-          ""Weight"": 0,
-          ""RowCount"": 0
         }
       ]
     }
@@ -429,11 +413,11 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			fields[nameof(Test1Row.Name)].Area = Area.Column;
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
-			var slow = p.GetGroupedData_SlowIntersect();// createEmptyIntersects: true);
-			var fast = p.GetGroupedData_FastIntersect();// createEmptyIntersects: true);
+			var slow = p.GetGroupedData_FastIntersect();// createEmptyIntersects: true);
+			var fast = p.GetGroupedData_FastIntersect2();// createEmptyIntersects: true);
 
 			var slowData = new Presentation<Test1Row>(slow);
-			var fastData = new Presentation<Test1Row>(fast);
+			var fastData = new Presentation2<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable(createEmptyIntersects: true);
 			var fastDT = fastData.GetDataTable(createEmptyIntersects: true);
@@ -453,7 +437,7 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
 
-			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns(createEmptyIntersects: true));
+			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
 			Assert.Equal(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nest);
 		}
 
@@ -549,11 +533,11 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			fields[nameof(Test1Row.Name)].Area = Area.Column;
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
-			var slow = p.GetGroupedData_SlowIntersect();
-			var fast = p.GetGroupedData_FastIntersect();
+			var slow = p.GetGroupedData_FastIntersect();
+			var fast = p.GetGroupedData_FastIntersect2();
 
 			var slowData = new Presentation<Test1Row>(slow);
-			var fastData = new Presentation<Test1Row>(fast);
+			var fastData = new Presentation2<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -638,11 +622,11 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 
-			var slow = p.GetGroupedData_SlowIntersect();
-			var fast = p.GetGroupedData_FastIntersect();
+			var slow = p.GetGroupedData_FastIntersect();
+			var fast = p.GetGroupedData_FastIntersect2();
 
 			var slowData = new Presentation<Test1Row>(slow);
-			var fastData = new Presentation<Test1Row>(fast);
+			var fastData = new Presentation2<Test1Row>(fast);
 
 			var slowDT = slowData.GetDataTable();
 			var fastDT = fastData.GetDataTable();
@@ -920,8 +904,8 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			sg.GroupIndex = 0;
 			sg.SortOrder = SortOrder.Desc;
 
-			var data = td.GetGroupedData_FastIntersect();
-			var pr = new Presentation<Test1Row>(data);
+			var data = td.GetGroupedData_FastIntersect2();
+			var pr = new Presentation2<Test1Row>(data);
 			var nest = pr.GetTable_NestedKeyValueList_VariableColumns();
 			var json = ToJson(nest);
 			Assert.Equal(TestGroupSiteThenUnitSortBoth_nested, json);

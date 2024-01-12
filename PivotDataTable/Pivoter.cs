@@ -122,79 +122,6 @@ namespace PivotDataTable
 
 
 
-		/// <summary>
-		/// For a 5 million rows example, this takes 4 min 19sec. So 13 times slower than FastIntersect.
-		/// Used only for testing\benchmarking, as this code is shorter and easier than FastIntersect.
-		/// </summary>
-		/// <returns></returns>
-		public GroupedData<TRow, KeyValueList> GetGroupedData_SlowIntersect()//bool createEmptyIntersects = false)
-		{
-			Validate();
-
-			var dataFields = GetDataFields().ToArray();
-
-			var rowFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Row).OrderBy(f => f.GroupIndex).ToArray();
-			var colFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Column).OrderBy(f => f.GroupIndex).ToArray();
-
-			List<List<Group<TRow>>> allRowGroups = GroupRows(rowFieldsInGroupOrder, RootType.Row);
-			List<List<Group<TRow>>> allColGroups = GroupRows(colFieldsInGroupOrder, RootType.Col);
-
-			if (!allRowGroups.Any())
-			{
-				var list = new List<Group<TRow>>();
-				list.Add(new Group<TRow>() { RootType = RootType.Row, Rows = _rows });
-				allRowGroups.Add( list);
-			}
-
-			List<Group<TRow>> lastRowGroups = allRowGroups.Last();
-			List<Group<TRow>> lastColGroups = allColGroups.Last();
-
-			foreach (var lastRowGroup in lastRowGroups)
-			{
-				lastRowGroup.IntersectData = new();
-
-				foreach (var lastColGroup in lastColGroups)
-				{
-					var intersectRows = lastRowGroup.Rows.Intersect(lastColGroup.Rows).ToList();
-
-					if (intersectRows.Any())// || createEmptyIntersects)
-					{
-						var data = new object?[dataFields.Length];
-
-						int dataFieldIdx = 0;
-						foreach (var dataField in dataFields)
-						{
-							//var prop = _props[dataField.FieldName];
-							var theValue = dataField.GetValue(intersectRows);
-
-							data[dataFieldIdx] = theValue;
-							dataFieldIdx++;
-						}
-
-						lastRowGroup.IntersectData.Add(lastColGroup, data);
-					}
-				}
-			}
-
-			// free mem
-			foreach (var lastColGroup in lastColGroups)
-			{
-				lastColGroup.Rows = null!;
-			}
-
-			return new GroupedData<TRow, KeyValueList>()
-			{
-				colFieldsInGroupOrder = colFieldsInGroupOrder,
-				dataFields = dataFields,
-				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
-				lastRowGroups = allRowGroups.Last(),
-				lastColGroups = allColGroups.Last(),
-				fields = _fields,
-				//props = _props
-			};
-		}
-
-
 		public GroupedData<TRow, KeyValueList> GetGroupedData_FastIntersect2()//bool createEmptyIntersects = false)
 		{
 			Validate();
@@ -345,35 +272,6 @@ namespace PivotDataTable
 			{
 				allColGroups.Add(new List<Group<TRow>>() { rootColGroup }); 
 			}
-
-			// because of the was we group, groups without rows are not intersected. So fill these groups with default data here.
-			//if (createEmptyIntersects)
-			//{
-			//	object?[] defaultValues = null!;
-			//	foreach (var lastRowGroup in allRowGroups.Last())
-			//	{
-			//		foreach (var lastColGroup in allColGroups.Last())
-			//		{
-			//			if (!lastRowGroup.IntersectData.ContainsKey(lastColGroup))
-			//			{
-			//				// write default values
-			//				if (defaultValues == null)
-			//				{
-			//					// aggregate with no rows = default value
-			//					var defVals = new object?[dataFields.Length];
-			//					int i = 0;
-			//					foreach (var df in dataFields)
-			//					{
-			//						defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
-			//					}
-			//					defaultValues = defVals;
-			//				}
-			//				//Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
-			//				lastRowGroup.IntersectData.Add(lastColGroup, defaultValues);
-			//			}
-			//		}
-			//	}
-			//}
 
 			return new GroupedData<TRow, KeyValueList>()
 			{

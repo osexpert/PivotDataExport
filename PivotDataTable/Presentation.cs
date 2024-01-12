@@ -242,14 +242,14 @@ namespace PivotDataTable
 		/// Variable columns\every row may  have different columns
 		/// </summary>
 		/// <returns></returns>
-		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns(bool createEmptyIntersects = false)
+		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()//bool createEmptyIntersects = false)
 		{
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
 
 			var lastColGroupsSorted = SortGroups(_data.lastColGroups, _data.colFieldsInGroupOrder).ToList();
 
-			object?[] defaultValues = null!;
+			//object?[] defaultValues = null!;
 			foreach (var rg in SortGroups(_data.lastRowGroups, _data.rowFieldsInGroupOrder))
 			{
 				KeyValueList r = new();
@@ -267,23 +267,23 @@ namespace PivotDataTable
 				foreach (var cg in lastColGroupsSorted)//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
 				{
 					var hasData = rg.IntersectData.TryGetValue(cg, out var data);
-					if (hasData || createEmptyIntersects)
+					if (hasData)// || createEmptyIntersects)
 					{
-						if (!hasData)
-						{
-							if (defaultValues == null)
-							{
-								// aggregate with no rows = default value
-								var defVals = new object?[_data.dataFields.Length];
-								int i = 0;
-								foreach (var df in _data.dataFields)
-								{
-									defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
-								}
-								defaultValues = defVals;
-							}
-							data = defaultValues;
-						}
+						//if (!hasData)
+						//{
+						//	if (defaultValues == null)
+						//	{
+						//		// aggregate with no rows = default value
+						//		var defVals = new object?[_data.dataFields.Length];
+						//		int i = 0;
+						//		foreach (var df in _data.dataFields)
+						//		{
+						//			defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
+						//		}
+						//		defaultValues = defVals;
+						//	}
+						//	data = defaultValues;
+						//}
 
 						KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
 

@@ -6,23 +6,23 @@ using System.Net;
 namespace PivotDataTable
 {
 
-	public class Presentation3<TRow> : Presentation2<TRow, KeyValueList>
+	public class Presentation2<TRow> : Presto<TRow, KeyValueList>
 		where TRow : class
 	{
-		public Presentation3(GroupedData<TRow, KeyValueList> data) : base(data)
+		public Presentation2(GroupedData<TRow, KeyValueList> data) : base(data)
 		{
 		}
 	}
 
 
-	public class Presentation2<TRow, TAgg> 
+	public class Presto<TRow, TAgg> 
 		where TRow : class
 		where TAgg : KeyValueList
 	{
 
 		GroupedData<TRow, TAgg> _data;
 
-		public Presentation2(GroupedData<TRow, TAgg> data)
+		public Presto(GroupedData<TRow, TAgg> data)
 		{
 			_data = data;
 		}
@@ -33,7 +33,7 @@ namespace PivotDataTable
 		/// <typeparam name="TTableRow"></typeparam>
 		/// <param name="toRow"></param>
 		/// <returns></returns>
-		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow)
+		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool createEmptyIntersects = false)
 			where TTableRow : class, IEnumerable
 		{
 			var lastRowGroups = _data.PT_lastRows;// OrDefault() ?? [];
@@ -57,7 +57,8 @@ namespace PivotDataTable
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rows = GetFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects);
+			List<object?[]> rows = GetFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, 
+				createEmptyIntersects: createEmptyIntersects);
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 			//rowsss = SortRows(rowsss, tableCols);
@@ -76,7 +77,7 @@ namespace PivotDataTable
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
 		private List<object?[]> GetFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<IGroup<TAgg>> lastRowGroups /* sorted */, List<IGroup<TAgg>> lastColGroups /* sorted */,
-			out bool partialIntersects)
+			out bool partialIntersects, bool createEmptyIntersects = false)
 		{
 			partialIntersects = false;
 
@@ -102,58 +103,49 @@ namespace PivotDataTable
 
 			object?[] defaultValues = null!;
 
-			if (lastRowGroups.Any())
+			bool fakeRow = false;
+			if (!lastRowGroups.Any())
 			{
-				foreach (var lastRowGroup in lastRowGroups.Cast<Row<TAgg>>())
+				var row = new Row<TAgg>();
+				row.ColumnAggregates = lastColGroups.Cast<Column<TAgg>>();
+				row.Aggregates = _data.PT.Aggregates;
+				lastRowGroups.Add(row);
+				fakeRow = true;
+			}
+
+			foreach (var lastRowGroup in lastRowGroups.Cast<Row<TAgg>>())
+			{
+				var row = new object?[colCount];
+
+				if (!fakeRow)
 				{
-					var row = new object?[colCount];
-
-					// TODO: write rowGroup values
-					//int rowFieldIdx = 0;
-					//foreach (var rowField in rowFieldsInGroupOrder)
-					//{
-					//	row[rowFieldIdx] = lastRowGroup.GetKeyByField(rowField);
-					//	rowFieldIdx++;
-					//}
-
-					//if (!lastRowGroup.IsRoot)
-					//			if (lastRowGroup.Parent != null)
+					var current = lastRowGroup;
+					int par_idx = rowFieldsInGroupOrder.Length - 1;
+					do
 					{
-						var current = lastRowGroup;
-						int par_idx = rowFieldsInGroupOrder.Length - 1;
-						do
-						{
-							row[par_idx] = current.Value;
-							current = current.Parent;
-							par_idx--;
-						} while (current != null);// && !current.IsRoot);
-					}
+						row[par_idx] = current.Value;
+						current = current.Parent;
+						par_idx--;
+					} while (current != null);// && !current.IsRoot);
+				}
 
-					if (lastColGroups.Any())
+				if (lastColGroups.Any())
+				{
+					var intersectData = lastRowGroup.ColumnAggregates.ToDictionary(ks => ks.Value);
+
+					// this produce one row in the table
+					foreach (var lastColGroup in lastColGroups)
 					{
-						var intersectData = lastRowGroup.ColumnAggregates.ToDictionary(ks => ks.Value);
+						var startIdx = grpStartIdx[lastColGroup];
 
-						// this produce one row in the table
-						foreach (var lastColGroup in lastColGroups)
+						//if (lastRowGroup.IntersectData.TryGetValue(lastColGroup, out var values))
+						var hasData = intersectData.TryGetValue(lastColGroup.Value, out var data);
+						if (hasData || createEmptyIntersects)
 						{
-							var startIdx = grpStartIdx[lastColGroup];
+							object?[]? values = null;
 
-							//if (lastRowGroup.IntersectData.TryGetValue(lastColGroup, out var values))
-							if (intersectData.TryGetValue(lastColGroup.Value, out var data))
+							if (!hasData)
 							{
-								//var values = lastRowGroup.IntersectData[lastColGroup];
-								// write values
-								//Array.Copy(values, 0, row, startIdx, values.Length);
-								var values = data.Aggregates.Select(a => a.Value).ToArray();
-								if (values.Length != _data.dataFields.Length)
-									throw new Exception("mismatch in length..");
-								Array.Copy(values, 0, row, startIdx, values.Length);
-							}
-							else
-							{
-								// Use createEmptyIntersects = true if you always want data (instead of lack of data)
-								partialIntersects = true;
-
 								// write default values
 								if (defaultValues == null)
 								{
@@ -166,36 +158,37 @@ namespace PivotDataTable
 									}
 									defaultValues = defVals;
 								}
-
-								Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
-
+								values = defaultValues;
 							}
+							else
+							{
+								values = data.Aggregates.Select(a => a.Value).ToArray();
+							}
+
+							//var values = lastRowGroup.IntersectData[lastColGroup];
+							// write values
+							//Array.Copy(values, 0, row, startIdx, values.Length);
+							if (values.Length != _data.dataFields.Length)
+								throw new Exception("mismatch in length..");
+
+							Array.Copy(values, 0, row, startIdx, values.Length);
+						}
+						else
+						{
+							// Use createEmptyIntersects = true if you always want data (instead of lack of data)
+							partialIntersects = true;
 						}
 					}
-					else
-					{
-						// no col grouping
-
-						var agg = lastRowGroup.Aggregates;
-						var values = agg.Select(a => a.Value).ToArray();
-						if (values.Length != _data.dataFields.Length)
-							throw new Exception("mismatch in length..");
-						Array.Copy(values, 0, row, totalStartIdx, values.Length);
-					}
-
-					rows.Add(row);
 				}
-			}
-			else
-			{
-				// no row grouping
-				var row = new object?[colCount];
-				
-				var agg = _data.PT.Aggregates;
-				var values = agg.Select(a => a.Value).ToArray();
-				if (values.Length != _data.dataFields.Length)
-					throw new Exception("mismatch in length..");
-				Array.Copy(values, 0, row, totalStartIdx, values.Length);
+				else
+				{
+					// no col grouping
+					var agg = lastRowGroup.Aggregates;
+					var values = agg.Select(a => a.Value).ToArray();
+					if (values.Length != _data.dataFields.Length)
+						throw new Exception("mismatch in length..");
+					Array.Copy(values, 0, row, totalStartIdx, values.Length);
+				}
 
 				rows.Add(row);
 			}
@@ -203,9 +196,9 @@ namespace PivotDataTable
 			return rows;
 		}
 
-		public Table<object?[]> GetTable_Array()
+		public Table<object?[]> GetTable_Array(bool createEmptyIntersects = false)
 		{
-			return GetTableCore((rows, tcols) => rows);
+			return GetTableCore((rows, tcols) => rows, createEmptyIntersects: createEmptyIntersects);
 		}
 
 		/*
@@ -238,7 +231,7 @@ namespace PivotDataTable
 		/// Every row has all columns
 		/// </summary>
 		/// <returns></returns>
-		public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns()
+		public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns(bool createEmptyIntersects = false)
 		{
 			return GetTableCore((row, tcols) =>
 			{
@@ -260,12 +253,12 @@ namespace PivotDataTable
 
 				//			return dictRows;
 
-			});
+			}, createEmptyIntersects: createEmptyIntersects);
 		}
 
-		public DataTable GetDataTable()
+		public DataTable GetDataTable(bool createEmptyIntersects = false)
 		{
-			var t = GetTable_Array();
+			var t = GetTable_Array(createEmptyIntersects: createEmptyIntersects);
 
 			DataTable res = new("row");
 
@@ -334,7 +327,7 @@ namespace PivotDataTable
 		/// Variable columns\every row may  have different columns
 		/// </summary>
 		/// <returns></returns>
-		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()
+		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()//bool createEmptyIntersects = false)
 		{
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
@@ -364,44 +357,7 @@ namespace PivotDataTable
 				// Add the data
 				foreach (var cg in rg.ColumnAggregates)//flippedCols)//lastColGroupsSorted.Cast<Column<TAgg>>())//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
 				{
-					//Process(row, cg);
-
 					AddData(row, cg, groupToLists, ref groupToKeyVals);
-
-
-
-
-
-
-
-
-
-
-
-					//cg.
-
-					////if (rg.IntersectData.TryGetValue(cg, out var data))
-					////if (rg.ColumnAggregates.
-					//// FIXME: sensitive to match on Value alone?
-					//if (intersectData.TryGetValue(cg.Value, out var data))
-					//{
-					//	KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
-
-					//	// dataField order
-					//	//foreach (var z in _data.dataFields.ZipForceEqual(data., (f, s) => new { First = f, Second = s }))
-					//	//{
-					//	//	keyVals.Add(z.First.Name, z.First.GetDisplayValue(z.Second));
-					//	//}
-
-					//	foreach (var v in data.Aggregates)
-					//	{
-					//		keyVals.Add(v);
-					//	}
-					//}
-					//else
-					//{
-					//	partialIntersects = true;
-					//}
 				}
 			}
 
@@ -440,47 +396,19 @@ namespace PivotDataTable
 			}
 		}
 
-		//private IEnumerable<object> SortGroupss(IEnumerable<IGroup<Dictionary<string, object?>>> list, Field[] rowFieldsInGroupOrder)
-		//{
-		//	throw new NotImplementedException();
-		//}
-
 		private KeyValueList GetCreateKeyVals(IGroup<TAgg> cg, KeyValueList r, ref Dictionary<IGroup<TAgg>, KeyValueList> groupToKeyVals, Dictionary<IGroup<TAgg>, List<KeyValueList>> groupToLists)
 		{
-			//if (cg.Parent == null)//.IsRoot)
-			//{
-			//	return r;
-			//}
-
-			//if (groupToLists.TryGetValue(cg.Field, out var kvs))
-			//{
-			//	return kvs;
-			//}
-
 			var cg_ParentOrFake = cg.Parent ?? _fakeRoot;
 
-			//KeyValueList keyVals = null!;
-
-			//			foreach (var colGrp in GetParentsAndMe(cg))//includeMeIfRoot: true))
-			//			{
 			// add the root group
 			if (groupToKeyVals == null)
 			{
 				groupToKeyVals = new();
 				groupToKeyVals.Add(cg_ParentOrFake, r);
-				//if (!colGrp.ParentGroup!.IsRoot)
-				if (cg.Parent != null)//Group!.IsRoot)
+				if (cg.Parent != null)
 					throw new Exception("not root");
 			}
 
-			//List<KeyValueList> list = null!;
-
-			//if (cg.Parent == null)
-			//{
-			//	r.Add(cg.Field.Name + "List", list);
-			//	list = new();
-			//}
-			//else 
 			if (!groupToLists.TryGetValue(cg_ParentOrFake, out var list))
 			{
 				list = new();
@@ -499,8 +427,6 @@ namespace PivotDataTable
 
 				groupToKeyVals.Add(cg, keyVals);
 			}
-
-//			}
 
 			return keyVals;
 		}
@@ -614,70 +540,5 @@ namespace PivotDataTable
 			return tablecols;
 		}
 
-#if false
-
-		//private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field[] groupFields) //where TEle : Group<TRow>
-		//{
-		//	return SortGroups<TEle>(grops, groupFields, ele => ele);
-		//}
-
-		/// <summary>
-		/// Sort the last group level.
-		/// Sort by checking parent values
-		/// </summary>
-		private IEnumerable<IGroup<TEle>> SortGroups<TEle>(IEnumerable<IGroup<TEle>> grops, Field[] groupFields)//, Func<TEle, Group<TRow>> getGroup)
-//			where TEle : IGroup<TEle>
-		{
-			//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
-
-			//var sortFields = _fields.Where(f => f.Grouping == Grouping.Col)
-			//	.Where(f => f.SortOrder != SortOrder.None)
-			//	.OrderBy(f => f.SortIndex)
-			//	.ToArray();
-
-			var sortedGroupFields = groupFields.Where(f => f.SortOrder != SortOrder.None);
-
-			if (sortedGroupFields.Any())
-			{
-				IOrderedEnumerable<IGroup<TEle>> sorter = null!;
-
-				int colFieldIdx = 0;
-				foreach (var colField in sortedGroupFields)
-				{
-					int colFieldIdx_local_capture = colFieldIdx;
-
-					if (sorter == null)
-						sorter = colField.SortOrder == SortOrder.Asc ?
-							grops.OrderBy(r => GetKeyByField(r, colField), colField.SortComparer)
-							: grops.OrderByDescending(r => GetKeyByField(r, colField), colField.SortComparer);
-					else
-						sorter = colField.SortOrder == SortOrder.Asc ?
-							sorter.ThenBy(r => GetKeyByField(r, colField), colField.SortComparer)
-							: sorter.ThenByDescending(r => GetKeyByField(r, colField), colField.SortComparer);
-
-					colFieldIdx++;
-				}
-
-				grops = sorter;//.ToList(); // tolist needed?
-			}
-
-			return grops;
-		}
-#endif
-
-		private static object? GetKeyByField<TEle>(IGroup<TEle> r, Field colField)// where TEle : IGroup<TEle>
-		{
-
-			var current = r;
-			do
-			{
-				if (current.Field == colField)
-					return current.Value;
-				current = current.Parent;
-
-			} while (current != null);
-
-			throw new Exception($"Bug: field '{colField.Name}' not found");
-		}
 	}
 }
