@@ -28,3 +28,5 @@ FieldType
 }
 
 result from POST is the report.
+
+Tests where we only group by col, only by row, and none at all.

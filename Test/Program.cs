@@ -3,7 +3,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
+using Examples;
+using Kazinix.PivotTable;
 using PivotDataTable;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Test
 {
@@ -11,7 +14,7 @@ namespace Test
 	{
 		public static void Main()
 		{
-
+			Kazinixx.test();
 
 			var t = new Program();
 			t.Test();
@@ -46,6 +49,8 @@ namespace Test
 
 			//var props = TypeDescriptor.GetProperties(typeof(CsvRow));
 
+
+			var s = Stopwatch.StartNew();
 
 			var fields = new List<Field>();
 
@@ -141,6 +146,33 @@ namespace Test
 			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
 			var data = pivot.GetGroupedData_FastIntersect();
+
+			s.Stop(); // 13 sek
+
+			var pivotTable = salesRecords
+	.GetPivotTableBuilder(l => l.Sum(e => e.UnitsSold))
+	.SetRow(e => e.Region)
+	.SetRow(e => e.Country)
+	.SetColumn(e => e.ItemType)
+	.SetColumn(e => e.SalesChannel)
+	.Build();
+
+			var pivotTable2 = salesRecords
+	.GetPivotTableBuilder(l => l.Sum(e => e.UnitsSold))
+	.SetRow(e => e.Region)
+	.SetRow(e => e.Country)
+	.Build();
+
+			var pivotTable3 = salesRecords
+.GetPivotTableBuilder(l => new
+{
+	Sum = l.Sum(e => e.UnitsSold),
+	Avg = l.Average(e => e.UnitsSold)
+})
+.SetRow(e => e.Region)
+.SetRow(e => e.Country)
+.Build();
+
 			var pres = new Presentation<CsvRow>(data);
 			var nested_kv_tbl = pres.GetTable_NestedKeyValueList_VariableColumns();
 

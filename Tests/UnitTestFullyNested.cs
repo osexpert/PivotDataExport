@@ -270,7 +270,7 @@ namespace Tests
 			fields[nameof(Test1Row.Group)].GroupIndex = 2;
 
 
-			var sdata = pivoter.GetGroupedData_SlowIntersect();
+			//var sdata = pivoter.GetGroupedData_SlowIntersect();
 			var gdata = pivoter.GetGroupedData_FastIntersect();
 
 

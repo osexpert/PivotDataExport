@@ -29,7 +29,10 @@ namespace PivotDataTable
 		public ICollection<object?> Values => throw new NotImplementedException();
 		public int Count => throw new NotImplementedException();
 		public bool IsReadOnly => throw new NotImplementedException();
-		public void Add(KeyValuePair<string, object?> item) => throw new NotImplementedException();
+		public void Add(KeyValuePair<string, object?> item)
+		{
+			_list.Add(item);
+		}
 		public void Clear() => throw new NotImplementedException();
 		public bool Contains(KeyValuePair<string, object?> item) => throw new NotImplementedException();
 		public bool ContainsKey(string key) => throw new NotImplementedException();

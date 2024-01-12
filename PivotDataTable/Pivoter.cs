@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.ComponentModel;
 using System.Data;
 
 namespace PivotDataTable
@@ -11,13 +12,8 @@ namespace PivotDataTable
 	{
 		List<Field> _fields;
 		IEnumerable<TRow> _rows;
-		//Dictionary<string, PropertyDescriptor> _props;
 
-		// TODO: change to dict? the same logic apply here, can only be one field per fieldname
 		public List<Field> Fields => _fields;
-
-		//public IReadOnlyDictionary<string, PropertyDescriptor> Props => _props;
-
 
 		public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields)
 		{
@@ -34,12 +30,6 @@ namespace PivotDataTable
 		{
 			if (_fields.Any(f => f.Area == Area.Column) && _fields.Any(f => f.Area == Area.Data && f.SortOrder != SortOrder.None))
 				throw new ArgumentException("Can not sort on data fields if grouping on columns");
-
-			//if (_fields.Any(f => f.FieldName.StartsWith('/')))
-			//	throw new ArgumentException("FieldName can not start with reserved char '/'");
-
-			//if (_props.Values.Any(p => p.Name.StartsWith('/')))
-				//throw new ArgumentException("Property.Name can not start with reserved char '/'");
 
 			if (_fields.GroupBy(f => f.Name).Any(g => g.Count() > 1))
 				throw new ArgumentException("More than one field with same fieldName");
@@ -137,7 +127,7 @@ namespace PivotDataTable
 		/// Used only for testing\benchmarking, as this code is shorter and easier than FastIntersect.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow> GetGroupedData_SlowIntersect(bool createEmptyIntersects = false)
+		public GroupedData<TRow, KeyValueList> GetGroupedData_SlowIntersect()//bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -167,7 +157,7 @@ namespace PivotDataTable
 				{
 					var intersectRows = lastRowGroup.Rows.Intersect(lastColGroup.Rows).ToList();
 
-					if (intersectRows.Any() || createEmptyIntersects)
+					if (intersectRows.Any())// || createEmptyIntersects)
 					{
 						var data = new object?[dataFields.Length];
 
@@ -192,23 +182,98 @@ namespace PivotDataTable
 				lastColGroup.Rows = null!;
 			}
 
-			return new GroupedData<TRow>()
+			return new GroupedData<TRow, KeyValueList>()
 			{
 				colFieldsInGroupOrder = colFieldsInGroupOrder,
 				dataFields = dataFields,
 				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
-				allRowGroups = allRowGroups,
-				allColGroups = allColGroups,
+				lastRowGroups = allRowGroups.Last(),
+				lastColGroups = allColGroups.Last(),
 				fields = _fields,
 				//props = _props
 			};
+		}
+
+
+		public GroupedData<TRow, KeyValueList> GetGroupedData_FastIntersect2()//bool createEmptyIntersects = false)
+		{
+			Validate();
+
+			var dataFields = GetDataFields().ToArray();
+
+			var rowFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Row).OrderBy(f => f.GroupIndex).ToArray();
+			var colFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Column).OrderBy(f => f.GroupIndex).ToArray();
+
+			var ptb = new PivotTableBuilder<TRow, KeyValueList?>(_rows, (rows, group) =>
+			{
+				// only leafs
+//				if (group is IGroup<KeyValueList?> g && !g.Children.Any())
+				{
+					KeyValueList res = new();
+					foreach (var dataField in dataFields)
+					{
+						var theValue = dataField.GetValue(rows);
+						res.Add(dataField.Name, theValue);
+					}
+					return res;
+				}
+
+	//			return null;
+			});
+
+			foreach (var rowF in rowFieldsInGroupOrder)
+			{
+				ptb.AddRow((row => rowF.GetValue(row.Yield()), rowF));
+			}
+			foreach (var colF in colFieldsInGroupOrder)
+			{
+				ptb.AddColumn((col => colF.GetValue(col.Yield()), colF));
+			}
+			var rbl = ptb.Build();
+
+			// flip so we get the last groups (they have no children)
+			var lastRows = Flatten(rbl.Rows).Where(r => !r.Children.Any()).ToList();
+			var lastCols = Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
+
+
+			return new GroupedData<TRow, KeyValueList>()
+			{
+				colFieldsInGroupOrder = colFieldsInGroupOrder,
+				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
+				dataFields = dataFields,
+				//allRowGroups = allRowGroups,
+				//allColGroups = allColGroups,
+				PT = rbl,
+				fields = _fields,
+				//props = _props
+				PT_lastCols = lastCols,
+				PT_lastRows = lastRows
+			};
+		}
+
+		static IEnumerable<IGroup<TAgg>> Flatten<TAgg>(IEnumerable<IGroup<TAgg>> collection)
+		{
+			foreach (var o in collection)
+			{
+				foreach (var t in Flatten(o.Children))
+					yield return t;
+
+				yield return o;
+				//if (o. is IEnumerable<IGroup<TAgg>> oo)// oo && !(o is T))
+				//{
+				//	foreach (var t in Flatten(oo))
+				//		yield return t;
+				//}
+				//else
+				//	yield return o;
+			}
 		}
 
 		/// <summary>
 		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow> GetGroupedData_FastIntersect(bool createEmptyIntersects = false)
+		public GroupedData<TRow, KeyValueList> GetGroupedData_FastIntersect()//bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -282,41 +347,41 @@ namespace PivotDataTable
 			}
 
 			// because of the was we group, groups without rows are not intersected. So fill these groups with default data here.
-			if (createEmptyIntersects)
-			{
-				object?[] defaultValues = null!;
-				foreach (var lastRowGroup in allRowGroups.Last())
-				{
-					foreach (var lastColGroup in allColGroups.Last())
-					{
-						if (!lastRowGroup.IntersectData.ContainsKey(lastColGroup))
-						{
-							// write default values
-							if (defaultValues == null)
-							{
-								// aggregate with no rows = default value
-								var defVals = new object?[dataFields.Length];
-								int i = 0;
-								foreach (var df in dataFields)
-								{
-									defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
-								}
-								defaultValues = defVals;
-							}
-							//Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
-							lastRowGroup.IntersectData.Add(lastColGroup, defaultValues);
-						}
-					}
-				}
-			}
+			//if (createEmptyIntersects)
+			//{
+			//	object?[] defaultValues = null!;
+			//	foreach (var lastRowGroup in allRowGroups.Last())
+			//	{
+			//		foreach (var lastColGroup in allColGroups.Last())
+			//		{
+			//			if (!lastRowGroup.IntersectData.ContainsKey(lastColGroup))
+			//			{
+			//				// write default values
+			//				if (defaultValues == null)
+			//				{
+			//					// aggregate with no rows = default value
+			//					var defVals = new object?[dataFields.Length];
+			//					int i = 0;
+			//					foreach (var df in dataFields)
+			//					{
+			//						defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
+			//					}
+			//					defaultValues = defVals;
+			//				}
+			//				//Array.Copy(defaultValues, 0, row, startIdx, defaultValues.Length);
+			//				lastRowGroup.IntersectData.Add(lastColGroup, defaultValues);
+			//			}
+			//		}
+			//	}
+			//}
 
-			return new GroupedData<TRow>()
+			return new GroupedData<TRow, KeyValueList>()
 			{
 				colFieldsInGroupOrder = colFieldsInGroupOrder,
 				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
 				dataFields = dataFields,
-				allRowGroups = allRowGroups,
-				allColGroups = allColGroups,
+				lastRowGroups = allRowGroups.Last(),
+				lastColGroups = allColGroups.Last(),
 				fields = _fields,
 				//props = _props
 			};
@@ -404,33 +469,23 @@ namespace PivotDataTable
 			return current;
 		}
 
-		//public void Sort(GroupedData<TRow> data)
-		//{
-		//	//			data.rowFieldsInGroupOrder
-		//	var comparer = Comparer<object>.Default;
-		//	foreach (var grpLevel in data.allRowGroups)
-		//	{
-		//		var first = grpLevel.First();
-		//		if (first.Field.SortOrder != SortOrder.None)
-		//		{
-		//			bool asc = first.Field.SortOrder == SortOrder.Asc;
-		//			grpLevel.Sort((a, b) => asc ? comparer.Compare(a.Key, b.Key) : comparer.Compare(b.Key, a.Key));
-		//		}
-		//	}
-		//}
 	}
 
-	public class GroupedData<TRow> where TRow : class
+	public class GroupedData<TRow, TAggregates> where TRow : class
 	{
 		public Field[] rowFieldsInGroupOrder = null!;
 		public Field[] colFieldsInGroupOrder = null!;
 
 		public Field[] dataFields = null!;
 
-		public List<List<Group<TRow>>> allRowGroups = null!;
-		public List<List<Group<TRow>>> allColGroups = null!;
+		public List<Group<TRow>> lastRowGroups = null!;
+		public List<Group<TRow>> lastColGroups = null!;
 
 		public List<Field> fields = null!;
-		public Dictionary<string, PropertyDescriptor> props = null!;
+		//public Dictionary<string, PropertyDescriptor> props = null!;
+
+		public PivotTable<TAggregates> PT = null!;
+		public IEnumerable<IGroup<TAggregates>> PT_lastCols = null!;
+		public IEnumerable<IGroup<TAggregates>> PT_lastRows = null!;
 	}
 }

@@ -161,183 +161,7 @@
 
 
 #if false
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PivotExpert
-{
-
-
-	internal class NullableDict<K, V> : IDictionary<K, V>
-	{
-		Dictionary<K, V> dict = new Dictionary<K, V>();
-		V nullValue = default(V);
-		bool hasNull = false;
-
-		public NullableDict()
-		{
-		}
-
-		public void Add(K key, V value)
-		{
-			if (key == null)
-				if (hasNull)
-					throw new ArgumentException("Duplicate key");
-				else
-				{
-					nullValue = value;
-					hasNull = true;
-				}
-			else
-				dict.Add(key, value);
-		}
-
-		public bool ContainsKey(K key)
-		{
-			if (key == null)
-				return hasNull;
-			return dict.ContainsKey(key);
-		}
-
-		public ICollection<K> Keys
-		{
-			get
-			{
-				if (!hasNull)
-					return dict.Keys;
-
-				List<K> keys = dict.Keys.ToList();
-				keys.Add(default(K));
-				return new ReadOnlyCollection<K>(keys);
-			}
-		}
-
-		public bool Remove(K key)
-		{
-			if (key != null)
-				return dict.Remove(key);
-
-			bool oldHasNull = hasNull;
-			hasNull = false;
-			return oldHasNull;
-		}
-
-		public bool TryGetValue(K key, out V value)
-		{
-			if (key != null)
-				return dict.TryGetValue(key, out value);
-
-			value = hasNull ? nullValue : default(V);
-			return hasNull;
-		}
-
-		public ICollection<V> Values
-		{
-			get
-			{
-				if (!hasNull)
-					return dict.Values;
-
-				List<V> values = dict.Values.ToList();
-				values.Add(nullValue);
-				return new ReadOnlyCollection<V>(values);
-			}
-		}
-
-		public V this[K key]
-		{
-			get
-			{
-				if (key == null)
-					if (hasNull)
-						return nullValue;
-					else
-						throw new KeyNotFoundException();
-				else
-					return dict[key];
-			}
-			set
-			{
-				if (key == null)
-				{
-					nullValue = value;
-					hasNull = true;
-				}
-				else
-					dict[key] = value;
-			}
-		}
-
-		public void Add(KeyValuePair<K, V> item)
-		{
-			Add(item.Key, item.Value);
-		}
-
-		public void Clear()
-		{
-			hasNull = false;
-			dict.Clear();
-		}
-
-		public bool Contains(KeyValuePair<K, V> item)
-		{
-			if (item.Key != null)
-				return ((ICollection<KeyValuePair<K, V>>)dict).Contains(item);
-			if (hasNull)
-				return EqualityComparer<V>.Default.Equals(nullValue, item.Value);
-			return false;
-		}
-
-		public void CopyTo(KeyValuePair<K, V>[] array, int arrayIndex)
-		{
-			((ICollection<KeyValuePair<K, V>>)dict).CopyTo(array, arrayIndex);
-			if (hasNull)
-				array[arrayIndex + dict.Count] = new KeyValuePair<K, V>(default(K), nullValue);
-		}
-
-		public int Count
-		{
-			get { return dict.Count + (hasNull ? 1 : 0); }
-		}
-
-		public bool IsReadOnly
-		{
-			get { return false; }
-		}
-
-		public bool Remove(KeyValuePair<K, V> item)
-		{
-			V value;
-			if (TryGetValue(item.Key, out value) && EqualityComparer<V>.Default.Equals(item.Value, value))
-				return Remove(item.Key);
-			return false;
-		}
-
-		public IEnumerator<KeyValuePair<K, V>> GetEnumerator()
-		{
-			if (!hasNull)
-				return dict.GetEnumerator();
-			else
-				return GetEnumeratorWithNull();
-		}
-
-		private IEnumerator<KeyValuePair<K, V>> GetEnumeratorWithNull()
-		{
-			yield return new KeyValuePair<K, V>(default(K), nullValue);
-			foreach (var kv in dict)
-				yield return kv;
-		}
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-	}
-}
 #endif
 
 #if false
@@ -491,3 +315,245 @@ namespace PivotExpert
 			throw new FormatException("Not a keyValue property name (does not start with '/')");
 		}
 #endif
+
+#if false
+using System.ComponentModel;
+
+namespace PivotDataTable
+{
+
+	class RowList<TRow> : List<TRow>, ITypedList
+	{
+		PropertyDescriptorCollection _props;
+
+		public RowList(PropertyDescriptorCollection props)
+		{
+			_props = props;
+		}
+
+		public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors) => _props;
+		public string GetListName(PropertyDescriptor[] listAccessors) => string.Empty;
+	}
+
+	//public abstract class PropertyColumn : PropertyDescriptor
+	//{
+	//	public PropertyColumn(string name, Attribute[] attrs) : base(name, attrs)
+	//	{
+	//	}
+	//}
+
+	/// <summary>
+	/// rename DataField ?
+	/// FieldProperty? _props
+	/// FieldData _datas
+	/// FieldStore _Stores
+	/// _props
+	/// _datas
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	/// <typeparam name="TProp"></typeparam>
+	public class Property<TRow, TProp> : PropertyDescriptor
+	{
+		readonly Func<IEnumerable<TRow>, TProp> _getValue;
+
+		public Property(string fieldName, Func<IEnumerable<TRow>, TProp> getValue)
+			: base(fieldName, null)
+		{
+			_getValue = getValue;
+		}
+
+		public Property(string fieldName)
+			: base(fieldName, null)
+		{
+			_getValue = GetValue;
+		}
+
+		public override object? GetValue(object? component)
+		{
+			if (component is IEnumerable<TRow> rows)
+			{
+				return _getValue(rows);
+			}
+			else
+				throw new InvalidOperationException("wrong component type");
+		}
+
+		protected virtual TProp GetValue(IEnumerable<TRow> rows)
+			=> throw new InvalidOperationException("GetValue(IEnumerable<TRow> rows) must be overridden");
+
+		public override Type PropertyType => typeof(TProp);
+
+		public override void ResetValue(object component)
+		{
+			// Not relevant.
+		}
+
+		public override void SetValue(object? component, object? value) => throw new NotImplementedException();
+
+		public override bool ShouldSerializeValue(object component) => true;
+		public override bool CanResetValue(object component) => false;
+
+		public override Type ComponentType => typeof(IEnumerable<TRow>);
+		public override bool IsReadOnly => true;
+
+
+	}
+
+
+}
+
+#endif
+
+#if false
+using System.Collections;
+using System.Diagnostics.CodeAnalysis;
+
+namespace PivotDataTable
+{
+	public class KeyValueZipList : IDictionary<string, object?>
+	{
+		object?[] _row;
+		List<TableColumn> _tcols;
+
+		public KeyValueZipList(object?[] row, List<TableColumn> tcols)
+		{
+			_row = row;
+			_tcols = tcols;
+		}
+
+		public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
+		{
+			var a = _row.Zip(_tcols).Select(a => new KeyValuePair<string, object?>(a.Second.Name, a.First));
+			return a.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
+		public object? this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+		public ICollection<string> Keys => throw new NotImplementedException();
+		public ICollection<object?> Values => throw new NotImplementedException();
+		public int Count => throw new NotImplementedException();
+		public bool IsReadOnly => throw new NotImplementedException();
+		public void Add(string key, object? value) => throw new NotImplementedException();
+		public void Add(KeyValuePair<string, object?> item) => throw new NotImplementedException();
+		public void Clear() => throw new NotImplementedException();
+		public bool Contains(KeyValuePair<string, object?> item) => throw new NotImplementedException();
+		public bool ContainsKey(string key) => throw new NotImplementedException();
+		public void CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex) => throw new NotImplementedException();
+		public bool Remove(string key) => throw new NotImplementedException();
+		public bool Remove(KeyValuePair<string, object?> item) => throw new NotImplementedException();
+		public bool TryGetValue(string key, [MaybeNullWhen(false)] out object? value) => throw new NotImplementedException();
+
+
+	}
+
+
+}
+
+#endif
+
+#if false
+
+namespace PivotDataTable
+{
+	public class GroupingKey<T> : IEquatable<GroupingKey<T>>
+	{
+		public T[] Groups { get; init; }
+		static EqualityComparer<T> equalityComparer = EqualityComparer<T>.Default;
+
+		public GroupingKey(T[] groups)
+		{
+			Groups = groups;
+		}
+
+		public override int GetHashCode()
+		{
+			var hc = new HashCode();
+			foreach (var g in Groups)
+				hc.Add(g);
+			return hc.ToHashCode();
+		}
+
+		public override bool Equals(object? other)
+		{
+			return Equals(other as GroupingKey<T>);
+		}
+
+		public bool Equals(GroupingKey<T>? other)
+		{
+			if (other == null)
+				return false;
+
+			if (ReferenceEquals(this, other))
+				return true;
+
+			if (Groups.Length != other.Groups.Length)
+				return false;
+
+			for (int i = 0; i < Groups.Length; i++)
+			{
+				if (!equalityComparer.Equals(Groups[i], other.Groups[i]))
+					return false;
+			}
+
+			return true;
+		}
+
+		public override string ToString()
+		{
+			string[] array = new string[Groups.Length];
+			for (int i = 0; i < Groups.Length; i++)
+				array[i] = $"Group{i} = {Groups[i]}";
+
+			return $"{{ {string.Join(", ", array)} }}";
+		}
+	}
+}
+
+#endif
+
+#if false
+		private List<object?[]> SortRows(List<object?[]> rows, List<TableColumn> tableCols)
+		{
+			var sortFields = _data.fields
+				.Where(f => f.FieldArea != Area.Column) // SortOrder col groups mean SortOrder the columns themself (the labels)
+				.Where(f => f.SortOrder != SortOrder.None)
+				.OrderBy(f => f.GroupIndex);
+
+			if (sortFields.Any())
+			{
+				IOrderedEnumerable<object?[]> sorter = null!;
+				foreach (var sf in sortFields)
+				{
+					// TODO lookup idx from filedname
+					var sortCol = tableCols.Single(tc => tc.Name == sf.FieldName);
+					var idx = tableCols.IndexOf(sortCol);
+
+					if (sorter == null)
+						sorter = sf.SortOrder == SortOrder.Asc ? rows.OrderBy(r => r[idx], sf.SortComparer) : rows.OrderByDescending(r => r[idx], sf.SortComparer);
+					else
+						sorter = sf.SortOrder == SortOrder.Asc ? sorter.ThenBy(r => r[idx], sf.SortComparer) : sorter.ThenByDescending(r => r[idx], sf.SortComparer);
+				}
+				rows = sorter.ToList();
+			}
+
+			return rows;
+		}
+#endif
+
+
+//public void Sort(GroupedData<TRow> data)
+//{
+//	//			data.rowFieldsInGroupOrder
+//	var comparer = Comparer<object>.Default;
+//	foreach (var grpLevel in data.allRowGroups)
+//	{
+//		var first = grpLevel.First();
+//		if (first.Field.SortOrder != SortOrder.None)
+//		{
+//			bool asc = first.Field.SortOrder == SortOrder.Asc;
+//			grpLevel.Sort((a, b) => asc ? comparer.Compare(a.Key, b.Key) : comparer.Compare(b.Key, a.Key));
+//		}
+//	}
+//}

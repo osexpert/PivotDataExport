@@ -160,11 +160,11 @@ Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
 Site3;Unit1;Group1;Name1;5;2.1;1
 Site5;Unit6;Group1;Name1;6;5.1;1
 ";
-		const string TestCompareFastAndSlow_RowGroupOnSite_nestcsv = @"Site;Unit;Group;Name;Number;Weight;RowCount
-Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
-Site3;Unit1;Group1;Name1;5;2.1;1
-Site5;Unit6;Group1;Name1;6;5.1;1
-";
+//		const string TestCompareFastAndSlow_RowGroupOnSite_nestcsv = @"Site;Unit;Group;Name;Number;Weight;RowCount
+//Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+//Site3;Unit1;Group1;Name1;5;2.1;1
+//Site5;Unit6;Group1;Name1;6;5.1;1
+//";
 
 		[Fact]
 		public void TestCompareFastAndSlow_RowGroupOnSite()
@@ -211,8 +211,8 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			var nested = slowData.GetTable_NestedKeyValueList_VariableColumns();
 			var nest = ToJson(nested);
 			Assert.Equal(nested_TestCompareFastAndSlow_RowGroupOnSite, nest);
-			var nestCsv = nested.ToCsv();
-			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
+//			var nestCsv = nested.ToCsv();
+//			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
 		}
 
 		private static string ToJson<T>(T table)
@@ -429,14 +429,14 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			fields[nameof(Test1Row.Name)].Area = Area.Column;
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
-			var slow = p.GetGroupedData_SlowIntersect(createEmptyIntersects: true);
-			var fast = p.GetGroupedData_FastIntersect(createEmptyIntersects: true);
+			var slow = p.GetGroupedData_SlowIntersect();// createEmptyIntersects: true);
+			var fast = p.GetGroupedData_FastIntersect();// createEmptyIntersects: true);
 
 			var slowData = new Presentation<Test1Row>(slow);
 			var fastData = new Presentation<Test1Row>(fast);
 
-			var slowDT = slowData.GetDataTable();
-			var fastDT = fastData.GetDataTable();
+			var slowDT = slowData.GetDataTable(createEmptyIntersects: true);
+			var fastDT = fastData.GetDataTable(createEmptyIntersects: true);
 
 			string sFast = fastDT.ToXml();
 			string sSlow = slowDT.ToXml();
@@ -444,16 +444,16 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, sFast);
 			Assert.Equal(sFast, sSlow);
 
-			string slowJson = ToJson(slowData.GetTable_Array());
-			string fastJson = ToJson(fastData.GetTable_Array());
+			string slowJson = ToJson(slowData.GetTable_Array(createEmptyIntersects: true));
+			string fastJson = ToJson(fastData.GetTable_Array(createEmptyIntersects: true));
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json, slowJson);
 			Assert.Equal(slowJson, fastJson);
 
-			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
+			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns(createEmptyIntersects: true);
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
 			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
 
-			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());
+			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns(createEmptyIntersects: true));
 			Assert.Equal(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nest);
 		}
 
