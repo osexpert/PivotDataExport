@@ -21,6 +21,17 @@ namespace PivotDataTable
 	//	Column
 	//}
 
+	/// <summary>
+	/// Based on https://github.com/Kazinix/PivotTable
+	/// Added sorting
+	/// Added common iface for row and col (IGroup)
+	/// Introduced Field
+	/// This impl. seems to be just as fast as GetGroupedData_FastIntersect and more readable,
+	/// so idea is to switch to use this completely.
+	/// It has 1 con: aggregates a lot, waistefull if we dont need them. Could maybe use lazy. Or some other way (eg. callback context in the _aggregateFunction, WIP)
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	/// <typeparam name="TAgg"></typeparam>
 	public class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggregates>
 		   where TRow : class
 	{

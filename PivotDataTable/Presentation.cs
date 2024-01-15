@@ -267,6 +267,7 @@ namespace PivotDataTable
 				foreach (var cg in lastColGroupsSorted)//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
 				{
 					var hasData = rg.IntersectData.TryGetValue(cg, out var data);
+					// createEmptyIntersects did work here, but not in Presentation3, so removed from here for now. Maybe add back again if find out how to implement in Presentation3
 					if (hasData)// || createEmptyIntersects)
 					{
 						//if (!hasData)

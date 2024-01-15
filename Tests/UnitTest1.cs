@@ -349,6 +349,7 @@ Site5;Unit6;Group1;Name1;6;5.1;1
   ]
 }";
 
+		// this originally had dummy values for Name3 in the last 2 rows. Not sure what is more correct.
 		const string nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = @"{
   ""rows"": [
     {
