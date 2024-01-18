@@ -122,7 +122,7 @@ namespace PivotDataTable
 
 
 
-		public GroupedData<TRow, KeyValueList> GetGroupedData_FastIntersect2()//bool createEmptyIntersects = false)
+		public GroupedData<TRow, Lazy<KeyValueList>> GetGroupedData_FastIntersect2()//bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -131,21 +131,24 @@ namespace PivotDataTable
 			var rowFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Row).OrderBy(f => f.GroupIndex).ToArray();
 			var colFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Column).OrderBy(f => f.GroupIndex).ToArray();
 
-			var ptb = new PivotTableBuilder<TRow, KeyValueList?>(_rows, (rows, group) =>
+			var ptb = new PivotTableBuilder<TRow, Lazy<KeyValueList>>(_rows, rows =>
 			{
 				// only leafs
-//				if (group is IGroup<KeyValueList?> g && !g.Children.Any())
+				//if ((agg_ctx == AggregateContext.Row_ColumnAggregates || agg_ctx == AggregateContext.Row_Aggregates) && group is IGroup<KeyValueList?> g && !g.Children.Any())
 				{
-					KeyValueList res = new();
-					foreach (var dataField in dataFields)
+					return new Lazy<KeyValueList>(() =>
 					{
-						var theValue = dataField.GetValue(rows);
-						res.Add(dataField.Name, theValue);
-					}
-					return res;
+						KeyValueList res = new();
+						foreach (var dataField in dataFields)
+						{
+							var theValue = dataField.GetValue(rows);
+							res.Add(dataField.Name, theValue);
+						}
+						return res;
+					});
 				}
 
-	//			return null;
+				//return null;
 			});
 
 			foreach (var rowF in rowFieldsInGroupOrder)
@@ -163,7 +166,7 @@ namespace PivotDataTable
 			var lastCols = Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
 
 
-			return new GroupedData<TRow, KeyValueList>()
+			return new GroupedData<TRow, Lazy<KeyValueList>>()
 			{
 				colFieldsInGroupOrder = colFieldsInGroupOrder,
 				rowFieldsInGroupOrder = rowFieldsInGroupOrder,

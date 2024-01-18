@@ -6,10 +6,10 @@ using System.Net;
 namespace PivotDataTable
 {
 
-	public class Presentation2<TRow> : Presto<TRow, KeyValueList>
+	public class Presentation2<TRow> : Presto<TRow, Lazy<KeyValueList>>
 		where TRow : class
 	{
-		public Presentation2(GroupedData<TRow, KeyValueList> data) : base(data)
+		public Presentation2(GroupedData<TRow, Lazy<KeyValueList>> data) : base(data)
 		{
 		}
 	}
@@ -17,7 +17,7 @@ namespace PivotDataTable
 
 	public class Presto<TRow, TAgg> 
 		where TRow : class
-		where TAgg : KeyValueList
+		where TAgg : Lazy<KeyValueList>
 	{
 
 		GroupedData<TRow, TAgg> _data;
@@ -107,7 +107,7 @@ namespace PivotDataTable
 			if (!lastRowGroups.Any())
 			{
 				var row = new Row<TAgg>();
-				row.ColumnAggregates = lastColGroups.Cast<Column<TAgg>>();
+				row.ColumnAggregates = _data.PT.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
 				row.Aggregates = _data.PT.Aggregates;
 				lastRowGroups.Add(row);
 				fakeRow = true;
@@ -146,6 +146,7 @@ namespace PivotDataTable
 
 							if (!hasData)
 							{
+								// createEmptyIntersects is true and no data
 								// write default values
 								if (defaultValues == null)
 								{
@@ -162,7 +163,7 @@ namespace PivotDataTable
 							}
 							else
 							{
-								values = data.Aggregates.Select(a => a.Value).ToArray();
+								values = data.Aggregates.Value.Select(a => a.Value).ToArray();
 							}
 
 							//var values = lastRowGroup.IntersectData[lastColGroup];
@@ -184,7 +185,7 @@ namespace PivotDataTable
 				{
 					// no col grouping
 					var agg = lastRowGroup.Aggregates;
-					var values = agg.Select(a => a.Value).ToArray();
+					var values = agg.Value.Select(a => a.Value).ToArray();
 					if (values.Length != _data.dataFields.Length)
 						throw new Exception("mismatch in length..");
 					Array.Copy(values, 0, row, totalStartIdx, values.Length);
@@ -384,7 +385,7 @@ namespace PivotDataTable
 			// only leafs
 			if (!cg.Children.Any())
 			{
-				foreach (var v in cg.Aggregates)
+				foreach (var v in cg.Aggregates.Value)
 				{
 					keyVals.Add(v);
 				}

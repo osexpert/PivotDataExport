@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
 namespace PivotDataTable
 {
 	//public interface IPivotTableBuilder<TRow, TAggregates>
@@ -16,9 +17,14 @@ namespace PivotDataTable
 
 	//public enum AggregateContext
 	//{
-	//	Table,
-	//	Row,
-	//	Column
+	//	//Table,
+	//	//Row,
+	//	//Column,
+	//	Row_Aggregates,
+	//	Row_ColumnAggregates,
+	//	Table_Aggregates,
+	//	Table_ColumnAggregates,
+	//	//Column_Aggregates
 	//}
 
 	/// <summary>
@@ -37,12 +43,12 @@ namespace PivotDataTable
 	{
 		private readonly IList<(Func<TRow, object?>, Field)> _rowFunctions;
 		private readonly IList<(Func<TRow, object?>, Field)> _columnFunctions;
-		private readonly Func<IEnumerable<TRow>, IGroup<TAgg>?, TAgg> _aggregateFunction;
+		private readonly Func<IEnumerable<TRow>, TAgg> _aggregateFunction;
 		private readonly IEnumerable<TRow> _list;
 
 		//public bool _calcRootColumnAggregates = true;
 
-		internal PivotTableBuilder(IEnumerable<TRow> list, Func<IEnumerable<TRow>, IGroup<TAgg>?, TAgg> aggregateFunction)
+		internal PivotTableBuilder(IEnumerable<TRow> list, Func<IEnumerable<TRow>, TAgg> aggregateFunction)
 		{
 			_list = list;
 			_aggregateFunction = aggregateFunction;
@@ -66,14 +72,14 @@ namespace PivotDataTable
 			var pivotTable = new PivotTable<TAgg>();
 
 			//compute aggregates for the whole table
-			pivotTable.Aggregates = _aggregateFunction(_list, null);
-			pivotTable.ColumnAggregates = ComputeColumns(null, _list, _columnFunctions);
+			pivotTable.Aggregates = _aggregateFunction(_list);//, null, AggregateContext.Table_Aggregates);
+			pivotTable.ColumnAggregates = ComputeColumns(null, _list, _columnFunctions);//, AggregateContext.Table_ColumnAggregates);
 			pivotTable.Rows = ComputeRows(null, _list, _rowFunctions, _columnFunctions);
 
 			return pivotTable;
 		}
 
-		private IEnumerable<Row<TAgg>> ComputeRows(Row<TAgg>? parent, IEnumerable<TRow> list,
+		private List<Row<TAgg>> ComputeRows(Row<TAgg>? parent, IEnumerable<TRow> list,
 			IEnumerable<(Func<TRow, object?>, Field)> rowFunctions,
 			IEnumerable<(Func<TRow, object?>, Field)> columnFunctions)
 		{
@@ -99,13 +105,16 @@ namespace PivotDataTable
 				newRow.Field = field;
 				newRow.Parent = parent;
 				newRow.Value = group.Key;
-				
-				newRow.Children = ComputeRows(newRow, group.ToList(), rowFunctionsCopy, columnFunctions);
 
-				newRow.ColumnAggregates = ComputeColumns(null /* hmm...maybe the newRow is the parent here?? in case, parent must be IGroup? */, group.ToList(), _columnFunctions);
+				var groupRows = group.ToList();
 
-				// ToList seems useless? At least 3 times...
-				newRow.Aggregates = _aggregateFunction(group.ToList(), newRow);
+				// ToList seems useless? At least 3 times...fixed now?
+				// Do Aggregate after Compute, so the delegate can use info from newRow to decide if to calc the agg.
+				newRow.Aggregates = _aggregateFunction(groupRows);//, newRow, AggregateContext.Row_Aggregates);
+
+				newRow.Children = ComputeRows(newRow, groupRows, rowFunctionsCopy, columnFunctions);
+
+				newRow.ColumnAggregates = ComputeColumns(null /* hmm...maybe the newRow is the parent here?? in case, parent must be IGroup? */, groupRows, _columnFunctions);//, AggregateContext.Row_ColumnAggregates);
 
 				rows.Add(newRow);
 			}
@@ -122,8 +131,8 @@ namespace PivotDataTable
 			return rows;
 		}
 
-		private IEnumerable<Column<TAgg>> ComputeColumns(Column<TAgg>? parent, IEnumerable<TRow> list,
-			IEnumerable<(Func<TRow, object?>, Field)> columnFunctions)
+		private List<Column<TAgg>> ComputeColumns(Column<TAgg>? parent, IEnumerable<TRow> list,
+			IEnumerable<(Func<TRow, object?>, Field)> columnFunctions)//, AggregateContext agg_ctx)
 		{
 			var columns = new List<Column<TAgg>>();
 			if (!columnFunctions.Any())
@@ -147,10 +156,14 @@ namespace PivotDataTable
 				newColumn.Field = field;
 				newColumn.Parent = parent;
 				newColumn.Value = group.Key;
-				newColumn.Children = ComputeColumns(newColumn, group.ToList(), columnFunctionsCopy);
 
-				// ToList seems useless? At least 2 times...
-				newColumn.Aggregates = _aggregateFunction(group.ToList(), newColumn);
+				var groupRows = group.ToList();
+
+				// ToList seems useless? At least 2 times...fixed now?
+				// Do Aggregate after Compute, so the delegate can use info from newColumn to decide if to calc the agg.
+				newColumn.Aggregates = _aggregateFunction(groupRows);//, newColumn);//, agg_ctx);
+
+				newColumn.Children = ComputeColumns(newColumn, groupRows, columnFunctionsCopy);//, agg_ctx);
 
 				columns.Add(newColumn);
 			}
@@ -210,6 +223,9 @@ namespace PivotDataTable
 		IGroup<TAgg>? IGroup<TAgg>.Parent => Parent;
 	}
 
+	// This one is kind of similar to a row and share all 3 things with a row: Aggregates, ColumnAggregates and Rows (Children)
+	// Could this be extracted into an iface? Or could a row inherit PivotTable?
+	// So its kind of weid that the table is kind of a row?
 	public class PivotTable<TAgg>
 	{
 		internal PivotTable() { }
