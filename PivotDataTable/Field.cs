@@ -17,6 +17,7 @@ namespace PivotDataTable
 
 		public Func<IEnumerable<object>, object?> GetValue = null!;
 
+
 		// TODO: need both?
 		public IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
 		public IComparer<object?> SortComparer = Comparer<object?>.Default;

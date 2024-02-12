@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 
@@ -162,8 +163,8 @@ namespace PivotDataTable
 			var rbl = ptb.Build();
 
 			// flip so we get the last groups (they have no children)
-			var lastRows = Flatten(rbl.Rows).Where(r => !r.Children.Any()).ToList();
-			var lastCols = Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
+			var lastRows = GetLast(rbl.Rows).ToList();// Flatten(rbl.Rows).Where(r => !r.Children.Any()).ToList();
+			var lastCols = GetLast(rbl.ColumnAggregates).ToList();// Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
 
 
 			return new GroupedData<TRow, Lazy<KeyValueList>>()
@@ -181,23 +182,32 @@ namespace PivotDataTable
 			};
 		}
 
-		static IEnumerable<IGroup<TAgg>> Flatten<TAgg>(IEnumerable<IGroup<TAgg>> collection)
+		/// <summary>
+		/// return groups without children (Last groups)
+		/// </summary>
+		static IEnumerable<IGroup<TAgg>> GetLast<TAgg>(IEnumerable<IGroup<TAgg>> source)
 		{
-			foreach (var o in collection)
-			{
-				foreach (var t in Flatten(o.Children))
-					yield return t;
-
-				yield return o;
-				//if (o. is IEnumerable<IGroup<TAgg>> oo)// oo && !(o is T))
-				//{
-				//	foreach (var t in Flatten(oo))
-				//		yield return t;
-				//}
-				//else
-				//	yield return o;
-			}
+			return source.TopogicalSequenceDFS<IGroup<TAgg>>(d => d.Children).Where(r => !r.Children.Any());
 		}
+
+
+		//static IEnumerable<IGroup<TAgg>> Flatten<TAgg>(IEnumerable<IGroup<TAgg>> collection)
+		//{
+		//	foreach (var o in collection)
+		//	{
+		//		foreach (var t in Flatten(o.Children))
+		//			yield return t;
+
+		//		yield return o;
+		//		//if (o. is IEnumerable<IGroup<TAgg>> oo)// oo && !(o is T))
+		//		//{
+		//		//	foreach (var t in Flatten(oo))
+		//		//		yield return t;
+		//		//}
+		//		//else
+		//		//	yield return o;
+		//	}
+		//}
 
 		/// <summary>
 		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
