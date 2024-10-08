@@ -274,27 +274,27 @@ namespace Tests
 			fields[nameof(Test1Row.Group)].GroupIndex = 2;
 
 
-			//var sdata = pivoter.GetGroupedData_SlowIntersect();
 			var gdata_ptb = pivoter.GetGroupedData_PivotTableBuilder();
+			var gdata_fis = pivoter.GetGroupedData_FastIntersect();
 
 
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var pres_fis = new Presentation<Test1Row>(gdata_fis);
+
 			// FIXME: currently no supporty for SortOrder
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
+
+			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 
 			//			nested.Columns = null;
 			//		nested.ColumnGroups = null;
 			//	nested.RowGroups = null;
 
 			var json_ptb = ToJson(nested_tbl_ptb);
-
-			//var slow = p.GetGroupedData_SlowIntersect();
-			//var fast = p.GetGroupedData_FastIntersect();
-
-			//var slowData = new Presentation<Test1Row>(slow);
-			//var fastData = new Presentation<Test1Row>(fast);
+			var json_fis = ToJson(nested_tbl_fis);
 
 			Assert.AreEqual(test_json, json_ptb);
+			Assert.AreEqual(json_ptb, json_fis);
 		}
 
 		private static string ToJson<T>(T table)

@@ -210,26 +210,41 @@ namespace Tests
 			Assert.AreEqual(xml_ptb, xml_fis);
 
 			var table_fis = pres_fis.GetTable_Array();
+			var table_ptb = pres_ptb.GetTable_Array();
 			string json_fis = ToJson(table_fis);
-			string json_ptb = ToJson(pres_ptb.GetTable_Array());
+			string json_ptb = ToJson(table_ptb);
 			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite_json, json_fis);
 			Assert.AreEqual(json_fis, json_ptb);
 
 			var csv_fis = table_fis.ToCsv();
 			Assert.AreEqual(TestCompareFastAndSlow_RowGroupOnSite_csv_slow, csv_fis);
+			var csv_ptb = table_ptb.ToCsv();
+			Assert.AreEqual(csv_ptb, csv_fis);
 
 			var tblDictArr_fis = pres_fis.GetTable_FlatKeyValueList_CompleteColumns();
 			var json_tblDictArr_fis = ToJson(tblDictArr_fis);
 			Assert.AreEqual(str_TestCompareFastAndSlow_GetTable_DictArr, json_tblDictArr_fis);
+			var tblDictArr_ptb = pres_ptb.GetTable_FlatKeyValueList_CompleteColumns();
+			var json_tblDictArr_ptb = ToJson(tblDictArr_ptb);
+			Assert.AreEqual(json_tblDictArr_ptb, json_tblDictArr_fis);
+
 			var flatCsv_fis = tblDictArr_fis.ToCsv();
 			Assert.AreEqual(TestCompareFastAndSlow_RowGroupOnSite_csv_flat, flatCsv_fis);
+			var flatCsv_ptb = tblDictArr_ptb.ToCsv();
+			Assert.AreEqual(flatCsv_ptb, flatCsv_fis);
 
 			// same as GetTable_FlatDict in this case
 			var nested_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 			var nest_json_fis = ToJson(nested_fis);
 			Assert.AreEqual(nested_TestCompareFastAndSlow_RowGroupOnSite, nest_json_fis);
-//			var nestCsv = nested.ToCsv();
-//			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
+			// FIXME: ptb is empty
+//			var nested_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
+	//		var nest_json_ptb = ToJson(nested_ptb);
+		//	Assert.AreEqual(nest_json_ptb, nest_json_fis);
+
+
+			//			var nestCsv = nested.ToCsv();
+			//			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
 		}
 
 		private static string ToJson<T>(T table)
@@ -463,9 +478,16 @@ namespace Tests
 			var tblDictArr_fis = pres_fis.GetTable_FlatKeyValueList_CompleteColumns(createEmptyIntersects: true);
 			var json_tblDictArr_fis = ToJson(tblDictArr_fis);
 			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, json_tblDictArr_fis);
+			var tblDictArr_ptb = pres_ptb.GetTable_FlatKeyValueList_CompleteColumns(createEmptyIntersects: true);
+			var json_tblDictArr_ptb = ToJson(tblDictArr_ptb);
+			Assert.AreEqual(json_tblDictArr_ptb, json_tblDictArr_fis);
 
 			var nested_json_fis = ToJson(pres_fis.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
 			Assert.AreEqual(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nested_json_fis);
+			
+			// fixme: PTB is empty
+			//var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
+			//Assert.AreEqual(nested_json_ptb, nested_json_fis);
 		}
 
 		const string str_TestCompareFastAndSlow_ColGroupOnName = """
@@ -698,10 +720,17 @@ namespace Tests
 			var tblDictArr_fis = pres_fis.GetTable_FlatKeyValueList_CompleteColumns();
 			var json_tblDictArr_fis = ToJson(tblDictArr_fis);
 			Assert.AreEqual(str_TestCompareFastAndSlow_NoGroup_DictArr, json_tblDictArr_fis);
+			var tblDictArr_ptb = pres_ptb.GetTable_FlatKeyValueList_CompleteColumns();
+			var json_tblDictArr_ptb = ToJson(tblDictArr_ptb);
+			Assert.AreEqual(json_tblDictArr_ptb, json_tblDictArr_fis);
 
 			// this produce same result as GetTable_FlatDict in this case (no col groups)
 			var nested_json_fis = ToJson(pres_fis.GetTable_NestedKeyValueList_VariableColumns());
 			Assert.AreEqual(nested_TestCompareFastAndSlow_NoGroup, nested_json_fis);
+			
+			// FIXME: ptb is empty (dont support total rows?)
+			//var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());
+			//Assert.AreEqual(nested_json_ptb, nested_json_fis);
 		}
 
 		const string TestGroupSiteThenUnitSortBoth_nested = """
@@ -966,25 +995,36 @@ namespace Tests
 			sg.SortOrder = SortOrder.Desc;
 
 			var gdata_ptb = td.GetGroupedData_PivotTableBuilder();
+			var gdata_fis = td.GetGroupedData_FastIntersect();
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
+			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 			var json_ptb = ToJson(nested_tbl_ptb);
 			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_nested, json_ptb);
+			var json_fis = ToJson(nested_tbl_fis);
+			Assert.AreEqual(json_fis, json_ptb);
 
 			var flat_tbl_ptb = pres_ptb.GetTable_FlatKeyValueList_CompleteColumns();
-//			flat.Columns = null;
-//			flat.ColumnGroups = null;
-	//		flat.RowGroups = null;
+			var flat_tbl_fis = pres_fis.GetTable_FlatKeyValueList_CompleteColumns();
+			//			flat.Columns = null;
+			//			flat.ColumnGroups = null;
+			//		flat.RowGroups = null;
 			var flat_json_ptb = ToJson(flat_tbl_ptb);
 			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_flat, flat_json_ptb);
+			var flat_json_fis = ToJson(flat_tbl_fis);
+			Assert.AreEqual(flat_json_fis, flat_json_ptb);
 
 			var xml_nest_ptb = nested_tbl_ptb.ToXml();
 			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_xml_nest, xml_nest_ptb);
+			var xml_nest_fis = nested_tbl_fis.ToXml();
+			Assert.AreEqual(xml_nest_fis, xml_nest_ptb);
 
 			var xml_flat_ptb = flat_tbl_ptb.ToXml();
 			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_xml_flat, xml_flat_ptb);
-
-			// TODO: add fis tests!!
+			var xml_flat_fis = flat_tbl_fis.ToXml();
+			Assert.AreEqual(xml_flat_fis, xml_flat_ptb);
+			
 		}
 
 
