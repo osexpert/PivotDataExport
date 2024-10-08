@@ -50,7 +50,7 @@ namespace Test
 			//var props = TypeDescriptor.GetProperties(typeof(CsvRow));
 
 
-			var s = Stopwatch.StartNew();
+			
 
 			var fields = new List<Field>();
 
@@ -143,38 +143,64 @@ namespace Test
 
 			////			TypeValue: object, name, fullname
 
+
 			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
+			var pivot2 = new Pivoter2<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
-			var data = pivot.GetGroupedData_FastIntersect();
+			Console.WriteLine("start?");
+			Console.ReadKey();
+			Console.WriteLine("start!");
 
-			s.Stop(); // 13 sek
+			var s3 = Stopwatch.StartNew();
+			var gdata_ptb = pivot2.GetGroupedData_PivotTableBuilder();
+			s3.Stop(); // 29 ?? mem??
 
-			var pivotTable = salesRecords
-	.GetPivotTableBuilder(l => l.Sum(e => e.UnitsSold))
-	.SetRow(e => e.Region)
-	.SetRow(e => e.Country)
-	.SetColumn(e => e.ItemType)
-	.SetColumn(e => e.SalesChannel)
-	.Build();
+			Console.WriteLine("done");
+			Console.ReadKey();
 
-			var pivotTable2 = salesRecords
-	.GetPivotTableBuilder(l => l.Sum(e => e.UnitsSold))
-	.SetRow(e => e.Region)
-	.SetRow(e => e.Country)
-	.Build();
+			var s = Stopwatch.StartNew();
+			var gdata_fis = pivot.GetGroupedData_FastIntersect();
+			s.Stop(); // 14.4 sek
 
-			var pivotTable3 = salesRecords
-.GetPivotTableBuilder(l => new
-{
-	Sum = l.Sum(e => e.UnitsSold),
-	Avg = l.Average(e => e.UnitsSold)
-})
-.SetRow(e => e.Region)
-.SetRow(e => e.Country)
-.Build();
 
-			var pres = new Presentation<CsvRow>(data);
-			var nested_kv_tbl = pres.GetTable_NestedKeyValueList_VariableColumns();
+			//			var pivotTable = salesRecords
+			//	.GetPivotTableBuilder(l => l.Sum(e => e.UnitsSold))
+			//	.SetRow(e => e.Region)
+			//	.SetRow(e => e.Country)
+			//	.SetColumn(e => e.ItemType)
+			//	.SetColumn(e => e.SalesChannel)
+			//	.Build();
+
+			//			var pivotTable2 = salesRecords
+			//	.GetPivotTableBuilder(l => l.Sum(e => e.UnitsSold))
+			//	.SetRow(e => e.Region)
+			//	.SetRow(e => e.Country)
+			//	.Build();
+
+			//			var pivotTable3 = salesRecords
+			//.GetPivotTableBuilder(l => new
+			//{
+			//	Sum = l.Sum(e => e.UnitsSold),
+			//	Avg = l.Average(e => e.UnitsSold)
+			//})
+			//.SetRow(e => e.Region)
+			//.SetRow(e => e.Country)
+			//.Build();
+
+			var s2 = Stopwatch.StartNew();
+
+			var pres_fis = new Presentation<CsvRow>(gdata_fis);
+			var nested_kv_tbl = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
+
+			s2.Stop();
+
+			var s4 = Stopwatch.StartNew();
+
+			var pres_ptb = new Presentation2<CsvRow>(gdata_ptb);
+			var nested_kv_tbl2 = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
+
+			s4.Stop();
+
 
 			using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv.json", FileMode.Create))
 			{
@@ -186,13 +212,25 @@ namespace Test
 				nested_kv_tbl.WriteXml(f);
 			}
 
+			using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv2.json", FileMode.Create))
+			{
+				JsonSerializer.Serialize(f, nested_kv_tbl2, new JsonSerializerOptions { WriteIndented = true });
+			}
+
+			using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv2.xml", FileMode.Create))
+			{
+				nested_kv_tbl2.WriteXml(f);
+			}
+
+
+
 			// fails
 			//using (var f = File.Open(@"d:\test5mill_nested_kv.csv", FileMode.Create))
 			//{
 			//	nested_kv_tbl.WriteCsv(f);
 			//}
 
-			var flat_kv_tbl = pres.GetTable_FlatKeyValueList_CompleteColumns();
+			var flat_kv_tbl = pres_fis.GetTable_FlatKeyValueList_CompleteColumns();
 
 			using (var f = File.Open(@"d:\pivottest\test5mill_flat_kv.json", FileMode.Create))
 			{
@@ -209,7 +247,7 @@ namespace Test
 				flat_kv_tbl.WriteCsv(f);
 			}
 
-			var array_tbl = pres.GetTable_Array();
+			var array_tbl = pres_fis.GetTable_Array();
 
 			using (var f = File.Open(@"d:\pivottest\test5mill_array.json", FileMode.Create))
 			{

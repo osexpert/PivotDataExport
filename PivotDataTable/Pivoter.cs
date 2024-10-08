@@ -115,111 +115,13 @@ namespace PivotDataTable
 			return _fields.Where(f => f.Area == Area.Data);//.OrderBy(f => f.Index);
 		}
 
-		//private IEnumerable<Field> GetGroupFields()
-		//{
-		//	return _fields.Where(f => f.FieldType == FieldType.RowGroup).OrderBy(f => f.GroupIndex)
-		//		.Concat(_fields.Where(f => f.FieldType == FieldType.ColGroup).OrderBy(f => f.GroupIndex));
-		//}
 
-
-		/// <summary>
-		/// Don't remeber why I made both GetGroupedData_FastIntersec and GetGroupedData_PivotTableBuilder
-		/// But It seems GetGroupedData_PivotTableBuilder is 2 times slower than GetGroupedData_FastIntersect?
-		/// This seemss weird thou.
-		/// And I see this one uses Lazy, but not the other one.
-		/// </summary>
-		/// <returns></returns>
-		public GroupedData<TRow, Lazy<KeyValueList>> GetGroupedData_PivotTableBuilder()//bool createEmptyIntersects = false)
-		{
-			Validate();
-
-			var dataFields = GetDataFields().ToArray();
-
-			var rowFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Row).OrderBy(f => f.GroupIndex).ToArray();
-			var colFieldsInGroupOrder = _fields.Where(f => f.Area == Area.Column).OrderBy(f => f.GroupIndex).ToArray();
-
-			var ptb = new PivotTableBuilder<TRow, Lazy<KeyValueList>>(_rows, rows =>
-			{
-				// only leafs
-				//if ((agg_ctx == AggregateContext.Row_ColumnAggregates || agg_ctx == AggregateContext.Row_Aggregates) && group is IGroup<KeyValueList?> g && !g.Children.Any())
-				{
-					return new Lazy<KeyValueList>(() =>
-					{
-						KeyValueList res = new();
-						foreach (var dataField in dataFields)
-						{
-							var theValue = dataField.GetValue(rows);
-							res.Add(dataField.Name, theValue);
-						}
-						return res;
-					});
-				}
-
-				//return null;
-			});
-
-			foreach (var rowF in rowFieldsInGroupOrder)
-			{
-				ptb.AddRow((row => rowF.GetValue(row.Yield()), rowF));
-			}
-			foreach (var colF in colFieldsInGroupOrder)
-			{
-				ptb.AddColumn((col => colF.GetValue(col.Yield()), colF));
-			}
-			var rbl = ptb.Build();
-
-			// flip so we get the last groups (they have no children)
-			var lastRows = GetLast(rbl.Rows).ToList();// Flatten(rbl.Rows).Where(r => !r.Children.Any()).ToList();
-			var lastCols = GetLast(rbl.ColumnAggregates).ToList();// Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
-
-
-			return new GroupedData<TRow, Lazy<KeyValueList>>()
-			{
-				colFieldsInGroupOrder = colFieldsInGroupOrder,
-				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
-				dataFields = dataFields,
-				//allRowGroups = allRowGroups,
-				//allColGroups = allColGroups,
-				PT = rbl,
-				fields = _fields,
-				//props = _props
-				PT_lastCols = lastCols,
-				PT_lastRows = lastRows
-			};
-		}
-
-		/// <summary>
-		/// return groups without children (Last groups)
-		/// </summary>
-		static IEnumerable<IGroup<TAgg>> GetLast<TAgg>(IEnumerable<IGroup<TAgg>> source)
-		{
-			return source.TopogicalSequenceDFS<IGroup<TAgg>>(d => d.Children).Where(r => !r.Children.Any());
-		}
-
-
-		//static IEnumerable<IGroup<TAgg>> Flatten<TAgg>(IEnumerable<IGroup<TAgg>> collection)
-		//{
-		//	foreach (var o in collection)
-		//	{
-		//		foreach (var t in Flatten(o.Children))
-		//			yield return t;
-
-		//		yield return o;
-		//		//if (o. is IEnumerable<IGroup<TAgg>> oo)// oo && !(o is T))
-		//		//{
-		//		//	foreach (var t in Flatten(oo))
-		//		//		yield return t;
-		//		//}
-		//		//else
-		//		//	yield return o;
-		//	}
-		//}
 
 		/// <summary>
 		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow, KeyValueList> GetGroupedData_FastIntersect()//bool createEmptyIntersects = false)
+		public GroupedData<TRow> GetGroupedData_FastIntersect()//bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -292,7 +194,7 @@ namespace PivotDataTable
 				allColGroups.Add(new List<Group<TRow>>() { rootColGroup }); 
 			}
 
-			return new GroupedData<TRow, KeyValueList>()
+			return new GroupedData<TRow>()
 			{
 				colFieldsInGroupOrder = colFieldsInGroupOrder,
 				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
@@ -388,7 +290,7 @@ namespace PivotDataTable
 
 	}
 
-	public class GroupedData<TRow, TAggregates> where TRow : class
+	public class GroupedData<TRow> where TRow : class
 	{
 		public Field[] rowFieldsInGroupOrder = null!;
 		public Field[] colFieldsInGroupOrder = null!;
@@ -399,10 +301,5 @@ namespace PivotDataTable
 		public List<Group<TRow>> lastColGroups = null!;
 
 		public List<Field> fields = null!;
-		//public Dictionary<string, PropertyDescriptor> props = null!;
-
-		public PivotTable<TAggregates> PT = null!;
-		public IEnumerable<IGroup<TAggregates>> PT_lastCols = null!;
-		public IEnumerable<IGroup<TAggregates>> PT_lastRows = null!;
 	}
 }

@@ -186,7 +186,7 @@ namespace Tests
 		[TestMethod]
 		public void TestCompareFastAndSlow_RowGroupOnSite()
 		{
-			Pivoter<Test1Row> p = GetPivoterTestData();
+			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 			fields[nameof(Test1Row.Site)].Area = Area.Row;
@@ -195,7 +195,7 @@ namespace Tests
 			fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Asc;
 
 			var gdata_fis = p.GetGroupedData_FastIntersect();
-			var gdata_ptb = p.GetGroupedData_PivotTableBuilder();
+			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
@@ -446,7 +446,7 @@ namespace Tests
 		[TestMethod]
 		public void TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName()
 		{
-			Pivoter<Test1Row> p = GetPivoterTestData();
+			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 			fields[nameof(Test1Row.Site)].Area = Area.Row;
@@ -456,7 +456,7 @@ namespace Tests
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
 			var gdata_fis = p.GetGroupedData_FastIntersect();// createEmptyIntersects: true);
-			var gdata_ptb = p.GetGroupedData_PivotTableBuilder();// createEmptyIntersects: true);
+			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();// createEmptyIntersects: true);
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
@@ -584,7 +584,7 @@ namespace Tests
 	// Expected: when only group in col, 1 row in the result with only totalt
 		public void TestCompareFastAndSlow_ColGroupOnName()
 		{
-			Pivoter<Test1Row> p = GetPivoterTestData();
+			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 
@@ -592,7 +592,7 @@ namespace Tests
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
 			var gdata_fis = p.GetGroupedData_FastIntersect();
-			var gdata_ptb = p.GetGroupedData_PivotTableBuilder();
+			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
@@ -690,12 +690,12 @@ namespace Tests
 		// Expected: 1 row with totals
 		public void TestCompareFastAndSlow_NoGroup()
 		{
-			Pivoter<Test1Row> p = GetPivoterTestData();
+			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 
 			var gdata_fis = p.GetGroupedData_FastIntersect();
-			var gdata_ptb = p.GetGroupedData_PivotTableBuilder();
+			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
@@ -975,7 +975,7 @@ namespace Tests
 		[TestMethod]
 		public void TestGroupSiteThenUnitSortBoth()
 		{
-			var td = GetPivoterTestData();
+			(Pivoter<Test1Row> td, Pivoter2<Test1Row> td2) = GetPivoterTestData();
 			var sf = td.Fields.Single(f => f.Name == "Site");
 			sf.Area = Area.Row;
 			sf.GroupIndex = 0;
@@ -989,7 +989,20 @@ namespace Tests
 			sg.GroupIndex = 0;
 			sg.SortOrder = SortOrder.Desc;
 
-			var gdata_ptb = td.GetGroupedData_PivotTableBuilder();
+			var sf2 = td2.Fields.Single(f => f.Name == "Site");
+			sf2.Area = Area.Row;
+			sf2.GroupIndex = 0;
+			sf2.SortOrder = SortOrder.Asc;
+			var su2 = td2.Fields.Single(f => f.Name == "Unit");
+			su2.Area = Area.Row;
+			su2.GroupIndex = 1;
+			su2.SortOrder = SortOrder.Desc;
+			var sg2 = td2.Fields.Single(f => f.Name == "Group");
+			sg2.Area = Area.Column;
+			sg2.GroupIndex = 0;
+			sg2.SortOrder = SortOrder.Desc;
+
+			var gdata_ptb = td2.GetGroupedData_PivotTableBuilder();
 			var gdata_fis = td.GetGroupedData_FastIntersect();
 			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
@@ -1023,7 +1036,7 @@ namespace Tests
 		}
 
 
-		private static Pivoter<Test1Row> GetPivoterTestData()
+		private static (Pivoter<Test1Row>, Pivoter2<Test1Row>) GetPivoterTestData()
 		{
 			var r1 = new Test1Row { Site = "Site1", Unit = "Unit1", Group = "Group1", Name = "Name1", Number = 1, Weight = 1.1 };
 			var r2 = new Test1Row { Site = "Site1", Unit = "Unit1", Group = "Group2", Name = "Name1", Number = 2, Weight = 1.2 };
@@ -1041,8 +1054,9 @@ namespace Tests
 			var p7 = new Field<Test1Row, int>("RowCount", rows => rows.Count());
 			var props = new Field[] { p1, p2, p3, p4, p5, p6, p7 };
 
-			var p = new Pivoter<Test1Row>(rows, props);
-			return p;
+			var pivot = new Pivoter<Test1Row>(rows, props);
+			var pivot2 = new Pivoter2<Test1Row>(rows, props);
+			return (pivot, pivot2);
 		}
 
 

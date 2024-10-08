@@ -6,23 +6,23 @@ using System.Net;
 namespace PivotDataTable
 {
 
-	public class Presentation2<TRow> : Presto<TRow, Lazy<KeyValueList>>
+	public class Presentation2<TRow> : Presentation2<TRow, Lazy<KeyValueList>>
 		where TRow : class
 	{
-		public Presentation2(GroupedData<TRow, Lazy<KeyValueList>> data) : base(data)
+		public Presentation2(GroupedData2<TRow, Lazy<KeyValueList>> data) : base(data)
 		{
 		}
 	}
 
 
-	public class Presto<TRow, TAgg> 
+	public class Presentation2<TRow, TAgg> 
 		where TRow : class
 		where TAgg : Lazy<KeyValueList>
 	{
 
-		GroupedData<TRow, TAgg> _data;
+		GroupedData2<TRow, TAgg> _data;
 
-		public Presto(GroupedData<TRow, TAgg> data)
+		public Presentation2(GroupedData2<TRow, TAgg> data)
 		{
 			_data = data;
 		}
@@ -36,8 +36,8 @@ namespace PivotDataTable
 		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool createEmptyIntersects = false)
 			where TTableRow : class, IEnumerable
 		{
-			var lastRowGroups = _data.PT_lastRows;// OrDefault() ?? [];
-			var lastColGroups = _data.PT_lastCols;// OrDefault() ?? [];
+			var lastRowGroups = _data.lastRows;// OrDefault() ?? [];
+			var lastColGroups = _data.lastCols;// OrDefault() ?? [];
 
 			var colFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Column)
 				.Where(f => f.SortOrder != SortOrder.None)
@@ -107,8 +107,8 @@ namespace PivotDataTable
 			if (!lastRowGroups.Any())
 			{
 				var row = new Row<TAgg>();
-				row.ColumnAggregates = _data.PT.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
-				row.Aggregates = _data.PT.Aggregates;
+				row.ColumnAggregates = _data.table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.table.Aggregates;
 				lastRowGroups.Add(row);
 				fakeRow = true;
 			}
@@ -335,20 +335,15 @@ namespace PivotDataTable
 
 			//var lastColGroupsSorted = SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder).ToList();
 
-			var lastRowGroups = _data.PT_lastRows.ToList();
+			var lastRowGroups = _data.lastRows.ToList();
 
-			//bool fakeRow = false;
 			if (!lastRowGroups.Any())
 			{
 				var row = new Row<TAgg>();
-				row.ColumnAggregates = _data.PT.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
-				row.Aggregates = _data.PT.Aggregates;
+				row.ColumnAggregates = _data.table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.table.Aggregates;
 				lastRowGroups.Add(row);
-			//	fakeRow = true;
 			}
-
-
-
 
 			foreach (var rg in lastRowGroups.Cast<Row<TAgg>>())// SortGroups(_data.PT_lastRows, _data.rowFieldsInGroupOrder).Cast<Row<TAgg>>())
 			{
@@ -368,37 +363,19 @@ namespace PivotDataTable
 				Dictionary<IGroup<TAgg>, List<KeyValueList>> groupToLists = new();
 
 
-				if (_data.PT_lastCols.Any())
+				if (_data.lastCols.Any())
 				{
-
-					//				var intersectData = rg.ColumnAggregates.ToDictionary(ks => ks.Value);
-
-					// Add the data
-					foreach (var cg in rg.ColumnAggregates)//flippedCols)//lastColGroupsSorted.Cast<Column<TAgg>>())//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
-					{
+					foreach (var cg in rg.ColumnAggregates)
 						AddData(row, cg, groupToLists, ref groupToKeyVals);
-					}
 				}
 				else
 				{
-					// no col grouping
-					var agg = rg.Aggregates;
-//					var values = agg.Value.Select(a => a.Value).ToArray();
-	//				if (values.Length != _data.dataFields.Length)
-		//				throw new Exception("mismatch in length..");
-					//Array.Copy(values, 0, row, totalStartIdx, values.Length);
-					foreach (var cg in agg.Value)//flippedCols)//lastColGroupsSorted.Cast<Column<TAgg>>())//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
-					{
-						//	AddData(row, cg, groupToLists, ref groupToKeyVals);
+					foreach (var cg in rg.Aggregates.Value)
 						row.Add(cg);
-					}
-
-					//KeyValueList keyVals = GetCreateKeyVals(agg.Value, row, ref groupToKeyVals, groupToLists);
 				}
-			
 			}
 
-			var lastColGroupsSorted = _data.PT_lastCols.ToList();// SortGroups<TAgg>(_data.PT_lastCols, _data.colFieldsInGroupOrder).ToList();
+			var lastColGroupsSorted = _data.lastCols.ToList();// SortGroups<TAgg>(_data.PT_lastCols, _data.colFieldsInGroupOrder).ToList();
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 

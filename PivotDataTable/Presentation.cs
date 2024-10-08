@@ -7,9 +7,9 @@ namespace PivotDataTable
 	public class Presentation<TRow> where TRow : class
 	{
 
-		GroupedData<TRow, KeyValueList> _data;
+		GroupedData<TRow> _data;
 
-		public Presentation(GroupedData<TRow, KeyValueList> data)
+		public Presentation(GroupedData<TRow> data)
 		{
 			_data = data;			
 		}
