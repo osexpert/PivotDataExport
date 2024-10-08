@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	[XmlRoot("Table")]
 	public class Table<TTableRow> : IXmlSerializable

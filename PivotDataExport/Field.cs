@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	public class Field
 	{

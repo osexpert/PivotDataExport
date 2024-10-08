@@ -5,7 +5,7 @@ using System.Text.Json;
 using CsvHelper;
 using Examples;
 using Kazinix.PivotTable;
-using PivotDataTable;
+using PivotDataExport;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Test
@@ -137,7 +137,7 @@ namespace Test
 			//	, rs => new { rs.Region, rs.Country }, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
 
 
-			//sw3.Stop(); // 6.9sek
+			//sw3.Stop(); // 6.9 sec
 
 
 
@@ -160,7 +160,7 @@ namespace Test
 
 			var s = Stopwatch.StartNew();
 			var gdata_fis = pivot.GetGroupedData_FastIntersect();
-			s.Stop(); // 14.4 sek
+			s.Stop(); // 14.4 sec
 
 
 			//			var pivotTable = salesRecords

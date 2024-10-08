@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	//public interface IPivotTableBuilder<TRow, TAggregates>
 	//where TRow : class

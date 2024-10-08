@@ -3,11 +3,12 @@ Dynamic group, aggregate, sort, pivot data.
 Output to json, xml, csv or via DataTable.
 Csv or json with or without header row.
 
-Built on an idea: recieve field definitions via api. Fetch, process and return data as result from api,
+Built on an idea: receive field definitions via api. Fetch, process and return data as result from api,
 alternatively queue it up and save a file somewhere, that later can be downloaded.
 So the idea is a dynamic report/export engine that can power a single api (per topic/data source).
-Kind of similar to GraphQL, but only for reporting/exports:-)
-Maybe an api that implement this concept, could be called PivotQL:-)
+Kind of similar to GraphQL, but only for reporting/exports.
+Maybe an api that implement this concept, could be called PivotQL.
+This library is not PivotQL thou, it is an engine that could power such api.
 
 Example:
 

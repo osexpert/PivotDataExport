@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PivotDataTable\PivotDataTable.csproj" />
+    <ProjectReference Include="..\PivotDataExport\PivotDataExport.csproj" />
   </ItemGroup>
 
 </Project>

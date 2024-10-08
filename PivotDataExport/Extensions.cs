@@ -3,7 +3,7 @@ using System.Buffers.Text;
 using System.Data;
 using System.Runtime.CompilerServices;
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	public static class Extensions
 	{

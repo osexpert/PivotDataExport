@@ -1,5 +1,5 @@
 ﻿
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	public enum RootType
 	{

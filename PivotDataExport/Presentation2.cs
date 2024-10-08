@@ -3,7 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Net;
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 
 	public class Presentation2<TRow> : Presentation2<TRow, Lazy<KeyValueList>>

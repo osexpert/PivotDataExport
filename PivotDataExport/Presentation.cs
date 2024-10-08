@@ -2,7 +2,7 @@
 using System.Data;
 using System.Net;
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	public class Presentation<TRow> where TRow : class
 	{

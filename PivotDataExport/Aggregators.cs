@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 
-namespace PivotDataTable
+namespace PivotDataExport
 {
 	public static class Aggregators
 	{
