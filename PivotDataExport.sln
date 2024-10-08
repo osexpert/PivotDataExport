@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PivotDataTable", "PivotDataTable\PivotDataTable.csproj", "{80D9D7AE-F842-45C7-B555-985C9602E850}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PivotDataExport", "PivotDataExport\PivotDataExport.csproj", "{80D9D7AE-F842-45C7-B555-985C9602E850}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{A7B4DD2E-DF97-43E2-9A97-9300FC39925D}"
 EndProject
