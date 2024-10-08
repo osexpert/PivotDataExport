@@ -123,7 +123,7 @@ namespace PivotDataTable
 
 
 		/// <summary>
-		/// Don't remeber why I made both FastIntersec and FastIntersect2
+		/// Don't remeber why I made both GetGroupedData_FastIntersec and GetGroupedData_PivotTableBuilder
 		/// But It seems GetGroupedData_PivotTableBuilder is 2 times slower than GetGroupedData_FastIntersect?
 		/// This seemss weird thou.
 		/// And I see this one uses Lazy, but not the other one.

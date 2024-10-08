@@ -275,18 +275,18 @@ namespace Tests
 
 
 			//var sdata = pivoter.GetGroupedData_SlowIntersect();
-			var gdata = pivoter.GetGroupedData_PivotTableBuilder();
+			var gdata_ptb = pivoter.GetGroupedData_PivotTableBuilder();
 
 
-			var pres = new Presentation2<Test1Row>(gdata);
+			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
 			// FIXME: currently no supporty for SortOrder
-			var nested = pres.GetTable_NestedKeyValueList_VariableColumns();
+			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
 
 			//			nested.Columns = null;
 			//		nested.ColumnGroups = null;
 			//	nested.RowGroups = null;
 
-			var js = ToJson(nested);
+			var json_ptb = ToJson(nested_tbl_ptb);
 
 			//var slow = p.GetGroupedData_SlowIntersect();
 			//var fast = p.GetGroupedData_FastIntersect();
@@ -294,7 +294,7 @@ namespace Tests
 			//var slowData = new Presentation<Test1Row>(slow);
 			//var fastData = new Presentation<Test1Row>(fast);
 
-			Assert.AreEqual(test_json, js);
+			Assert.AreEqual(test_json, json_ptb);
 		}
 
 		private static string ToJson<T>(T table)
