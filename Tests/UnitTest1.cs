@@ -1,3 +1,4 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PivotDataTable;
 using System.Collections;
 using System.ComponentModel;
@@ -11,6 +12,8 @@ using static Tests.UnitTest1;
 
 namespace Tests
 {
+
+	[TestClass]
 	public class UnitTest1
 	{
 
@@ -24,149 +27,163 @@ namespace Tests
 			public double Weight { get; set; }
 		}
 
-		const string str_TestCompareFastAndSlow_RowGroupOnSite = @"<DocumentElement>
-  <row>
-    <Site>Site1</Site>
-    <Unit>Unit1, Unit2</Unit>
-    <Group>Group1, Group2</Group>
-    <Name>Name1, Name3</Name>
-    <Number>7</Number>
-    <Weight>3.6999999999999997</Weight>
-    <RowCount>3</RowCount>
-  </row>
-  <row>
-    <Site>Site3</Site>
-    <Unit>Unit1</Unit>
-    <Group>Group1</Group>
-    <Name>Name1</Name>
-    <Number>5</Number>
-    <Weight>2.1</Weight>
-    <RowCount>1</RowCount>
-  </row>
-  <row>
-    <Site>Site5</Site>
-    <Unit>Unit6</Unit>
-    <Group>Group1</Group>
-    <Name>Name1</Name>
-    <Number>6</Number>
-    <Weight>5.1</Weight>
-    <RowCount>1</RowCount>
-  </row>
-</DocumentElement>";
+		const string str_TestCompareFastAndSlow_RowGroupOnSite = """
+			<DocumentElement>
+			  <row>
+			    <Site>Site1</Site>
+			    <Unit>Unit1, Unit2</Unit>
+			    <Group>Group1, Group2</Group>
+			    <Name>Name1, Name3</Name>
+			    <Number>7</Number>
+			    <Weight>3.6999999999999997</Weight>
+			    <RowCount>3</RowCount>
+			  </row>
+			  <row>
+			    <Site>Site3</Site>
+			    <Unit>Unit1</Unit>
+			    <Group>Group1</Group>
+			    <Name>Name1</Name>
+			    <Number>5</Number>
+			    <Weight>2.1</Weight>
+			    <RowCount>1</RowCount>
+			  </row>
+			  <row>
+			    <Site>Site5</Site>
+			    <Unit>Unit6</Unit>
+			    <Group>Group1</Group>
+			    <Name>Name1</Name>
+			    <Number>6</Number>
+			    <Weight>5.1</Weight>
+			    <RowCount>1</RowCount>
+			  </row>
+			</DocumentElement>
+			""";
 
-		const string str_TestCompareFastAndSlow_RowGroupOnSite_json = @"{
-  ""rows"": [
-    [
-      ""Site1"",
-      ""Unit1, Unit2"",
-      ""Group1, Group2"",
-      ""Name1, Name3"",
-      7,
-      3.6999999999999997,
-      3
-    ],
-    [
-      ""Site3"",
-      ""Unit1"",
-      ""Group1"",
-      ""Name1"",
-      5,
-      2.1,
-      1
-    ],
-    [
-      ""Site5"",
-      ""Unit6"",
-      ""Group1"",
-      ""Name1"",
-      6,
-      5.1,
-      1
-    ]
-  ]
-}";
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_json = """
+			{
+			  "rows": [
+			    [
+			      "Site1",
+			      "Unit1, Unit2",
+			      "Group1, Group2",
+			      "Name1, Name3",
+			      7,
+			      3.6999999999999997,
+			      3
+			    ],
+			    [
+			      "Site3",
+			      "Unit1",
+			      "Group1",
+			      "Name1",
+			      5,
+			      2.1,
+			      1
+			    ],
+			    [
+			      "Site5",
+			      "Unit6",
+			      "Group1",
+			      "Name1",
+			      6,
+			      5.1,
+			      1
+			    ]
+			  ]
+			}
+			""";
 
-		const string str_TestCompareFastAndSlow_GetTable_DictArr = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit1, Unit2"",
-      ""Group"": ""Group1, Group2"",
-      ""Name"": ""Name1, Name3"",
-      ""Number"": 7,
-      ""Weight"": 3.6999999999999997,
-      ""RowCount"": 3
-    },
-    {
-      ""Site"": ""Site3"",
-      ""Unit"": ""Unit1"",
-      ""Group"": ""Group1"",
-      ""Name"": ""Name1"",
-      ""Number"": 5,
-      ""Weight"": 2.1,
-      ""RowCount"": 1
-    },
-    {
-      ""Site"": ""Site5"",
-      ""Unit"": ""Unit6"",
-      ""Group"": ""Group1"",
-      ""Name"": ""Name1"",
-      ""Number"": 6,
-      ""Weight"": 5.1,
-      ""RowCount"": 1
-    }
-  ]
-}";
+		const string str_TestCompareFastAndSlow_GetTable_DictArr = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1",
+			      "Unit": "Unit1, Unit2",
+			      "Group": "Group1, Group2",
+			      "Name": "Name1, Name3",
+			      "Number": 7,
+			      "Weight": 3.6999999999999997,
+			      "RowCount": 3
+			    },
+			    {
+			      "Site": "Site3",
+			      "Unit": "Unit1",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 5,
+			      "Weight": 2.1,
+			      "RowCount": 1
+			    },
+			    {
+			      "Site": "Site5",
+			      "Unit": "Unit6",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 6,
+			      "Weight": 5.1,
+			      "RowCount": 1
+			    }
+			  ]
+			}
+			""";
 
-		const string nested_TestCompareFastAndSlow_RowGroupOnSite = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit1, Unit2"",
-      ""Group"": ""Group1, Group2"",
-      ""Name"": ""Name1, Name3"",
-      ""Number"": 7,
-      ""Weight"": 3.6999999999999997,
-      ""RowCount"": 3
-    },
-    {
-      ""Site"": ""Site3"",
-      ""Unit"": ""Unit1"",
-      ""Group"": ""Group1"",
-      ""Name"": ""Name1"",
-      ""Number"": 5,
-      ""Weight"": 2.1,
-      ""RowCount"": 1
-    },
-    {
-      ""Site"": ""Site5"",
-      ""Unit"": ""Unit6"",
-      ""Group"": ""Group1"",
-      ""Name"": ""Name1"",
-      ""Number"": 6,
-      ""Weight"": 5.1,
-      ""RowCount"": 1
-    }
-  ]
-}";
+		const string nested_TestCompareFastAndSlow_RowGroupOnSite = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1",
+			      "Unit": "Unit1, Unit2",
+			      "Group": "Group1, Group2",
+			      "Name": "Name1, Name3",
+			      "Number": 7,
+			      "Weight": 3.6999999999999997,
+			      "RowCount": 3
+			    },
+			    {
+			      "Site": "Site3",
+			      "Unit": "Unit1",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 5,
+			      "Weight": 2.1,
+			      "RowCount": 1
+			    },
+			    {
+			      "Site": "Site5",
+			      "Unit": "Unit6",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 6,
+			      "Weight": 5.1,
+			      "RowCount": 1
+			    }
+			  ]
+			}
+			""";
 
-		const string TestCompareFastAndSlow_RowGroupOnSite_csv_slow = @"Site;Unit;Group;Name;Number;Weight;RowCount
-Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
-Site3;Unit1;Group1;Name1;5;2.1;1
-Site5;Unit6;Group1;Name1;6;5.1;1
-";
-		const string TestCompareFastAndSlow_RowGroupOnSite_csv_flat = @"Site;Unit;Group;Name;Number;Weight;RowCount
-Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
-Site3;Unit1;Group1;Name1;5;2.1;1
-Site5;Unit6;Group1;Name1;6;5.1;1
-";
-//		const string TestCompareFastAndSlow_RowGroupOnSite_nestcsv = @"Site;Unit;Group;Name;Number;Weight;RowCount
-//Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
-//Site3;Unit1;Group1;Name1;5;2.1;1
-//Site5;Unit6;Group1;Name1;6;5.1;1
-//";
+		const string TestCompareFastAndSlow_RowGroupOnSite_csv_slow = """
+			Site;Unit;Group;Name;Number;Weight;RowCount
+			Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+			Site3;Unit1;Group1;Name1;5;2.1;1
+			Site5;Unit6;Group1;Name1;6;5.1;1
+			
+			""";
 
-		[Fact]
+		const string TestCompareFastAndSlow_RowGroupOnSite_csv_flat = """
+			Site;Unit;Group;Name;Number;Weight;RowCount
+			Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+			Site3;Unit1;Group1;Name1;5;2.1;1
+			Site5;Unit6;Group1;Name1;6;5.1;1
+
+			""";
+
+		//		const string TestCompareFastAndSlow_RowGroupOnSite_nestcsv = @"Site;Unit;Group;Name;Number;Weight;RowCount
+		//Site1;Unit1, Unit2;Group1, Group2;Name1, Name3;7;3.6999999999999997;3
+		//Site3;Unit1;Group1;Name1;5;2.1;1
+		//Site5;Unit6;Group1;Name1;6;5.1;1
+		//";
+
+		[TestMethod]
 		public void TestCompareFastAndSlow_RowGroupOnSite()
 		{
 			Pivoter<Test1Row> p = GetPivoterTestData();
@@ -178,7 +195,7 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Asc;
 
 			var slow = p.GetGroupedData_FastIntersect();
-			var fast = p.GetGroupedData_FastIntersect2();
+			var fast = p.GetGroupedData_PivotTableBuilder();
 
 			var slowData = new Presentation<Test1Row>(slow);
 			var fastData = new Presentation2<Test1Row>(fast);
@@ -189,28 +206,28 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			string sFast = fastDT.ToXml();
 			string sSlow = slowDT.ToXml();
 
-			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite, sFast);
-			Assert.Equal(sFast, sSlow);
+			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite, sFast);
+			Assert.AreEqual(sFast, sSlow);
 
 			var slowTable = slowData.GetTable_Array();
 			string slowJson = ToJson(slowTable);
 			string fastJson = ToJson(fastData.GetTable_Array());
-			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_json, slowJson);
-			Assert.Equal(slowJson, fastJson);
+			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite_json, slowJson);
+			Assert.AreEqual(slowJson, fastJson);
 
 			var slowCsv = slowTable.ToCsv();
-			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_csv_slow, slowCsv);
+			Assert.AreEqual(TestCompareFastAndSlow_RowGroupOnSite_csv_slow, slowCsv);
 
 			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
-			Assert.Equal(str_TestCompareFastAndSlow_GetTable_DictArr, slowTblDictArrStr);
+			Assert.AreEqual(str_TestCompareFastAndSlow_GetTable_DictArr, slowTblDictArrStr);
 			var flatCsv = slowTblDictArr.ToCsv();
-			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_csv_flat, flatCsv);
+			Assert.AreEqual(TestCompareFastAndSlow_RowGroupOnSite_csv_flat, flatCsv);
 
 			// same as GetTable_FlatDict in this case
 			var nested = slowData.GetTable_NestedKeyValueList_VariableColumns();
 			var nest = ToJson(nested);
-			Assert.Equal(nested_TestCompareFastAndSlow_RowGroupOnSite, nest);
+			Assert.AreEqual(nested_TestCompareFastAndSlow_RowGroupOnSite, nest);
 //			var nestCsv = nested.ToCsv();
 //			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
 		}
@@ -220,189 +237,198 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			return JsonSerializer.Serialize<T>(table, new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 		}
 
-		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = @"<DocumentElement>
-  <row>
-    <Site>Site1</Site>
-    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1</_x002F_Name_x003A_Name1_x002F_Unit>
-    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
-    <_x002F_Name_x003A_Name1_x002F_Number>3</_x002F_Name_x003A_Name1_x002F_Number>
-    <_x002F_Name_x003A_Name1_x002F_Weight>2.3</_x002F_Name_x003A_Name1_x002F_Weight>
-    <_x002F_Name_x003A_Name1_x002F_RowCount>2</_x002F_Name_x003A_Name1_x002F_RowCount>
-    <_x002F_Name_x003A_Name3_x002F_Unit>Unit2</_x002F_Name_x003A_Name3_x002F_Unit>
-    <_x002F_Name_x003A_Name3_x002F_Group>Group1</_x002F_Name_x003A_Name3_x002F_Group>
-    <_x002F_Name_x003A_Name3_x002F_Number>4</_x002F_Name_x003A_Name3_x002F_Number>
-    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
-    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
-  </row>
-  <row>
-    <Site>Site3</Site>
-    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1</_x002F_Name_x003A_Name1_x002F_Unit>
-    <_x002F_Name_x003A_Name1_x002F_Group>Group1</_x002F_Name_x003A_Name1_x002F_Group>
-    <_x002F_Name_x003A_Name1_x002F_Number>5</_x002F_Name_x003A_Name1_x002F_Number>
-    <_x002F_Name_x003A_Name1_x002F_Weight>2.1</_x002F_Name_x003A_Name1_x002F_Weight>
-    <_x002F_Name_x003A_Name1_x002F_RowCount>1</_x002F_Name_x003A_Name1_x002F_RowCount>
-    <_x002F_Name_x003A_Name3_x002F_Unit />
-    <_x002F_Name_x003A_Name3_x002F_Group />
-    <_x002F_Name_x003A_Name3_x002F_Number>0</_x002F_Name_x003A_Name3_x002F_Number>
-    <_x002F_Name_x003A_Name3_x002F_Weight>0</_x002F_Name_x003A_Name3_x002F_Weight>
-    <_x002F_Name_x003A_Name3_x002F_RowCount>0</_x002F_Name_x003A_Name3_x002F_RowCount>
-  </row>
-  <row>
-    <Site>Site5</Site>
-    <_x002F_Name_x003A_Name1_x002F_Unit>Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
-    <_x002F_Name_x003A_Name1_x002F_Group>Group1</_x002F_Name_x003A_Name1_x002F_Group>
-    <_x002F_Name_x003A_Name1_x002F_Number>6</_x002F_Name_x003A_Name1_x002F_Number>
-    <_x002F_Name_x003A_Name1_x002F_Weight>5.1</_x002F_Name_x003A_Name1_x002F_Weight>
-    <_x002F_Name_x003A_Name1_x002F_RowCount>1</_x002F_Name_x003A_Name1_x002F_RowCount>
-    <_x002F_Name_x003A_Name3_x002F_Unit />
-    <_x002F_Name_x003A_Name3_x002F_Group />
-    <_x002F_Name_x003A_Name3_x002F_Number>0</_x002F_Name_x003A_Name3_x002F_Number>
-    <_x002F_Name_x003A_Name3_x002F_Weight>0</_x002F_Name_x003A_Name3_x002F_Weight>
-    <_x002F_Name_x003A_Name3_x002F_RowCount>0</_x002F_Name_x003A_Name3_x002F_RowCount>
-  </row>
-</DocumentElement>";
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = """
+			<DocumentElement>
+			  <row>
+			    <Site>Site1</Site>
+			    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1</_x002F_Name_x003A_Name1_x002F_Unit>
+			    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
+			    <_x002F_Name_x003A_Name1_x002F_Number>3</_x002F_Name_x003A_Name1_x002F_Number>
+			    <_x002F_Name_x003A_Name1_x002F_Weight>2.3</_x002F_Name_x003A_Name1_x002F_Weight>
+			    <_x002F_Name_x003A_Name1_x002F_RowCount>2</_x002F_Name_x003A_Name1_x002F_RowCount>
+			    <_x002F_Name_x003A_Name3_x002F_Unit>Unit2</_x002F_Name_x003A_Name3_x002F_Unit>
+			    <_x002F_Name_x003A_Name3_x002F_Group>Group1</_x002F_Name_x003A_Name3_x002F_Group>
+			    <_x002F_Name_x003A_Name3_x002F_Number>4</_x002F_Name_x003A_Name3_x002F_Number>
+			    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
+			    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
+			  </row>
+			  <row>
+			    <Site>Site3</Site>
+			    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1</_x002F_Name_x003A_Name1_x002F_Unit>
+			    <_x002F_Name_x003A_Name1_x002F_Group>Group1</_x002F_Name_x003A_Name1_x002F_Group>
+			    <_x002F_Name_x003A_Name1_x002F_Number>5</_x002F_Name_x003A_Name1_x002F_Number>
+			    <_x002F_Name_x003A_Name1_x002F_Weight>2.1</_x002F_Name_x003A_Name1_x002F_Weight>
+			    <_x002F_Name_x003A_Name1_x002F_RowCount>1</_x002F_Name_x003A_Name1_x002F_RowCount>
+			    <_x002F_Name_x003A_Name3_x002F_Unit />
+			    <_x002F_Name_x003A_Name3_x002F_Group />
+			    <_x002F_Name_x003A_Name3_x002F_Number>0</_x002F_Name_x003A_Name3_x002F_Number>
+			    <_x002F_Name_x003A_Name3_x002F_Weight>0</_x002F_Name_x003A_Name3_x002F_Weight>
+			    <_x002F_Name_x003A_Name3_x002F_RowCount>0</_x002F_Name_x003A_Name3_x002F_RowCount>
+			  </row>
+			  <row>
+			    <Site>Site5</Site>
+			    <_x002F_Name_x003A_Name1_x002F_Unit>Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
+			    <_x002F_Name_x003A_Name1_x002F_Group>Group1</_x002F_Name_x003A_Name1_x002F_Group>
+			    <_x002F_Name_x003A_Name1_x002F_Number>6</_x002F_Name_x003A_Name1_x002F_Number>
+			    <_x002F_Name_x003A_Name1_x002F_Weight>5.1</_x002F_Name_x003A_Name1_x002F_Weight>
+			    <_x002F_Name_x003A_Name1_x002F_RowCount>1</_x002F_Name_x003A_Name1_x002F_RowCount>
+			    <_x002F_Name_x003A_Name3_x002F_Unit />
+			    <_x002F_Name_x003A_Name3_x002F_Group />
+			    <_x002F_Name_x003A_Name3_x002F_Number>0</_x002F_Name_x003A_Name3_x002F_Number>
+			    <_x002F_Name_x003A_Name3_x002F_Weight>0</_x002F_Name_x003A_Name3_x002F_Weight>
+			    <_x002F_Name_x003A_Name3_x002F_RowCount>0</_x002F_Name_x003A_Name3_x002F_RowCount>
+			  </row>
+			</DocumentElement>
+			""";
 
-		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json = @"{
-  ""rows"": [
-    [
-      ""Site1"",
-      ""Unit1"",
-      ""Group1, Group2"",
-      3,
-      2.3,
-      2,
-      ""Unit2"",
-      ""Group1"",
-      4,
-      1.4,
-      1
-    ],
-    [
-      ""Site3"",
-      ""Unit1"",
-      ""Group1"",
-      5,
-      2.1,
-      1,
-      """",
-      """",
-      0,
-      0,
-      0
-    ],
-    [
-      ""Site5"",
-      ""Unit6"",
-      ""Group1"",
-      6,
-      5.1,
-      1,
-      """",
-      """",
-      0,
-      0,
-      0
-    ]
-  ]
-}";
-		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1"",
-      ""/Name:Name1/Unit"": ""Unit1"",
-      ""/Name:Name1/Group"": ""Group1, Group2"",
-      ""/Name:Name1/Number"": 3,
-      ""/Name:Name1/Weight"": 2.3,
-      ""/Name:Name1/RowCount"": 2,
-      ""/Name:Name3/Unit"": ""Unit2"",
-      ""/Name:Name3/Group"": ""Group1"",
-      ""/Name:Name3/Number"": 4,
-      ""/Name:Name3/Weight"": 1.4,
-      ""/Name:Name3/RowCount"": 1
-    },
-    {
-      ""Site"": ""Site3"",
-      ""/Name:Name1/Unit"": ""Unit1"",
-      ""/Name:Name1/Group"": ""Group1"",
-      ""/Name:Name1/Number"": 5,
-      ""/Name:Name1/Weight"": 2.1,
-      ""/Name:Name1/RowCount"": 1,
-      ""/Name:Name3/Unit"": """",
-      ""/Name:Name3/Group"": """",
-      ""/Name:Name3/Number"": 0,
-      ""/Name:Name3/Weight"": 0,
-      ""/Name:Name3/RowCount"": 0
-    },
-    {
-      ""Site"": ""Site5"",
-      ""/Name:Name1/Unit"": ""Unit6"",
-      ""/Name:Name1/Group"": ""Group1"",
-      ""/Name:Name1/Number"": 6,
-      ""/Name:Name1/Weight"": 5.1,
-      ""/Name:Name1/RowCount"": 1,
-      ""/Name:Name3/Unit"": """",
-      ""/Name:Name3/Group"": """",
-      ""/Name:Name3/Number"": 0,
-      ""/Name:Name3/Weight"": 0,
-      ""/Name:Name3/RowCount"": 0
-    }
-  ]
-}";
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json = """
+			{
+			  "rows": [
+			    [
+			      "Site1",
+			      "Unit1",
+			      "Group1, Group2",
+			      3,
+			      2.3,
+			      2,
+			      "Unit2",
+			      "Group1",
+			      4,
+			      1.4,
+			      1
+			    ],
+			    [
+			      "Site3",
+			      "Unit1",
+			      "Group1",
+			      5,
+			      2.1,
+			      1,
+			      "",
+			      "",
+			      0,
+			      0,
+			      0
+			    ],
+			    [
+			      "Site5",
+			      "Unit6",
+			      "Group1",
+			      6,
+			      5.1,
+			      1,
+			      "",
+			      "",
+			      0,
+			      0,
+			      0
+			    ]
+			  ]
+			}
+			""";
+
+		const string str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1",
+			      "/Name:Name1/Unit": "Unit1",
+			      "/Name:Name1/Group": "Group1, Group2",
+			      "/Name:Name1/Number": 3,
+			      "/Name:Name1/Weight": 2.3,
+			      "/Name:Name1/RowCount": 2,
+			      "/Name:Name3/Unit": "Unit2",
+			      "/Name:Name3/Group": "Group1",
+			      "/Name:Name3/Number": 4,
+			      "/Name:Name3/Weight": 1.4,
+			      "/Name:Name3/RowCount": 1
+			    },
+			    {
+			      "Site": "Site3",
+			      "/Name:Name1/Unit": "Unit1",
+			      "/Name:Name1/Group": "Group1",
+			      "/Name:Name1/Number": 5,
+			      "/Name:Name1/Weight": 2.1,
+			      "/Name:Name1/RowCount": 1,
+			      "/Name:Name3/Unit": "",
+			      "/Name:Name3/Group": "",
+			      "/Name:Name3/Number": 0,
+			      "/Name:Name3/Weight": 0,
+			      "/Name:Name3/RowCount": 0
+			    },
+			    {
+			      "Site": "Site5",
+			      "/Name:Name1/Unit": "Unit6",
+			      "/Name:Name1/Group": "Group1",
+			      "/Name:Name1/Number": 6,
+			      "/Name:Name1/Weight": 5.1,
+			      "/Name:Name1/RowCount": 1,
+			      "/Name:Name3/Unit": "",
+			      "/Name:Name3/Group": "",
+			      "/Name:Name3/Number": 0,
+			      "/Name:Name3/Weight": 0,
+			      "/Name:Name3/RowCount": 0
+			    }
+			  ]
+			}
+			""";
 
 		// this originally had dummy values for Name3 in the last 2 rows. Not sure what is more correct.
-		const string nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1"",
-      ""NameList"": [
-        {
-          ""Name"": ""Name1"",
-          ""Unit"": ""Unit1"",
-          ""Group"": ""Group1, Group2"",
-          ""Number"": 3,
-          ""Weight"": 2.3,
-          ""RowCount"": 2
-        },
-        {
-          ""Name"": ""Name3"",
-          ""Unit"": ""Unit2"",
-          ""Group"": ""Group1"",
-          ""Number"": 4,
-          ""Weight"": 1.4,
-          ""RowCount"": 1
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site3"",
-      ""NameList"": [
-        {
-          ""Name"": ""Name1"",
-          ""Unit"": ""Unit1"",
-          ""Group"": ""Group1"",
-          ""Number"": 5,
-          ""Weight"": 2.1,
-          ""RowCount"": 1
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site5"",
-      ""NameList"": [
-        {
-          ""Name"": ""Name1"",
-          ""Unit"": ""Unit6"",
-          ""Group"": ""Group1"",
-          ""Number"": 6,
-          ""Weight"": 5.1,
-          ""RowCount"": 1
-        }
-      ]
-    }
-  ]
-}";
+		const string nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1",
+			      "NameList": [
+			        {
+			          "Name": "Name1",
+			          "Unit": "Unit1",
+			          "Group": "Group1, Group2",
+			          "Number": 3,
+			          "Weight": 2.3,
+			          "RowCount": 2
+			        },
+			        {
+			          "Name": "Name3",
+			          "Unit": "Unit2",
+			          "Group": "Group1",
+			          "Number": 4,
+			          "Weight": 1.4,
+			          "RowCount": 1
+			        }
+			      ]
+			    },
+			    {
+			      "Site": "Site3",
+			      "NameList": [
+			        {
+			          "Name": "Name1",
+			          "Unit": "Unit1",
+			          "Group": "Group1",
+			          "Number": 5,
+			          "Weight": 2.1,
+			          "RowCount": 1
+			        }
+			      ]
+			    },
+			    {
+			      "Site": "Site5",
+			      "NameList": [
+			        {
+			          "Name": "Name1",
+			          "Unit": "Unit6",
+			          "Group": "Group1",
+			          "Number": 6,
+			          "Weight": 5.1,
+			          "RowCount": 1
+			        }
+			      ]
+			    }
+			  ]
+			}
+			""";
 
-		[Fact]
+		[TestMethod]
 		public void TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName()
 		{
 			Pivoter<Test1Row> p = GetPivoterTestData();
@@ -415,7 +441,7 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
 			var slow = p.GetGroupedData_FastIntersect();// createEmptyIntersects: true);
-			var fast = p.GetGroupedData_FastIntersect2();// createEmptyIntersects: true);
+			var fast = p.GetGroupedData_PivotTableBuilder();// createEmptyIntersects: true);
 
 			var slowData = new Presentation<Test1Row>(slow);
 			var fastData = new Presentation2<Test1Row>(fast);
@@ -426,104 +452,113 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			string sFast = fastDT.ToXml();
 			string sSlow = slowDT.ToXml();
 
-			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, sFast);
-			Assert.Equal(sFast, sSlow);
+			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, sFast);
+			Assert.AreEqual(sFast, sSlow);
 
 			string slowJson = ToJson(slowData.GetTable_Array(createEmptyIntersects: true));
 			string fastJson = ToJson(fastData.GetTable_Array(createEmptyIntersects: true));
-			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json, slowJson);
-			Assert.Equal(slowJson, fastJson);
+			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_json, slowJson);
+			Assert.AreEqual(slowJson, fastJson);
 
 			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns(createEmptyIntersects: true);
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
-			Assert.Equal(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
+			Assert.AreEqual(str_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName_DictArr, slowTblDictArrStr);
 
 			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
-			Assert.Equal(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nest);
+			Assert.AreEqual(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nest);
 		}
 
-		const string str_TestCompareFastAndSlow_ColGroupOnName = @"<DocumentElement>
-  <row>
-    <_x002F_Name_x003A_Name1_x002F_Site>Site1, Site3, Site5</_x002F_Name_x003A_Name1_x002F_Site>
-    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1, Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
-    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
-    <_x002F_Name_x003A_Name1_x002F_Number>14</_x002F_Name_x003A_Name1_x002F_Number>
-    <_x002F_Name_x003A_Name1_x002F_Weight>9.5</_x002F_Name_x003A_Name1_x002F_Weight>
-    <_x002F_Name_x003A_Name1_x002F_RowCount>4</_x002F_Name_x003A_Name1_x002F_RowCount>
-    <_x002F_Name_x003A_Name3_x002F_Site>Site1</_x002F_Name_x003A_Name3_x002F_Site>
-    <_x002F_Name_x003A_Name3_x002F_Unit>Unit2</_x002F_Name_x003A_Name3_x002F_Unit>
-    <_x002F_Name_x003A_Name3_x002F_Group>Group1</_x002F_Name_x003A_Name3_x002F_Group>
-    <_x002F_Name_x003A_Name3_x002F_Number>4</_x002F_Name_x003A_Name3_x002F_Number>
-    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
-    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
-  </row>
-</DocumentElement>";
+		const string str_TestCompareFastAndSlow_ColGroupOnName = """
+			<DocumentElement>
+			  <row>
+			    <_x002F_Name_x003A_Name1_x002F_Site>Site1, Site3, Site5</_x002F_Name_x003A_Name1_x002F_Site>
+			    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1, Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
+			    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
+			    <_x002F_Name_x003A_Name1_x002F_Number>14</_x002F_Name_x003A_Name1_x002F_Number>
+			    <_x002F_Name_x003A_Name1_x002F_Weight>9.5</_x002F_Name_x003A_Name1_x002F_Weight>
+			    <_x002F_Name_x003A_Name1_x002F_RowCount>4</_x002F_Name_x003A_Name1_x002F_RowCount>
+			    <_x002F_Name_x003A_Name3_x002F_Site>Site1</_x002F_Name_x003A_Name3_x002F_Site>
+			    <_x002F_Name_x003A_Name3_x002F_Unit>Unit2</_x002F_Name_x003A_Name3_x002F_Unit>
+			    <_x002F_Name_x003A_Name3_x002F_Group>Group1</_x002F_Name_x003A_Name3_x002F_Group>
+			    <_x002F_Name_x003A_Name3_x002F_Number>4</_x002F_Name_x003A_Name3_x002F_Number>
+			    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
+			    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
+			  </row>
+			</DocumentElement>
+			""";
 
-		const string str_TestCompareFastAndSlow_ColGroupOnName_json = @"{
-  ""rows"": [
-    [
-      ""Site1, Site3, Site5"",
-      ""Unit1, Unit6"",
-      ""Group1, Group2"",
-      14,
-      9.5,
-      4,
-      ""Site1"",
-      ""Unit2"",
-      ""Group1"",
-      4,
-      1.4,
-      1
-    ]
-  ]
-}";
-		const string str_TestCompareFastAndSlow_ColGroupOnName_DictArr = @"{
-  ""rows"": [
-    {
-      ""/Name:Name1/Site"": ""Site1, Site3, Site5"",
-      ""/Name:Name1/Unit"": ""Unit1, Unit6"",
-      ""/Name:Name1/Group"": ""Group1, Group2"",
-      ""/Name:Name1/Number"": 14,
-      ""/Name:Name1/Weight"": 9.5,
-      ""/Name:Name1/RowCount"": 4,
-      ""/Name:Name3/Site"": ""Site1"",
-      ""/Name:Name3/Unit"": ""Unit2"",
-      ""/Name:Name3/Group"": ""Group1"",
-      ""/Name:Name3/Number"": 4,
-      ""/Name:Name3/Weight"": 1.4,
-      ""/Name:Name3/RowCount"": 1
-    }
-  ]
-}";
+		const string str_TestCompareFastAndSlow_ColGroupOnName_json = """
+			{
+			  "rows": [
+			    [
+			      "Site1, Site3, Site5",
+			      "Unit1, Unit6",
+			      "Group1, Group2",
+			      14,
+			      9.5,
+			      4,
+			      "Site1",
+			      "Unit2",
+			      "Group1",
+			      4,
+			      1.4,
+			      1
+			    ]
+			  ]
+			}
+			""";
 
-		const string nested_TestCompareFastAndSlow_ColGroupOnName = @"{
-  ""rows"": [
-    {
-      ""NameList"": [
-        {
-          ""Name"": ""Name1"",
-          ""Site"": ""Site1, Site3, Site5"",
-          ""Unit"": ""Unit1, Unit6"",
-          ""Group"": ""Group1, Group2"",
-          ""Number"": 14,
-          ""Weight"": 9.5,
-          ""RowCount"": 4
-        },
-        {
-          ""Name"": ""Name3"",
-          ""Site"": ""Site1"",
-          ""Unit"": ""Unit2"",
-          ""Group"": ""Group1"",
-          ""Number"": 4,
-          ""Weight"": 1.4,
-          ""RowCount"": 1
-        }
-      ]
-    }
-  ]
-}";
+		const string str_TestCompareFastAndSlow_ColGroupOnName_DictArr = """
+			{
+			  "rows": [
+			    {
+			      "/Name:Name1/Site": "Site1, Site3, Site5",
+			      "/Name:Name1/Unit": "Unit1, Unit6",
+			      "/Name:Name1/Group": "Group1, Group2",
+			      "/Name:Name1/Number": 14,
+			      "/Name:Name1/Weight": 9.5,
+			      "/Name:Name1/RowCount": 4,
+			      "/Name:Name3/Site": "Site1",
+			      "/Name:Name3/Unit": "Unit2",
+			      "/Name:Name3/Group": "Group1",
+			      "/Name:Name3/Number": 4,
+			      "/Name:Name3/Weight": 1.4,
+			      "/Name:Name3/RowCount": 1
+			    }
+			  ]
+			}
+			""";
 
-		[Fact]
+		const string nested_TestCompareFastAndSlow_ColGroupOnName = """
+			{
+			  "rows": [
+			    {
+			      "NameList": [
+			        {
+			          "Name": "Name1",
+			          "Site": "Site1, Site3, Site5",
+			          "Unit": "Unit1, Unit6",
+			          "Group": "Group1, Group2",
+			          "Number": 14,
+			          "Weight": 9.5,
+			          "RowCount": 4
+			        },
+			        {
+			          "Name": "Name3",
+			          "Site": "Site1",
+			          "Unit": "Unit2",
+			          "Group": "Group1",
+			          "Number": 4,
+			          "Weight": 1.4,
+			          "RowCount": 1
+			        }
+			      ]
+			    }
+			  ]
+			}
+			""";
+
+		[TestMethod]
 	// Expected: when only group in col, 1 row in the result with only totalt
 		public void TestCompareFastAndSlow_ColGroupOnName()
 		{
@@ -535,7 +570,7 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
 			var slow = p.GetGroupedData_FastIntersect();
-			var fast = p.GetGroupedData_FastIntersect2();
+			var fast = p.GetGroupedData_PivotTableBuilder();
 
 			var slowData = new Presentation<Test1Row>(slow);
 			var fastData = new Presentation2<Test1Row>(fast);
@@ -546,76 +581,85 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			string sFast = fastDT.ToXml();
 			string sSlow = slowDT.ToXml();
 
-			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName, sFast);
-			Assert.Equal(sFast, sSlow);
+			Assert.AreEqual(str_TestCompareFastAndSlow_ColGroupOnName, sFast);
+			Assert.AreEqual(sFast, sSlow);
 
 			string slowJson = ToJson(slowData.GetTable_Array());
 			string fastJson = ToJson(fastData.GetTable_Array());
-			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_json, slowJson);
-			Assert.Equal(slowJson, fastJson);
+			Assert.AreEqual(str_TestCompareFastAndSlow_ColGroupOnName_json, slowJson);
+			Assert.AreEqual(slowJson, fastJson);
 
 			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
-			Assert.Equal(str_TestCompareFastAndSlow_ColGroupOnName_DictArr, slowTblDictArrStr);
+			Assert.AreEqual(str_TestCompareFastAndSlow_ColGroupOnName_DictArr, slowTblDictArrStr);
 
 			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());
-			Assert.Equal(nested_TestCompareFastAndSlow_ColGroupOnName, nest);
+			Assert.AreEqual(nested_TestCompareFastAndSlow_ColGroupOnName, nest);
 		}
 
-		const string str_TestCompareFastAndSlow_NoGroup = @"<DocumentElement>
-  <row>
-    <Site>Site1, Site3, Site5</Site>
-    <Unit>Unit1, Unit2, Unit6</Unit>
-    <Group>Group1, Group2</Group>
-    <Name>Name1, Name3</Name>
-    <Number>18</Number>
-    <Weight>10.9</Weight>
-    <RowCount>5</RowCount>
-  </row>
-</DocumentElement>";
+		const string str_TestCompareFastAndSlow_NoGroup = """
+			<DocumentElement>
+			  <row>
+			    <Site>Site1, Site3, Site5</Site>
+			    <Unit>Unit1, Unit2, Unit6</Unit>
+			    <Group>Group1, Group2</Group>
+			    <Name>Name1, Name3</Name>
+			    <Number>18</Number>
+			    <Weight>10.9</Weight>
+			    <RowCount>5</RowCount>
+			  </row>
+			</DocumentElement>
+			""";
 
-		const string str_TestCompareFastAndSlow_NoGroup_json = @"{
-  ""rows"": [
-    [
-      ""Site1, Site3, Site5"",
-      ""Unit1, Unit2, Unit6"",
-      ""Group1, Group2"",
-      ""Name1, Name3"",
-      18,
-      10.9,
-      5
-    ]
-  ]
-}";
-		const string str_TestCompareFastAndSlow_NoGroup_DictArr = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1, Site3, Site5"",
-      ""Unit"": ""Unit1, Unit2, Unit6"",
-      ""Group"": ""Group1, Group2"",
-      ""Name"": ""Name1, Name3"",
-      ""Number"": 18,
-      ""Weight"": 10.9,
-      ""RowCount"": 5
-    }
-  ]
-}";
+		const string str_TestCompareFastAndSlow_NoGroup_json = """
+			{
+			  "rows": [
+			    [
+			      "Site1, Site3, Site5",
+			      "Unit1, Unit2, Unit6",
+			      "Group1, Group2",
+			      "Name1, Name3",
+			      18,
+			      10.9,
+			      5
+			    ]
+			  ]
+			}
+			""";
 
-		const string nested_TestCompareFastAndSlow_NoGroup = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1, Site3, Site5"",
-      ""Unit"": ""Unit1, Unit2, Unit6"",
-      ""Group"": ""Group1, Group2"",
-      ""Name"": ""Name1, Name3"",
-      ""Number"": 18,
-      ""Weight"": 10.9,
-      ""RowCount"": 5
-    }
-  ]
-}";
+		const string str_TestCompareFastAndSlow_NoGroup_DictArr = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1, Site3, Site5",
+			      "Unit": "Unit1, Unit2, Unit6",
+			      "Group": "Group1, Group2",
+			      "Name": "Name1, Name3",
+			      "Number": 18,
+			      "Weight": 10.9,
+			      "RowCount": 5
+			    }
+			  ]
+			}
+			""";
 
-		[Fact]
+		const string nested_TestCompareFastAndSlow_NoGroup = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1, Site3, Site5",
+			      "Unit": "Unit1, Unit2, Unit6",
+			      "Group": "Group1, Group2",
+			      "Name": "Name1, Name3",
+			      "Number": 18,
+			      "Weight": 10.9,
+			      "RowCount": 5
+			    }
+			  ]
+			}
+			""";
+
+		[TestMethod]
 		// Expected: 1 row with totals
 		public void TestCompareFastAndSlow_NoGroup()
 		{
@@ -624,7 +668,7 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			var fields = p.Fields.ToDictionary(k => k.Name);
 
 			var slow = p.GetGroupedData_FastIntersect();
-			var fast = p.GetGroupedData_FastIntersect2();
+			var fast = p.GetGroupedData_PivotTableBuilder();
 
 			var slowData = new Presentation<Test1Row>(slow);
 			var fastData = new Presentation2<Test1Row>(fast);
@@ -635,260 +679,268 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			string sFast = fastDT.ToXml();
 			string sSlow = slowDT.ToXml();
 
-			Assert.Equal(str_TestCompareFastAndSlow_NoGroup, sFast);
-			Assert.Equal(sFast, sSlow);
+			Assert.AreEqual(str_TestCompareFastAndSlow_NoGroup, sFast);
+			Assert.AreEqual(sFast, sSlow);
 
 			string slowJson = ToJson(slowData.GetTable_Array());
 			string fastJson = ToJson(fastData.GetTable_Array());
-			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_json, slowJson);
-			Assert.Equal(slowJson, fastJson);
+			Assert.AreEqual(str_TestCompareFastAndSlow_NoGroup_json, slowJson);
+			Assert.AreEqual(slowJson, fastJson);
 
 			var slowTblDictArr = slowData.GetTable_FlatKeyValueList_CompleteColumns();
 			var slowTblDictArrStr = ToJson(slowTblDictArr);
-			Assert.Equal(str_TestCompareFastAndSlow_NoGroup_DictArr, slowTblDictArrStr);
+			Assert.AreEqual(str_TestCompareFastAndSlow_NoGroup_DictArr, slowTblDictArrStr);
 
 			// this produce same result as GetTable_FlatDict in this case (no col groups)
 			var nest = ToJson(slowData.GetTable_NestedKeyValueList_VariableColumns());
-			Assert.Equal(nested_TestCompareFastAndSlow_NoGroup, nest);
+			Assert.AreEqual(nested_TestCompareFastAndSlow_NoGroup, nest);
 		}
 
-		const string TestGroupSiteThenUnitSortBoth_nested = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit2"",
-      ""GroupList"": [
-        {
-          ""Group"": ""Group1"",
-          ""Name"": ""Name3"",
-          ""Number"": 4,
-          ""Weight"": 1.4,
-          ""RowCount"": 1
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit1"",
-      ""GroupList"": [
-        {
-          ""Group"": ""Group2"",
-          ""Name"": ""Name1"",
-          ""Number"": 2,
-          ""Weight"": 1.2,
-          ""RowCount"": 1
-        },
-        {
-          ""Group"": ""Group1"",
-          ""Name"": ""Name1"",
-          ""Number"": 1,
-          ""Weight"": 1.1,
-          ""RowCount"": 1
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site3"",
-      ""Unit"": ""Unit1"",
-      ""GroupList"": [
-        {
-          ""Group"": ""Group1"",
-          ""Name"": ""Name1"",
-          ""Number"": 5,
-          ""Weight"": 2.1,
-          ""RowCount"": 1
-        }
-      ]
-    },
-    {
-      ""Site"": ""Site5"",
-      ""Unit"": ""Unit6"",
-      ""GroupList"": [
-        {
-          ""Group"": ""Group1"",
-          ""Name"": ""Name1"",
-          ""Number"": 6,
-          ""Weight"": 5.1,
-          ""RowCount"": 1
-        }
-      ]
-    }
-  ]
-}";
+		const string TestGroupSiteThenUnitSortBoth_nested = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1",
+			      "Unit": "Unit2",
+			      "GroupList": [
+			        {
+			          "Group": "Group1",
+			          "Name": "Name3",
+			          "Number": 4,
+			          "Weight": 1.4,
+			          "RowCount": 1
+			        }
+			      ]
+			    },
+			    {
+			      "Site": "Site1",
+			      "Unit": "Unit1",
+			      "GroupList": [
+			        {
+			          "Group": "Group2",
+			          "Name": "Name1",
+			          "Number": 2,
+			          "Weight": 1.2,
+			          "RowCount": 1
+			        },
+			        {
+			          "Group": "Group1",
+			          "Name": "Name1",
+			          "Number": 1,
+			          "Weight": 1.1,
+			          "RowCount": 1
+			        }
+			      ]
+			    },
+			    {
+			      "Site": "Site3",
+			      "Unit": "Unit1",
+			      "GroupList": [
+			        {
+			          "Group": "Group1",
+			          "Name": "Name1",
+			          "Number": 5,
+			          "Weight": 2.1,
+			          "RowCount": 1
+			        }
+			      ]
+			    },
+			    {
+			      "Site": "Site5",
+			      "Unit": "Unit6",
+			      "GroupList": [
+			        {
+			          "Group": "Group1",
+			          "Name": "Name1",
+			          "Number": 6,
+			          "Weight": 5.1,
+			          "RowCount": 1
+			        }
+			      ]
+			    }
+			  ]
+			}
+			""";
 
-		const string TestGroupSiteThenUnitSortBoth_flat = @"{
-  ""rows"": [
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit2"",
-      ""/Group:Group2/Name"": null,
-      ""/Group:Group2/Number"": null,
-      ""/Group:Group2/Weight"": null,
-      ""/Group:Group2/RowCount"": null,
-      ""/Group:Group1/Name"": ""Name3"",
-      ""/Group:Group1/Number"": 4,
-      ""/Group:Group1/Weight"": 1.4,
-      ""/Group:Group1/RowCount"": 1
-    },
-    {
-      ""Site"": ""Site1"",
-      ""Unit"": ""Unit1"",
-      ""/Group:Group2/Name"": ""Name1"",
-      ""/Group:Group2/Number"": 2,
-      ""/Group:Group2/Weight"": 1.2,
-      ""/Group:Group2/RowCount"": 1,
-      ""/Group:Group1/Name"": ""Name1"",
-      ""/Group:Group1/Number"": 1,
-      ""/Group:Group1/Weight"": 1.1,
-      ""/Group:Group1/RowCount"": 1
-    },
-    {
-      ""Site"": ""Site3"",
-      ""Unit"": ""Unit1"",
-      ""/Group:Group2/Name"": null,
-      ""/Group:Group2/Number"": null,
-      ""/Group:Group2/Weight"": null,
-      ""/Group:Group2/RowCount"": null,
-      ""/Group:Group1/Name"": ""Name1"",
-      ""/Group:Group1/Number"": 5,
-      ""/Group:Group1/Weight"": 2.1,
-      ""/Group:Group1/RowCount"": 1
-    },
-    {
-      ""Site"": ""Site5"",
-      ""Unit"": ""Unit6"",
-      ""/Group:Group2/Name"": null,
-      ""/Group:Group2/Number"": null,
-      ""/Group:Group2/Weight"": null,
-      ""/Group:Group2/RowCount"": null,
-      ""/Group:Group1/Name"": ""Name1"",
-      ""/Group:Group1/Number"": 6,
-      ""/Group:Group1/Weight"": 5.1,
-      ""/Group:Group1/RowCount"": 1
-    }
-  ]
-}";
+		const string TestGroupSiteThenUnitSortBoth_flat = """
+			{
+			  "rows": [
+			    {
+			      "Site": "Site1",
+			      "Unit": "Unit2",
+			      "/Group:Group2/Name": null,
+			      "/Group:Group2/Number": null,
+			      "/Group:Group2/Weight": null,
+			      "/Group:Group2/RowCount": null,
+			      "/Group:Group1/Name": "Name3",
+			      "/Group:Group1/Number": 4,
+			      "/Group:Group1/Weight": 1.4,
+			      "/Group:Group1/RowCount": 1
+			    },
+			    {
+			      "Site": "Site1",
+			      "Unit": "Unit1",
+			      "/Group:Group2/Name": "Name1",
+			      "/Group:Group2/Number": 2,
+			      "/Group:Group2/Weight": 1.2,
+			      "/Group:Group2/RowCount": 1,
+			      "/Group:Group1/Name": "Name1",
+			      "/Group:Group1/Number": 1,
+			      "/Group:Group1/Weight": 1.1,
+			      "/Group:Group1/RowCount": 1
+			    },
+			    {
+			      "Site": "Site3",
+			      "Unit": "Unit1",
+			      "/Group:Group2/Name": null,
+			      "/Group:Group2/Number": null,
+			      "/Group:Group2/Weight": null,
+			      "/Group:Group2/RowCount": null,
+			      "/Group:Group1/Name": "Name1",
+			      "/Group:Group1/Number": 5,
+			      "/Group:Group1/Weight": 2.1,
+			      "/Group:Group1/RowCount": 1
+			    },
+			    {
+			      "Site": "Site5",
+			      "Unit": "Unit6",
+			      "/Group:Group2/Name": null,
+			      "/Group:Group2/Number": null,
+			      "/Group:Group2/Weight": null,
+			      "/Group:Group2/RowCount": null,
+			      "/Group:Group1/Name": "Name1",
+			      "/Group:Group1/Number": 6,
+			      "/Group:Group1/Weight": 5.1,
+			      "/Group:Group1/RowCount": 1
+			    }
+			  ]
+			}
+			""";
 
-		const string TestGroupSiteThenUnitSortBoth_xml_nest = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<Table>
-  <Rows>
-    <Row>
-      <Site>Site1</Site>
-      <Unit>Unit2</Unit>
-      <GroupList>
-        <Entry>
-          <Group>Group1</Group>
-          <Name>Name3</Name>
-          <Number>4</Number>
-          <Weight>1.4</Weight>
-          <RowCount>1</RowCount>
-        </Entry>
-      </GroupList>
-    </Row>
-    <Row>
-      <Site>Site1</Site>
-      <Unit>Unit1</Unit>
-      <GroupList>
-        <Entry>
-          <Group>Group2</Group>
-          <Name>Name1</Name>
-          <Number>2</Number>
-          <Weight>1.2</Weight>
-          <RowCount>1</RowCount>
-        </Entry>
-        <Entry>
-          <Group>Group1</Group>
-          <Name>Name1</Name>
-          <Number>1</Number>
-          <Weight>1.1</Weight>
-          <RowCount>1</RowCount>
-        </Entry>
-      </GroupList>
-    </Row>
-    <Row>
-      <Site>Site3</Site>
-      <Unit>Unit1</Unit>
-      <GroupList>
-        <Entry>
-          <Group>Group1</Group>
-          <Name>Name1</Name>
-          <Number>5</Number>
-          <Weight>2.1</Weight>
-          <RowCount>1</RowCount>
-        </Entry>
-      </GroupList>
-    </Row>
-    <Row>
-      <Site>Site5</Site>
-      <Unit>Unit6</Unit>
-      <GroupList>
-        <Entry>
-          <Group>Group1</Group>
-          <Name>Name1</Name>
-          <Number>6</Number>
-          <Weight>5.1</Weight>
-          <RowCount>1</RowCount>
-        </Entry>
-      </GroupList>
-    </Row>
-  </Rows>
-</Table>";
+		const string TestGroupSiteThenUnitSortBoth_xml_nest = """
+			<?xml version="1.0" encoding="utf-8"?>
+			<Table>
+			  <Rows>
+			    <Row>
+			      <Site>Site1</Site>
+			      <Unit>Unit2</Unit>
+			      <GroupList>
+			        <Entry>
+			          <Group>Group1</Group>
+			          <Name>Name3</Name>
+			          <Number>4</Number>
+			          <Weight>1.4</Weight>
+			          <RowCount>1</RowCount>
+			        </Entry>
+			      </GroupList>
+			    </Row>
+			    <Row>
+			      <Site>Site1</Site>
+			      <Unit>Unit1</Unit>
+			      <GroupList>
+			        <Entry>
+			          <Group>Group2</Group>
+			          <Name>Name1</Name>
+			          <Number>2</Number>
+			          <Weight>1.2</Weight>
+			          <RowCount>1</RowCount>
+			        </Entry>
+			        <Entry>
+			          <Group>Group1</Group>
+			          <Name>Name1</Name>
+			          <Number>1</Number>
+			          <Weight>1.1</Weight>
+			          <RowCount>1</RowCount>
+			        </Entry>
+			      </GroupList>
+			    </Row>
+			    <Row>
+			      <Site>Site3</Site>
+			      <Unit>Unit1</Unit>
+			      <GroupList>
+			        <Entry>
+			          <Group>Group1</Group>
+			          <Name>Name1</Name>
+			          <Number>5</Number>
+			          <Weight>2.1</Weight>
+			          <RowCount>1</RowCount>
+			        </Entry>
+			      </GroupList>
+			    </Row>
+			    <Row>
+			      <Site>Site5</Site>
+			      <Unit>Unit6</Unit>
+			      <GroupList>
+			        <Entry>
+			          <Group>Group1</Group>
+			          <Name>Name1</Name>
+			          <Number>6</Number>
+			          <Weight>5.1</Weight>
+			          <RowCount>1</RowCount>
+			        </Entry>
+			      </GroupList>
+			    </Row>
+			  </Rows>
+			</Table>
+			""";
 
-		const string TestGroupSiteThenUnitSortBoth_xml_flat = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<Table>
-  <Rows>
-    <Row>
-      <Site>Site1</Site>
-      <Unit>Unit2</Unit>
-      </Group:Group2/Name />
-      </Group:Group2/Number />
-      </Group:Group2/Weight />
-      </Group:Group2/RowCount />
-      </Group:Group1/Name>Name3<//Group:Group1/Name>
-      </Group:Group1/Number>4<//Group:Group1/Number>
-      </Group:Group1/Weight>1.4<//Group:Group1/Weight>
-      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
-    </Row>
-    <Row>
-      <Site>Site1</Site>
-      <Unit>Unit1</Unit>
-      </Group:Group2/Name>Name1<//Group:Group2/Name>
-      </Group:Group2/Number>2<//Group:Group2/Number>
-      </Group:Group2/Weight>1.2<//Group:Group2/Weight>
-      </Group:Group2/RowCount>1<//Group:Group2/RowCount>
-      </Group:Group1/Name>Name1<//Group:Group1/Name>
-      </Group:Group1/Number>1<//Group:Group1/Number>
-      </Group:Group1/Weight>1.1<//Group:Group1/Weight>
-      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
-    </Row>
-    <Row>
-      <Site>Site3</Site>
-      <Unit>Unit1</Unit>
-      </Group:Group2/Name />
-      </Group:Group2/Number />
-      </Group:Group2/Weight />
-      </Group:Group2/RowCount />
-      </Group:Group1/Name>Name1<//Group:Group1/Name>
-      </Group:Group1/Number>5<//Group:Group1/Number>
-      </Group:Group1/Weight>2.1<//Group:Group1/Weight>
-      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
-    </Row>
-    <Row>
-      <Site>Site5</Site>
-      <Unit>Unit6</Unit>
-      </Group:Group2/Name />
-      </Group:Group2/Number />
-      </Group:Group2/Weight />
-      </Group:Group2/RowCount />
-      </Group:Group1/Name>Name1<//Group:Group1/Name>
-      </Group:Group1/Number>6<//Group:Group1/Number>
-      </Group:Group1/Weight>5.1<//Group:Group1/Weight>
-      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
-    </Row>
-  </Rows>
-</Table>";
+		const string TestGroupSiteThenUnitSortBoth_xml_flat = """
+			<?xml version="1.0" encoding="utf-8"?>
+			<Table>
+			  <Rows>
+			    <Row>
+			      <Site>Site1</Site>
+			      <Unit>Unit2</Unit>
+			      </Group:Group2/Name />
+			      </Group:Group2/Number />
+			      </Group:Group2/Weight />
+			      </Group:Group2/RowCount />
+			      </Group:Group1/Name>Name3<//Group:Group1/Name>
+			      </Group:Group1/Number>4<//Group:Group1/Number>
+			      </Group:Group1/Weight>1.4<//Group:Group1/Weight>
+			      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
+			    </Row>
+			    <Row>
+			      <Site>Site1</Site>
+			      <Unit>Unit1</Unit>
+			      </Group:Group2/Name>Name1<//Group:Group2/Name>
+			      </Group:Group2/Number>2<//Group:Group2/Number>
+			      </Group:Group2/Weight>1.2<//Group:Group2/Weight>
+			      </Group:Group2/RowCount>1<//Group:Group2/RowCount>
+			      </Group:Group1/Name>Name1<//Group:Group1/Name>
+			      </Group:Group1/Number>1<//Group:Group1/Number>
+			      </Group:Group1/Weight>1.1<//Group:Group1/Weight>
+			      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
+			    </Row>
+			    <Row>
+			      <Site>Site3</Site>
+			      <Unit>Unit1</Unit>
+			      </Group:Group2/Name />
+			      </Group:Group2/Number />
+			      </Group:Group2/Weight />
+			      </Group:Group2/RowCount />
+			      </Group:Group1/Name>Name1<//Group:Group1/Name>
+			      </Group:Group1/Number>5<//Group:Group1/Number>
+			      </Group:Group1/Weight>2.1<//Group:Group1/Weight>
+			      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
+			    </Row>
+			    <Row>
+			      <Site>Site5</Site>
+			      <Unit>Unit6</Unit>
+			      </Group:Group2/Name />
+			      </Group:Group2/Number />
+			      </Group:Group2/Weight />
+			      </Group:Group2/RowCount />
+			      </Group:Group1/Name>Name1<//Group:Group1/Name>
+			      </Group:Group1/Number>6<//Group:Group1/Number>
+			      </Group:Group1/Weight>5.1<//Group:Group1/Weight>
+			      </Group:Group1/RowCount>1<//Group:Group1/RowCount>
+			    </Row>
+			  </Rows>
+			</Table>
+			""";
 
-		[Fact]
+		[TestMethod]
 		public void TestGroupSiteThenUnitSortBoth()
 		{
 			var td = GetPivoterTestData();
@@ -905,24 +957,24 @@ Site5;Unit6;Group1;Name1;6;5.1;1
 			sg.GroupIndex = 0;
 			sg.SortOrder = SortOrder.Desc;
 
-			var data = td.GetGroupedData_FastIntersect2();
+			var data = td.GetGroupedData_PivotTableBuilder();
 			var pr = new Presentation2<Test1Row>(data);
 			var nest = pr.GetTable_NestedKeyValueList_VariableColumns();
 			var json = ToJson(nest);
-			Assert.Equal(TestGroupSiteThenUnitSortBoth_nested, json);
+			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_nested, json);
 
 			var flat = pr.GetTable_FlatKeyValueList_CompleteColumns();
 //			flat.Columns = null;
 //			flat.ColumnGroups = null;
 	//		flat.RowGroups = null;
 			var flat_json = ToJson(flat);
-			Assert.Equal(TestGroupSiteThenUnitSortBoth_flat, flat_json);
+			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_flat, flat_json);
 
 			var xml_nest = nest.ToXml();
-			Assert.Equal(TestGroupSiteThenUnitSortBoth_xml_nest, xml_nest);
+			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_xml_nest, xml_nest);
 
 			var xml_flat = flat.ToXml();
-			Assert.Equal(TestGroupSiteThenUnitSortBoth_xml_flat, xml_flat);
+			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_xml_flat, xml_flat);
 
 		}
 

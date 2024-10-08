@@ -122,8 +122,14 @@ namespace PivotDataTable
 		//}
 
 
-
-		public GroupedData<TRow, Lazy<KeyValueList>> GetGroupedData_FastIntersect2()//bool createEmptyIntersects = false)
+		/// <summary>
+		/// Don't remeber why I made both FastIntersec and FastIntersect2
+		/// But It seems GetGroupedData_PivotTableBuilder is 2 times slower than GetGroupedData_FastIntersect?
+		/// This seemss weird thou.
+		/// And I see this one uses Lazy, but not the other one.
+		/// </summary>
+		/// <returns></returns>
+		public GroupedData<TRow, Lazy<KeyValueList>> GetGroupedData_PivotTableBuilder()//bool createEmptyIntersects = false)
 		{
 			Validate();
 
