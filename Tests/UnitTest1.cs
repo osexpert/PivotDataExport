@@ -620,11 +620,8 @@ namespace Tests
 
 			var nested_json_fis = ToJson(pres_fis.GetTable_NestedKeyValueList_VariableColumns());
 			Assert.AreEqual(nested_TestCompareFastAndSlow_ColGroupOnName, nested_json_fis);
-
-			// FIXME: ptb return no rows. It should return one total row?
-			// What is right, what is wrong?
-//			var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());
-//			Assert.AreEqual(nested_json_ptb, nested_json_fis);
+			var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());
+			Assert.AreEqual(nested_json_ptb, nested_json_fis);
 		}
 
 		const string str_TestCompareFastAndSlow_NoGroup = """
@@ -727,10 +724,8 @@ namespace Tests
 			// this produce same result as GetTable_FlatDict in this case (no col groups)
 			var nested_json_fis = ToJson(pres_fis.GetTable_NestedKeyValueList_VariableColumns());
 			Assert.AreEqual(nested_TestCompareFastAndSlow_NoGroup, nested_json_fis);
-			
-			// FIXME: ptb is empty (dont support total rows?)
-			//var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());
-			//Assert.AreEqual(nested_json_ptb, nested_json_fis);
+			var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());
+			Assert.AreEqual(nested_json_ptb, nested_json_fis);
 		}
 
 		const string TestGroupSiteThenUnitSortBoth_nested = """

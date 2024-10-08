@@ -334,9 +334,23 @@ namespace PivotDataTable
 			List<KeyValueList> rows = new List<KeyValueList>();
 
 			//var lastColGroupsSorted = SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder).ToList();
-			
 
-			foreach (var rg in _data.PT_lastRows.Cast<Row<TAgg>>())// SortGroups(_data.PT_lastRows, _data.rowFieldsInGroupOrder).Cast<Row<TAgg>>())
+			var lastRowGroups = _data.PT_lastRows.ToList();
+
+			//bool fakeRow = false;
+			if (!lastRowGroups.Any())
+			{
+				var row = new Row<TAgg>();
+				row.ColumnAggregates = _data.PT.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.PT.Aggregates;
+				lastRowGroups.Add(row);
+			//	fakeRow = true;
+			}
+
+
+
+
+			foreach (var rg in lastRowGroups.Cast<Row<TAgg>>())// SortGroups(_data.PT_lastRows, _data.rowFieldsInGroupOrder).Cast<Row<TAgg>>())
 			{
 				KeyValueList row = new();
 				rows.Add(row);
@@ -353,13 +367,35 @@ namespace PivotDataTable
 				Dictionary<IGroup<TAgg>, KeyValueList> groupToKeyVals = null!;
 				Dictionary<IGroup<TAgg>, List<KeyValueList>> groupToLists = new();
 
-//				var intersectData = rg.ColumnAggregates.ToDictionary(ks => ks.Value);
 
-				// Add the data
-				foreach (var cg in rg.ColumnAggregates)//flippedCols)//lastColGroupsSorted.Cast<Column<TAgg>>())//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
+				if (_data.PT_lastCols.Any())
 				{
-					AddData(row, cg, groupToLists, ref groupToKeyVals);
+
+					//				var intersectData = rg.ColumnAggregates.ToDictionary(ks => ks.Value);
+
+					// Add the data
+					foreach (var cg in rg.ColumnAggregates)//flippedCols)//lastColGroupsSorted.Cast<Column<TAgg>>())//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
+					{
+						AddData(row, cg, groupToLists, ref groupToKeyVals);
+					}
 				}
+				else
+				{
+					// no col grouping
+					var agg = rg.Aggregates;
+//					var values = agg.Value.Select(a => a.Value).ToArray();
+	//				if (values.Length != _data.dataFields.Length)
+		//				throw new Exception("mismatch in length..");
+					//Array.Copy(values, 0, row, totalStartIdx, values.Length);
+					foreach (var cg in agg.Value)//flippedCols)//lastColGroupsSorted.Cast<Column<TAgg>>())//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
+					{
+						//	AddData(row, cg, groupToLists, ref groupToKeyVals);
+						row.Add(cg);
+					}
+
+					//KeyValueList keyVals = GetCreateKeyVals(agg.Value, row, ref groupToKeyVals, groupToLists);
+				}
+			
 			}
 
 			var lastColGroupsSorted = _data.PT_lastCols.ToList();// SortGroups<TAgg>(_data.PT_lastCols, _data.colFieldsInGroupOrder).ToList();
