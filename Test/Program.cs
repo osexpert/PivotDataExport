@@ -153,7 +153,7 @@ namespace Test
 
 			var s3 = Stopwatch.StartNew();
 			var gdata_ptb = pivot2.GetGroupedData_PivotTableBuilder();
-			s3.Stop(); // 29 ?? mem??
+			s3.Stop(); // 29 ?? mem?? now that we get single row value directly, its much faster. But it did show that PTB aggregate a lot more than FIS.
 
 			//Console.WriteLine("done");
 			//Console.ReadKey();
