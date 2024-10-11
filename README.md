@@ -29,33 +29,33 @@ Create fields:
     
     var fields = new List<Field>();
     
-    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region))
+    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), row => row.Region, Aggregators.CommaList)
     {
       GroupIndex = 0,
       Area = Area.Row,
       SortOrder = SortOrder.Asc
     });
-    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country))
+    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), row => row.Country, Aggregators.CommaList)
     {
       GroupIndex = 1,
       Area = Area.Row,
       SortOrder = SortOrder.Desc
     });
     
-    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType))
+    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), row => row.ItemType, Aggregators.CommaList)
     {
       GroupIndex = 0,
       Area = Area.Column,
       SortOrder = SortOrder.Desc
     });
-    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel))
+    fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), row => row.SalesChannel, Aggregators.CommaList)
     {
       GroupIndex = 1,
       Area = Area.Column,
       SortOrder = SortOrder.Asc
     });
     
-    fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
+    fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), row => row.UnitsSold, Enumerable.Sum);
 
 Group, aggregate, sort:
 
