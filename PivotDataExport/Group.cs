@@ -24,7 +24,7 @@ namespace PivotDataExport
 
 		public IEnumerable<TRow> Rows = null!;
 
-		public Field Field = null!;
+		public Field<TRow> Field = null!;
 
 		/// <summary>
 		/// 
@@ -47,7 +47,7 @@ namespace PivotDataExport
 
 		public Dictionary<Group<TRow>, object?[]> IntersectData { get; internal set; } = null!;
 
-		internal object? GetKeyByField(Field colField)
+		internal object? GetKeyByField(Field<TRow> colField)
 		{
 			var current = this;
 			do

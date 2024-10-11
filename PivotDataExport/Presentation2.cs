@@ -76,7 +76,7 @@ namespace PivotDataExport
 		/// <summary>
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> GetFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<IGroup<TAgg>> lastRowGroups /* sorted */, List<IGroup<TAgg>> lastColGroups /* sorted */,
+		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, Field<TRow>[] rowFieldsInGroupOrder, List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
 			out bool partialIntersects, bool createEmptyIntersects = false)
 		{
 			partialIntersects = false;
@@ -90,7 +90,7 @@ namespace PivotDataExport
 			else
 				colCount += dataFields.Length;
 
-			Dictionary<IGroup<TAgg>, int> grpStartIdx = new();
+			Dictionary<IGroup<TRow, TAgg>, int> grpStartIdx = new();
 			int totalStartIdx = rowFieldsInGroupOrder.Length;
 			foreach (var colGrp in lastColGroups)
 			{
@@ -106,14 +106,14 @@ namespace PivotDataExport
 			bool fakeRow = false;
 			if (!lastRowGroups.Any())
 			{
-				var row = new Row<TAgg>();
+				var row = new Row<TRow, TAgg>();
 				row.ColumnAggregates = _data.table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
 				row.Aggregates = _data.table.Aggregates;
 				lastRowGroups.Add(row);
 				fakeRow = true;
 			}
 
-			foreach (var lastRowGroup in lastRowGroups.Cast<Row<TAgg>>())
+			foreach (var lastRowGroup in lastRowGroups.Cast<Row<TRow, TAgg>>())
 			{
 				var row = new object?[colCount];
 
@@ -123,7 +123,7 @@ namespace PivotDataExport
 					int par_idx = rowFieldsInGroupOrder.Length - 1;
 					do
 					{
-						row[par_idx] = current.Value;
+						row[par_idx] = current.Field.GetDisplayValue(current.Value);
 						current = current.Parent;
 						par_idx--;
 					} while (current != null);// && !current.IsRoot);
@@ -155,7 +155,9 @@ namespace PivotDataExport
 									int i = 0;
 									foreach (var df in dataFields)
 									{
-										defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
+										//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
+										//defVals[i++] = df.DefaultValue;// .GetRowsValue(Enumerable.Empty<TRow>());
+										defVals[i++] = df.GetDisplayTypeDefaultValue();
 									}
 									defaultValues = defVals;
 								}
@@ -283,17 +285,17 @@ namespace PivotDataExport
 		/// <summary>
 		/// Get top parent first and me last
 		/// </summary>
-		internal static IEnumerable<IGroup<TAgg>> GetParentsAndMe(IGroup<TAgg> grp)//bool includeMeIfRoot)
+		internal static IEnumerable<IGroup<TRow, TAgg>> GetParentsAndMe(IGroup<TRow, TAgg> grp)//bool includeMeIfRoot)
 		{
-			if (grp.Parent == null)//.IsRoot)
+			if (/*grp.Parent == null &&*/ grp.Field == null)//.IsRoot)
 			{
 				//if (includeMeIfRoot)
 				//	return this.Yield();
 				//else
-				return Enumerable.Empty<IGroup<TAgg>>();
+				return Enumerable.Empty<IGroup<TRow, TAgg>>();
 			}
 
-			var st = new Stack<IGroup<TAgg>>();
+			var st = new Stack<IGroup<TRow, TAgg>>();
 
 			var current = grp;
 			do
@@ -305,7 +307,7 @@ namespace PivotDataExport
 			return st;
 		}
 
-		static IEnumerable<IGroup<TAgg>> Flatten(IEnumerable<IGroup<TAgg>> collection)
+		static IEnumerable<IGroup<TRow, TAgg>> Flatten(IEnumerable<IGroup<TRow, TAgg>> collection)
 		{
 			foreach (var o in collection)
 			{
@@ -339,13 +341,13 @@ namespace PivotDataExport
 
 			if (!lastRowGroups.Any())
 			{
-				var row = new Row<TAgg>();
+				var row = new Row<TRow, TAgg>();
 				row.ColumnAggregates = _data.table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
 				row.Aggregates = _data.table.Aggregates;
 				lastRowGroups.Add(row);
 			}
 
-			foreach (var rg in lastRowGroups.Cast<Row<TAgg>>())// SortGroups(_data.PT_lastRows, _data.rowFieldsInGroupOrder).Cast<Row<TAgg>>())
+			foreach (var rg in lastRowGroups.Cast<Row<TRow, TAgg>>())// SortGroups(_data.PT_lastRows, _data.rowFieldsInGroupOrder).Cast<Row<TAgg>>())
 			{
 				KeyValueList row = new();
 				rows.Add(row);
@@ -359,8 +361,8 @@ namespace PivotDataExport
 
 				//var sortedColData = SortGroups<TAgg>(flippedCols, _data.colFieldsInGroupOrder);
 
-				Dictionary<IGroup<TAgg>, KeyValueList> groupToKeyVals = null!;
-				Dictionary<IGroup<TAgg>, List<KeyValueList>> groupToLists = new();
+				Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals = null!;
+				Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists = new();
 
 
 				if (_data.lastCols.Any())
@@ -389,9 +391,9 @@ namespace PivotDataExport
 			};
 		}
 
-		Row<TAgg> _fakeRoot = new Row<TAgg>();
+		Row<TRow, TAgg> _fakeRoot = new Row<TRow, TAgg>();
 
-		private void AddData(KeyValueList row, Column<TAgg> cg, Dictionary<IGroup<TAgg>, List<KeyValueList>> groupToLists, ref Dictionary<IGroup<TAgg>, KeyValueList> groupToKeyVals)
+		private void AddData(KeyValueList row, Column<TRow, TAgg> cg, Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists, ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals)
 		{
 			KeyValueList keyVals = GetCreateKeyVals(cg, row, ref groupToKeyVals, groupToLists);
 
@@ -410,7 +412,7 @@ namespace PivotDataExport
 			}
 		}
 
-		private KeyValueList GetCreateKeyVals(IGroup<TAgg> cg, KeyValueList r, ref Dictionary<IGroup<TAgg>, KeyValueList> groupToKeyVals, Dictionary<IGroup<TAgg>, List<KeyValueList>> groupToLists)
+		private KeyValueList GetCreateKeyVals(IGroup<TRow, TAgg> cg, KeyValueList r, ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals, Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists)
 		{
 			var cg_ParentOrFake = cg.Parent ?? _fakeRoot;
 
@@ -435,7 +437,7 @@ namespace PivotDataExport
 			if (!groupToKeyVals.TryGetValue(cg, out var keyVals))
 			{
 				keyVals = new KeyValueList();
-				keyVals.Add(cg.Field.Name, cg.Field.GetDisplayValue(cg.Value));
+				keyVals.Add(cg.Field.Name, cg.Value);
 
 				list.Add(keyVals);
 
@@ -490,7 +492,7 @@ namespace PivotDataExport
 			return combName;
 		}
 
-		private List<TableColumn> CreateTableCols(Field[] dataFields, Field[] rowGroupFields, List<IGroup<TAgg>> lastColGroups /* sorted */)
+		private List<TableColumn> CreateTableCols(Field<TRow>[] dataFields, Field<TRow>[] rowGroupFields, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */)
 		{
 			List<TableColumn> tablecols = new();
 			// fill rowGroups

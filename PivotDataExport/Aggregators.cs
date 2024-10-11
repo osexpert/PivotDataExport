@@ -1,40 +1,57 @@
 ﻿
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace PivotDataExport
 {
 	public static class Aggregators
 	{
-		public static string CommaList<TRow>(IEnumerable<TRow> rows, Func<TRow, string> value)
-		{
-			if (GetCountZeroOrOneAndSingle(rows, out var count, out var single))
-				return count == 0 ? "" : value(single!);
+		//public static string CommaList<TRow>(IEnumerable<TRow> rows, Func<TRow, string> value)
+		//{
+		//	if (GetCountZeroOrOneAndSingle(rows, out var count, out var single))
+		//		return count == 0 ? "" : value(single!);
 
-			return string.Join(", ", rows.Select(value).Distinct().OrderBy(v => v));
+		//	return string.Join(", ", rows.Select(value).Distinct().OrderBy(v => v));
+		//}
+
+		public static string CommaList(IEnumerable<string> values)//, string noValue = "", string separator = ", ")
+		{
+			if (GetCountZeroOrOneAndSingle(values, out var count, out var single))
+				return count == 0 ? "" : single!;
+
+			return string.Join(", ", values.Distinct().OrderBy(v => v));
 		}
 
-		public static string SingleOrCount<TRow>(IEnumerable<TRow> rows, Func<TRow, string> value)
-			=> SingleOr(rows, value, rows => $"Count: {rows.Count()}");
+		//public static string SingleOrCount(IEnumerable<string> rows)
+		//	=> SingleOr(rows, rows => $"Count: {rows.Count()}");
 
-		public static string SingleOr<TRow>(IEnumerable<TRow> rows, Func<TRow, string> value, string orValue)
-			=> SingleOr(rows, value, _ => orValue);
+		//public static string SingleOr(IEnumerable<string> rows, string orValue)
+		//	=> SingleOr(rows, _ => orValue);
 
-		public static string SingleOr<TRow>(IEnumerable<TRow> rows, Func<TRow, string> value, Func<IEnumerable<TRow>, string> orValue)
-		{
-			if (GetCountZeroOrOneAndSingle(rows, out var count, out var single))
-				return count == 0 ? "" : value(single!);
+		//public static string SingleOr(IEnumerable<string> rows, Func<IEnumerable<string>, string> orValue)
+		//{
+		//	if (GetCountZeroOrOneAndSingle(rows, out var count, out var single))
+		//		return count == 0 ? "" : single!;
 
-			return orValue(rows);
-		}
+		//	return orValue(rows);
+		//}
 
-		public static double AverageOr<TRow>(IEnumerable<TRow> rows, Func<TRow, double> value, Func<IEnumerable<TRow>, double> orValue)
-		{
-			if (!rows.Any())
-				return orValue(rows);
-			else
-				return rows.Average(value);
-		}
+		//public static double AverageOr<TRow>(IEnumerable<TRow> rows, Func<TRow, double> value, Func<IEnumerable<TRow>, double> orValue)
+		//{
+		//	if (!rows.Any())
+		//		return orValue(rows);
+		//	else
+		//		return rows.Average(value);
+		//}
+
+		//public static double AverageOr<TRow>(IEnumerable<TRow> vals, double orValue)
+		//{
+		//	if (!vals.Any())
+		//		return orValue;
+		//	else
+		//		return vals.Average();
+		//}
 
 		/// <summary>
 		/// return count 0, 1 or null
@@ -65,8 +82,8 @@ namespace PivotDataExport
 		public static bool TryGetCountWithoutEnumerating<TSource>(this IEnumerable<TSource> source, out int count, out TSource? single)
 		{
 #if NET6_0_OR_GREATER
-        // System.Linq will throw ArgumentNullException if necessary
-        return source.TryGetNonEnumeratedCount(out count);
+			// System.Linq will throw ArgumentNullException if necessary
+			return source.TryGetNonEnumeratedCount(out count);
 #else
 			single = default;
 

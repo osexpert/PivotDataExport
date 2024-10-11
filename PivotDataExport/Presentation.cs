@@ -62,7 +62,7 @@ namespace PivotDataExport
 		/// <summary>
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> GetFullRows(Field[] dataFields, Field[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */, out bool partialIntersects,
+		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, Field<TRow>[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */, out bool partialIntersects,
 			bool createEmptyIntersects = false)
 		{
 			partialIntersects = false;
@@ -106,7 +106,7 @@ namespace PivotDataExport
 					int par_idx = rowFieldsInGroupOrder.Length - 1;
 					do
 					{
-						row[par_idx] = current.Key;
+						row[par_idx] = current.Field.GetDisplayValue(current.Key);
 						current = current.ParentGroup;
 						par_idx--;
 					} while (current != null && !current.IsRoot);
@@ -132,7 +132,9 @@ namespace PivotDataExport
 								int i = 0;
 								foreach (var df in dataFields)
 								{
-									defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
+									//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
+														//defVals[i++] = df.DefaultValue;//.GetRowsValue(Enumerable.Empty<TRow>());
+									defVals[i++] = df.GetDisplayTypeDefaultValue();//.DefaultValue;//.GetRowsValue(Enumerable.Empty<TRow>());
 								}
 								defaultValues = defVals;
 							}
@@ -291,7 +293,7 @@ namespace PivotDataExport
 						// dataField order
 						foreach (var z in _data.dataFields.ZipForceEqual(data, (f, s) => new { First = f, Second = s }))
 						{
-							keyVals.Add(z.First.Name, z.First.GetDisplayValue(z.Second));
+							keyVals.Add(z.First.Name, z.Second);
 						}
 					}
 					else
@@ -345,7 +347,7 @@ namespace PivotDataExport
 				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals!))
 				{
 					keyVals = new KeyValueList();
-					keyVals.Add(colGrp.Field.Name, colGrp.Field.GetDisplayValue(colGrp.Key));
+					keyVals.Add(colGrp.Field.Name, colGrp.Key);
 
 					list.Add(keyVals);
 
@@ -402,7 +404,7 @@ namespace PivotDataExport
 			return combName;
 		}
 
-		private List<TableColumn> CreateTableCols(Field[] dataFields, Field[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
+		private List<TableColumn> CreateTableCols(Field<TRow>[] dataFields, Field<TRow>[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
 		{
 			List<TableColumn> tablecols = new();
 			// fill rowGroups
@@ -452,7 +454,7 @@ namespace PivotDataExport
 		}
 
 
-		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field[] groupFields) where TEle : Group<TRow>
+		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields) where TEle : Group<TRow>
 		{
 			return SortGroups<TEle>(grops, groupFields, ele => ele);
 		}
@@ -461,7 +463,7 @@ namespace PivotDataExport
 		/// Sort the last group level.
 		/// Sort by checking parent values
 		/// </summary>
-		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field[] groupFields, Func<TEle, Group<TRow>> getGroup)
+		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields, Func<TEle, Group<TRow>> getGroup)
 		{
 			//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
 

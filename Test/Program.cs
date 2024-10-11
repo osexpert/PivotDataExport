@@ -52,35 +52,35 @@ namespace Test
 
 			
 
-			var fields = new List<Field>();
+			var fields = new List<Field<CsvRow>>();
 
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region))
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), r => r.Region, Aggregators.CommaList)
 			{
 				GroupIndex = 0,
 				Area = Area.Row,
 				SortOrder = SortOrder.Asc
 			});
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), rows => Aggregators.CommaList(rows, row => row.Country))
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), r => r.Country, Aggregators.CommaList)
 			{
 				GroupIndex = 1,
 				Area = Area.Row,
 				SortOrder = SortOrder.Desc
 			});
 
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), rows => Aggregators.CommaList(rows, row => row.ItemType))
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), r => r.ItemType, Aggregators.CommaList)
 			{
 				GroupIndex = 0,
 				Area = Area.Column,
 				SortOrder = SortOrder.Desc
 			});
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), rows => Aggregators.CommaList(rows, row => row.SalesChannel))
+			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), r => r.SalesChannel, Aggregators.CommaList)
 			{
 				GroupIndex = 1,
 				Area = Area.Column,
 				SortOrder = SortOrder.Asc
 			});
 
-			fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), rows => rows.Sum(r => r.UnitsSold)));
+			fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), r => r.UnitsSold, Enumerable.Sum));
 
 			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
 			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
@@ -147,16 +147,16 @@ namespace Test
 			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 			var pivot2 = new Pivoter2<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
-			Console.WriteLine("start?");
-			Console.ReadKey();
-			Console.WriteLine("start!");
+			//Console.WriteLine("start?");
+			//Console.ReadKey();
+			//Console.WriteLine("start!");
 
 			var s3 = Stopwatch.StartNew();
 			var gdata_ptb = pivot2.GetGroupedData_PivotTableBuilder();
 			s3.Stop(); // 29 ?? mem??
 
-			Console.WriteLine("done");
-			Console.ReadKey();
+			//Console.WriteLine("done");
+			//Console.ReadKey();
 
 			var s = Stopwatch.StartNew();
 			var gdata_fis = pivot.GetGroupedData_FastIntersect();
@@ -361,7 +361,7 @@ namespace Test
 
 
 
-		private Field GetField(IEnumerable<Field> fieldsss, string v)
+		private Field<CsvRow> GetField(IEnumerable<Field<CsvRow>> fieldsss, string v)
 		{
 			return fieldsss.Where(f => f.Name == v).Single();
 		}

@@ -11,12 +11,12 @@ namespace PivotDataExport
 	/// <typeparam name="TRow"></typeparam>
 	public class Pivoter<TRow> where TRow : class // class notnull
 	{
-		List<Field> _fields;
+		List<Field<TRow>> _fields;
 		IEnumerable<TRow> _rows;
 
-		public List<Field> Fields => _fields;
+		public List<Field<TRow>> Fields => _fields;
 
-		public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field> fields)
+		public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 		{
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
@@ -36,7 +36,7 @@ namespace PivotDataExport
 				throw new ArgumentException("More than one field with same fieldName");
 		}
 
-		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, RootType rootType)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field<TRow>> fields, RootType rootType)//, bool sort = false)
 		{
 			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
 			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
@@ -47,7 +47,7 @@ namespace PivotDataExport
 			return res;
 		}
 
-		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
 		{
 			List<List<Group<TRow>>> listRes = new();
 
@@ -63,7 +63,7 @@ namespace PivotDataExport
 			//			List<Group<T>> lastGroups = new List<Group<T>>();
 			//		lastGroups.Add(new Group<T> { Rows = _list, IsRoot = true });
 
-			foreach (Field gf in fields)
+			foreach (Field<TRow> gf in fields)
 			{
 				//var getter = _props[gf.FieldName];
 
@@ -71,7 +71,7 @@ namespace PivotDataExport
 
 				foreach (var go in lastGroups)
 				{
-					var subGroups = go.Rows.GroupBy(r => gf.GetValue(r.Yield()), gf.GroupComparer).Select(g => new Group<TRow>()
+					var subGroups = go.Rows.GroupBy(r => gf.GetRowValue(r), gf.GroupComparer).Select(g => new Group<TRow>()
 					{
 						Key = g.Key,
 						Rows = g,
@@ -110,7 +110,7 @@ namespace PivotDataExport
 		}
 
 
-		private IEnumerable<Field> GetDataFields()
+		private IEnumerable<Field<TRow>> GetDataFields()
 		{
 			return _fields.Where(f => f.Area == Area.Data);//.OrderBy(f => f.Index);
 		}
@@ -160,7 +160,7 @@ namespace PivotDataExport
 				{
 					//var getter =  _props[dataField.FieldName];
 
-					var theValue = dataField.GetValue(lastRowThenColGroup.Rows);
+					var theValue = dataField.GetRowsValue(lastRowThenColGroup.Rows);
 
 					lastRowG.IntersectData ??= new();
 
@@ -292,14 +292,14 @@ namespace PivotDataExport
 
 	public class GroupedData<TRow> where TRow : class
 	{
-		public Field[] rowFieldsInGroupOrder = null!;
-		public Field[] colFieldsInGroupOrder = null!;
+		public Field<TRow>[] rowFieldsInGroupOrder = null!;
+		public Field<TRow>[] colFieldsInGroupOrder = null!;
 
-		public Field[] dataFields = null!;
+		public Field<TRow>[] dataFields = null!;
 
 		public List<Group<TRow>> lastRowGroups = null!;
 		public List<Group<TRow>> lastColGroups = null!;
 
-		public List<Field> fields = null!;
+		public List<Field<TRow>> fields = null!;
 	}
 }

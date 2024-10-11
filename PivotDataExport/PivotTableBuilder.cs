@@ -41,8 +41,8 @@ namespace PivotDataExport
 	public class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggregates>
 		   where TRow : class
 	{
-		private readonly IList<(Func<TRow, object?>, Field)> _rowFunctions;
-		private readonly IList<(Func<TRow, object?>, Field)> _columnFunctions;
+		private readonly IList<(Func<TRow, object?>, Field<TRow>)> _rowFunctions;
+		private readonly IList<(Func<TRow, object?>, Field<TRow>)> _columnFunctions;
 		private readonly Func<IEnumerable<TRow>, TAgg> _aggregateFunction;
 		private readonly IEnumerable<TRow> _list;
 
@@ -52,24 +52,24 @@ namespace PivotDataExport
 		{
 			_list = list;
 			_aggregateFunction = aggregateFunction;
-			_rowFunctions = new List<(Func<TRow, object?>, Field)>();
-			_columnFunctions = new List<(Func<TRow, object?>, Field)>();
+			_rowFunctions = new List<(Func<TRow, object?>, Field<TRow>)>();
+			_columnFunctions = new List<(Func<TRow, object?>, Field<TRow>)>();
 		}
-		public PivotTableBuilder<TRow, TAgg> AddRow((Func<TRow, object?>, Field) rowFunction)
+		public PivotTableBuilder<TRow, TAgg> AddRow((Func<TRow, object?>, Field<TRow>) rowFunction)
 		{
 			_rowFunctions.Add(rowFunction);
 			return this;
 		}
 
-		public PivotTableBuilder<TRow, TAgg> AddColumn((Func<TRow, object?>, Field) columnFunction)
+		public PivotTableBuilder<TRow, TAgg> AddColumn((Func<TRow, object?>, Field<TRow>) columnFunction)
 		{
 			_columnFunctions.Add(columnFunction);
 			return this;
 		}
 
-		public PivotTable<TAgg> Build()
+		public PivotTable<TRow, TAgg> Build()
 		{
-			var pivotTable = new PivotTable<TAgg>();
+			var pivotTable = new PivotTable<TRow, TAgg>();
 
 			//compute aggregates for the whole table
 			pivotTable.Aggregates = _aggregateFunction(_list);//, null, AggregateContext.Table_Aggregates);
@@ -79,11 +79,11 @@ namespace PivotDataExport
 			return pivotTable;
 		}
 
-		private List<Row<TAgg>> ComputeRows(Row<TAgg>? parent, IEnumerable<TRow> list,
-			IEnumerable<(Func<TRow, object?>, Field)> rowFunctions,
-			IEnumerable<(Func<TRow, object?>, Field)> columnFunctions)
+		private List<Row<TRow, TAgg>> ComputeRows(Row<TRow, TAgg>? parent, IEnumerable<TRow> list,
+			IEnumerable<(Func<TRow, object?>, Field<TRow>)> rowFunctions,
+			IEnumerable<(Func<TRow, object?>, Field<TRow>)> columnFunctions)
 		{
-			var rows = new List<Row<TAgg>>();
+			var rows = new List<Row<TRow, TAgg>>();
 			if (!rowFunctions.Any())
 				return rows;
 
@@ -101,7 +101,7 @@ namespace PivotDataExport
 
 			foreach (var group in groups)
 			{
-				var newRow = new Row<TAgg>();
+				var newRow = new Row<TRow, TAgg>();
 				newRow.Field = field;
 				newRow.Parent = parent;
 				newRow.Value = group.Key;
@@ -131,10 +131,10 @@ namespace PivotDataExport
 			return rows;
 		}
 
-		private List<Column<TAgg>> ComputeColumns(Column<TAgg>? parent, IEnumerable<TRow> list,
-			IEnumerable<(Func<TRow, object?>, Field)> columnFunctions)//, AggregateContext agg_ctx)
+		private List<Column<TRow, TAgg>> ComputeColumns(Column<TRow, TAgg>? parent, IEnumerable<TRow> list,
+			IEnumerable<(Func<TRow, object?>, Field<TRow>)> columnFunctions)//, AggregateContext agg_ctx)
 		{
-			var columns = new List<Column<TAgg>>();
+			var columns = new List<Column<TRow, TAgg>>();
 			if (!columnFunctions.Any())
 				return columns;
 
@@ -152,7 +152,7 @@ namespace PivotDataExport
 
 			foreach (var group in groups)
 			{
-				var newColumn = new Column<TAgg>();
+				var newColumn = new Column<TRow, TAgg>();
 				newColumn.Field = field;
 				newColumn.Parent = parent;
 				newColumn.Value = group.Key;
@@ -181,57 +181,57 @@ namespace PivotDataExport
 		}
 	}
 
-	public interface IGroup<TAgg>
+	public interface IGroup<TRow, TAgg>
 	{
 		object? Value { get; }
 		TAgg Aggregates { get; }
-		IEnumerable<IGroup<TAgg>> Children { get; }
+		IEnumerable<IGroup<TRow, TAgg>> Children { get; }
 
-		IGroup<TAgg>? Parent { get; }
+		IGroup<TRow, TAgg>? Parent { get; }
 
-		Field Field { get; }
+		Field<TRow> Field { get; }
 	}
 
-	public class Row<TAgg> : IGroup<TAgg>
+	public class Row<TRow, TAgg> : IGroup<TRow, TAgg>
 	{
 		internal Row() { }
 		public object? Value { get; set; }
 		public TAgg Aggregates { get; set; }
-		public IEnumerable<Column<TAgg>> ColumnAggregates { get; set; }
-		public IEnumerable<Row<TAgg>> Children { get; set; }
+		public IEnumerable<Column<TRow, TAgg>> ColumnAggregates { get; set; }
+		public IEnumerable<Row<TRow, TAgg>> Children { get; set; }
 
-		public Row<TAgg>? Parent { get; set; }
+		public Row<TRow, TAgg>? Parent { get; set; }
 
-		public Field Field { get; set; }
+		public Field<TRow> Field { get; set; }
 
-		IEnumerable<IGroup<TAgg>> IGroup<TAgg>.Children => Children;
-		IGroup<TAgg>? IGroup<TAgg>.Parent => Parent;
+		IEnumerable<IGroup<TRow, TAgg>> IGroup<TRow, TAgg>.Children => Children;
+		IGroup<TRow, TAgg>? IGroup<TRow, TAgg>.Parent => Parent;
 	}
 
-	public class Column<TAgg> : IGroup<TAgg>
+	public class Column<TRow, TAgg> : IGroup<TRow, TAgg>
 	{
 		internal Column() { }
 		public object? Value { get; set; }
 		public TAgg Aggregates { get; set; }
-		public IEnumerable<Column<TAgg>> Children { get; set; }
+		public IEnumerable<Column<TRow, TAgg>> Children { get; set; }
 
-		public Column<TAgg>? Parent { get; set; }
+		public Column<TRow, TAgg>? Parent { get; set; }
 
-		public Field Field { get; set; }
+		public Field<TRow> Field { get; set; }
 
-		IEnumerable<IGroup<TAgg>> IGroup<TAgg>.Children => Children;
-		IGroup<TAgg>? IGroup<TAgg>.Parent => Parent;
+		IEnumerable<IGroup<TRow, TAgg>> IGroup<TRow, TAgg>.Children => Children;
+		IGroup<TRow, TAgg>? IGroup<TRow, TAgg>.Parent => Parent;
 	}
 
 	// This one is kind of similar to a row and share all 3 things with a row: Aggregates, ColumnAggregates and Rows (Children)
 	// Could this be extracted into an iface? Or could a row inherit PivotTable?
 	// So its kind of weid that the table is kind of a row?
-	public class PivotTable<TAgg>
+	public class PivotTable<TRow, TAgg>
 	{
 		internal PivotTable() { }
 		public TAgg Aggregates { get; set; }
-		public IEnumerable<Column<TAgg>> ColumnAggregates { get; set; }
-		public IEnumerable<Row<TAgg>> Rows { get; set; }
+		public IEnumerable<Column<TRow, TAgg>> ColumnAggregates { get; set; }
+		public IEnumerable<Row<TRow, TAgg>> Rows { get; set; }
 	}
 
 
