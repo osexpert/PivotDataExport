@@ -94,7 +94,6 @@ namespace PivotDataExport
 				SortOrder = SortOrder,
 				GroupIndex = GroupIndex
 			};
-
 		}
 
 		internal TableColumn ToTableColumn(string combName, object?[] groupVals)
@@ -109,7 +108,6 @@ namespace PivotDataExport
 				SortOrder = SortOrder,
 				GroupValues = groupVals
 			};
-
 		}
 
 		public override string ToString()
@@ -144,8 +142,6 @@ namespace PivotDataExport
 			return CreateFieldsFromProperties(props.GetItemProperties(null));
 		}
 
-
-
 		//public void SetGetRowsValue<TProp>(Func<IEnumerable<TRow>, TProp> getRowsValue)
 		//{
 		//	GetRowsValue = rows => getRowsValue(rows);//.Cast<TRow>());
@@ -173,14 +169,13 @@ namespace PivotDataExport
 			Name = fieldName;
 			GetRowValue = row => getRowValue(row);
 			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
-			DisplayType = DataType = typeof(TProp);
+			DataType = typeof(TProp);
+			DisplayType = typeof(TProp);
 		}
 	}
 
 	public class Field<TRow, TProp, TDisp> : Field<TRow>
 	{
-		// TAgg = display type?
-
 		public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TDisp> getRowsValue)
 		{
 			Name = fieldName;
@@ -221,8 +216,6 @@ namespace PivotDataExport
 		}
 	}
 
-
-
 	public enum Area
 	{
 		Data = 0,
@@ -230,13 +223,10 @@ namespace PivotDataExport
 		Column = 2,
 	}
 
-
 	public enum SortOrder
 	{
 		None = 0,
 		Asc = 1,
 		Desc = 2
 	}
-
 }
-

@@ -1,13 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Text.Json;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PivotDataExport;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Tests
 {
@@ -348,10 +341,5 @@ namespace Tests
 			var piv2 = new Pivoter2<Test1Row>(rows, fields);
 			return (piv, piv2);
 		}
-
-
 	}
-
-
 }
-

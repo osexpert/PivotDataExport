@@ -1109,7 +1109,6 @@ namespace Tests
 			
 		}
 
-
 		private static (Pivoter<Test1Row>, Pivoter2<Test1Row>) GetPivoterTestData()
 		{
 			var r1 = new Test1Row { RowId = 1, Site = "Site1", Unit = "Unit1", Group = "Group1", Name = "Name1", Number = 1, Weight = 1.1, Time = new DateTime(2024, 1, 2, 3, 4, 5) };
@@ -1135,9 +1134,235 @@ namespace Tests
 			return (pivot, pivot2);
 		}
 
+		const string TestGroupOnTimeJson = """
+			{
+			  "rows": [
+			    {
+			      "Time": "2024-01-02T03:04:05.0000000",
+			      "Site": "Site1",
+			      "Unit": "Unit1",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 1,
+			      "Weight": 1.1,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-03T03:04:05.0000000",
+			      "Site": "Site1",
+			      "Unit": "Unit1",
+			      "Group": "Group2",
+			      "Name": "Name1",
+			      "Number": 2,
+			      "Weight": 1.2,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-04T03:04:05.0000000",
+			      "Site": "Site3",
+			      "Unit": "Unit1",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 5,
+			      "Weight": 2.1,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-05T03:04:05.0000000",
+			      "Site": "Site1",
+			      "Unit": "Unit2",
+			      "Group": "Group1",
+			      "Name": "Name3",
+			      "Number": 4,
+			      "Weight": 1.4,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-06T03:04:05.0000000",
+			      "Site": "Site5",
+			      "Unit": "Unit6",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 6,
+			      "Weight": 5.1,
+			      "RowCount": 1
+			    }
+			  ]
+			}
+			""";
 
+		const string TestGroupOnTimeJsonFlat = """
+			{
+			  "rows": [
+			    {
+			      "Time": "2024-01-02T03:04:05.0000000",
+			      "Site": "Site1",
+			      "Unit": "Unit1",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 1,
+			      "Weight": 1.1,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-03T03:04:05.0000000",
+			      "Site": "Site1",
+			      "Unit": "Unit1",
+			      "Group": "Group2",
+			      "Name": "Name1",
+			      "Number": 2,
+			      "Weight": 1.2,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-04T03:04:05.0000000",
+			      "Site": "Site3",
+			      "Unit": "Unit1",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 5,
+			      "Weight": 2.1,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-05T03:04:05.0000000",
+			      "Site": "Site1",
+			      "Unit": "Unit2",
+			      "Group": "Group1",
+			      "Name": "Name3",
+			      "Number": 4,
+			      "Weight": 1.4,
+			      "RowCount": 1
+			    },
+			    {
+			      "Time": "2024-01-06T03:04:05.0000000",
+			      "Site": "Site5",
+			      "Unit": "Unit6",
+			      "Group": "Group1",
+			      "Name": "Name1",
+			      "Number": 6,
+			      "Weight": 5.1,
+			      "RowCount": 1
+			    }
+			  ]
+			}
+			""";
+		const string TestGroupOnTimeJsonXml = """
+			<?xml version="1.0" encoding="utf-8"?>
+			<Table>
+			  <Rows>
+			    <Row>
+			      <Time>2024-01-02T03:04:05.0000000</Time>
+			      <Site>Site1</Site>
+			      <Unit>Unit1</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name1</Name>
+			      <Number>1</Number>
+			      <Weight>1.1</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-03T03:04:05.0000000</Time>
+			      <Site>Site1</Site>
+			      <Unit>Unit1</Unit>
+			      <Group>Group2</Group>
+			      <Name>Name1</Name>
+			      <Number>2</Number>
+			      <Weight>1.2</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-04T03:04:05.0000000</Time>
+			      <Site>Site3</Site>
+			      <Unit>Unit1</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name1</Name>
+			      <Number>5</Number>
+			      <Weight>2.1</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-05T03:04:05.0000000</Time>
+			      <Site>Site1</Site>
+			      <Unit>Unit2</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name3</Name>
+			      <Number>4</Number>
+			      <Weight>1.4</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-06T03:04:05.0000000</Time>
+			      <Site>Site5</Site>
+			      <Unit>Unit6</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name1</Name>
+			      <Number>6</Number>
+			      <Weight>5.1</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			  </Rows>
+			</Table>
+			""";
+		const string TestGroupOnTimeJsonXmlFlat = """
+			<?xml version="1.0" encoding="utf-8"?>
+			<Table>
+			  <Rows>
+			    <Row>
+			      <Time>2024-01-02T03:04:05.0000000</Time>
+			      <Site>Site1</Site>
+			      <Unit>Unit1</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name1</Name>
+			      <Number>1</Number>
+			      <Weight>1.1</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-03T03:04:05.0000000</Time>
+			      <Site>Site1</Site>
+			      <Unit>Unit1</Unit>
+			      <Group>Group2</Group>
+			      <Name>Name1</Name>
+			      <Number>2</Number>
+			      <Weight>1.2</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-04T03:04:05.0000000</Time>
+			      <Site>Site3</Site>
+			      <Unit>Unit1</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name1</Name>
+			      <Number>5</Number>
+			      <Weight>2.1</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-05T03:04:05.0000000</Time>
+			      <Site>Site1</Site>
+			      <Unit>Unit2</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name3</Name>
+			      <Number>4</Number>
+			      <Weight>1.4</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			    <Row>
+			      <Time>2024-01-06T03:04:05.0000000</Time>
+			      <Site>Site5</Site>
+			      <Unit>Unit6</Unit>
+			      <Group>Group1</Group>
+			      <Name>Name1</Name>
+			      <Number>6</Number>
+			      <Weight>5.1</Weight>
+			      <RowCount>1</RowCount>
+			    </Row>
+			  </Rows>
+			</Table>
+			""";
 
-	//	[TestMethod]
+		[TestMethod]
 		public void GroupOnTime()
 		{
 			(Pivoter<Test1Row> td, Pivoter2<Test1Row> td2) = GetPivoterTestData();
@@ -1158,7 +1383,7 @@ namespace Tests
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
 			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 			var json_ptb = ToJson(nested_tbl_ptb);
-			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_nested, json_ptb);
+			Assert.AreEqual(TestGroupOnTimeJson, json_ptb);
 			var json_fis = ToJson(nested_tbl_fis);
 			Assert.AreEqual(json_fis, json_ptb);
 
@@ -1168,17 +1393,17 @@ namespace Tests
 			//			flat.ColumnGroups = null;
 			//		flat.RowGroups = null;
 			var flat_json_ptb = ToJson(flat_tbl_ptb);
-			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_flat, flat_json_ptb);
+			Assert.AreEqual(TestGroupOnTimeJsonFlat, flat_json_ptb);
 			var flat_json_fis = ToJson(flat_tbl_fis);
 			Assert.AreEqual(flat_json_fis, flat_json_ptb);
 
 			var xml_nest_ptb = nested_tbl_ptb.ToXml();
-			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_xml_nest, xml_nest_ptb);
+			Assert.AreEqual(TestGroupOnTimeJsonXml, xml_nest_ptb);
 			var xml_nest_fis = nested_tbl_fis.ToXml();
 			Assert.AreEqual(xml_nest_fis, xml_nest_ptb);
 
 			var xml_flat_ptb = flat_tbl_ptb.ToXml();
-			Assert.AreEqual(TestGroupSiteThenUnitSortBoth_xml_flat, xml_flat_ptb);
+			Assert.AreEqual(TestGroupOnTimeJsonXmlFlat, xml_flat_ptb);
 			var xml_flat_fis = flat_tbl_fis.ToXml();
 			Assert.AreEqual(xml_flat_fis, xml_flat_ptb);
 
