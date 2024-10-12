@@ -1118,16 +1118,16 @@ namespace Tests
 			var r5 = new Test1Row { RowId = 5, Site = "Site5", Unit = "Unit6", Group = "Group1", Name = "Name1", Number = 6, Weight = 5.1, Time = new DateTime(2024, 1, 6, 3, 4, 5) };
 			var rows = new[] { r1, r2, r3, r4, r5 };
 
-			var p1 = new Field<Test1Row, string>(nameof(Test1Row.Site), r => r.Site, Aggregators.CommaList);
-			var p2 = new Field<Test1Row, string>(nameof(Test1Row.Unit), r => r.Unit, Aggregators.CommaList);
-			var p3 = new Field<Test1Row, string>(nameof(Test1Row.Group), r => r.Group, Aggregators.CommaList);
-			var p4 = new Field<Test1Row, string>(nameof(Test1Row.Name), r => r.Name, Aggregators.CommaList);
-			var p5 = new Field<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
-			var p6 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Sum);
-			var p7 = new Field<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
+			var p1 = Field.Create<Test1Row, string>(nameof(Test1Row.Site), r => r.Site, Aggregators.CommaList);
+			var p2 = Field.Create<Test1Row, string>(nameof(Test1Row.Unit), r => r.Unit, Aggregators.CommaList);
+			var p3 = Field.Create<Test1Row, string>(nameof(Test1Row.Group), r => r.Group, Aggregators.CommaList);
+			var p4 = Field.Create<Test1Row, string>(nameof(Test1Row.Name), r => r.Name, Aggregators.CommaList);
+			var p5 = Field.Create<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
+			var p6 = Field.Create<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Sum);
+			var p7 = Field.Create<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
 			//var p8 = new Field<Test1Row, DateTime, string>(nameof(Test1Row.Time), r => r.Time, vals => vals.Any() ? vals.Max() : DateTime.MinValue, t => t == DateTime.MinValue ? "" : t.ToString("o"));
-			var p8 = new Field<Test1Row, DateTime, string>(nameof(Test1Row.Time), r => r.Time, Enumerable.Max, t => t.ToString("o"));
-			var props = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8 };
+			var p8 = Field.Create<Test1Row, DateTime, string>(nameof(Test1Row.Time), r => r.Time, Enumerable.Max, t => t.ToString("o"));
+			var props = new IField<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8 };
 
 			var pivot = new Pivoter<Test1Row>(rows, props);
 			var pivot2 = new Pivoter2<Test1Row>(rows, props);

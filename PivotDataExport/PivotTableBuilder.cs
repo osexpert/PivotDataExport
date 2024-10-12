@@ -41,8 +41,8 @@ namespace PivotDataExport
 	public class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggregates>
 		   where TRow : class
 	{
-		private readonly IList<(Func<TRow, object?>, Field<TRow>)> _rowFunctions;
-		private readonly IList<(Func<TRow, object?>, Field<TRow>)> _columnFunctions;
+		private readonly IList<(Func<TRow, object?>, IField<TRow>)> _rowFunctions;
+		private readonly IList<(Func<TRow, object?>, IField<TRow>)> _columnFunctions;
 		private readonly Func<IEnumerable<TRow>, TAgg> _aggregateFunction;
 		private readonly IEnumerable<TRow> _list;
 
@@ -52,16 +52,16 @@ namespace PivotDataExport
 		{
 			_list = list;
 			_aggregateFunction = aggregateFunction;
-			_rowFunctions = new List<(Func<TRow, object?>, Field<TRow>)>();
-			_columnFunctions = new List<(Func<TRow, object?>, Field<TRow>)>();
+			_rowFunctions = new List<(Func<TRow, object?>, IField<TRow>)>();
+			_columnFunctions = new List<(Func<TRow, object?>, IField<TRow>)>();
 		}
-		public PivotTableBuilder<TRow, TAgg> AddRow((Func<TRow, object?>, Field<TRow>) rowFunction)
+		public PivotTableBuilder<TRow, TAgg> AddRow((Func<TRow, object?>, IField<TRow>) rowFunction)
 		{
 			_rowFunctions.Add(rowFunction);
 			return this;
 		}
 
-		public PivotTableBuilder<TRow, TAgg> AddColumn((Func<TRow, object?>, Field<TRow>) columnFunction)
+		public PivotTableBuilder<TRow, TAgg> AddColumn((Func<TRow, object?>, IField<TRow>) columnFunction)
 		{
 			_columnFunctions.Add(columnFunction);
 			return this;
@@ -80,8 +80,8 @@ namespace PivotDataExport
 		}
 
 		private List<Row<TRow, TAgg>> ComputeRows(Row<TRow, TAgg>? parent, IEnumerable<TRow> list,
-			IEnumerable<(Func<TRow, object?>, Field<TRow>)> rowFunctions,
-			IEnumerable<(Func<TRow, object?>, Field<TRow>)> columnFunctions)
+			IEnumerable<(Func<TRow, object?>, IField<TRow>)> rowFunctions,
+			IEnumerable<(Func<TRow, object?>, IField<TRow>)> columnFunctions)
 		{
 			var rows = new List<Row<TRow, TAgg>>();
 			if (!rowFunctions.Any())
@@ -132,7 +132,7 @@ namespace PivotDataExport
 		}
 
 		private List<Column<TRow, TAgg>> ComputeColumns(Column<TRow, TAgg>? parent, IEnumerable<TRow> list,
-			IEnumerable<(Func<TRow, object?>, Field<TRow>)> columnFunctions)//, AggregateContext agg_ctx)
+			IEnumerable<(Func<TRow, object?>, IField<TRow>)> columnFunctions)//, AggregateContext agg_ctx)
 		{
 			var columns = new List<Column<TRow, TAgg>>();
 			if (!columnFunctions.Any())
@@ -189,7 +189,7 @@ namespace PivotDataExport
 
 		IGroup<TRow, TAgg>? Parent { get; }
 
-		Field<TRow> Field { get; }
+		IField<TRow> Field { get; }
 	}
 
 	public class Row<TRow, TAgg> : IGroup<TRow, TAgg>
@@ -202,7 +202,7 @@ namespace PivotDataExport
 
 		public Row<TRow, TAgg>? Parent { get; set; }
 
-		public Field<TRow> Field { get; set; }
+		public IField<TRow> Field { get; set; }
 
 		IEnumerable<IGroup<TRow, TAgg>> IGroup<TRow, TAgg>.Children => Children;
 		IGroup<TRow, TAgg>? IGroup<TRow, TAgg>.Parent => Parent;
@@ -217,7 +217,7 @@ namespace PivotDataExport
 
 		public Column<TRow, TAgg>? Parent { get; set; }
 
-		public Field<TRow> Field { get; set; }
+		public IField<TRow> Field { get; set; }
 
 		IEnumerable<IGroup<TRow, TAgg>> IGroup<TRow, TAgg>.Children => Children;
 		IGroup<TRow, TAgg>? IGroup<TRow, TAgg>.Parent => Parent;

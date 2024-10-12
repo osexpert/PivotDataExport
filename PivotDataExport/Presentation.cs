@@ -62,7 +62,7 @@ namespace PivotDataExport
 		/// <summary>
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, Field<TRow>[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */, out bool partialIntersects,
+		private List<object?[]> GetFullRows(IField<TRow>[] dataFields, IField<TRow>[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */, out bool partialIntersects,
 			bool createEmptyIntersects = false)
 		{
 			partialIntersects = false;
@@ -404,7 +404,7 @@ namespace PivotDataExport
 			return combName;
 		}
 
-		private List<TableColumn> CreateTableCols(Field<TRow>[] dataFields, Field<TRow>[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
+		private List<TableColumn> CreateTableCols(IField<TRow>[] dataFields, IField<TRow>[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
 		{
 			List<TableColumn> tablecols = new();
 			// fill rowGroups
@@ -454,7 +454,7 @@ namespace PivotDataExport
 		}
 
 
-		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields) where TEle : Group<TRow>
+		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, IField<TRow>[] groupFields) where TEle : Group<TRow>
 		{
 			return SortGroups<TEle>(grops, groupFields, ele => ele);
 		}
@@ -463,7 +463,7 @@ namespace PivotDataExport
 		/// Sort the last group level.
 		/// Sort by checking parent values
 		/// </summary>
-		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields, Func<TEle, Group<TRow>> getGroup)
+		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, IField<TRow>[] groupFields, Func<TEle, Group<TRow>> getGroup)
 		{
 			//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
 

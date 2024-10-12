@@ -368,22 +368,22 @@ namespace Tests
 			foreach (var r in rows)
 				r.RowId = i++;
 
-			var p1 = new Field<Test1Row, string>(nameof(Test1Row.Site), r => r.Site, Aggregators.CommaList);
-			var p2 = new Field<Test1Row, string>(nameof(Test1Row.Unit), r => r.Unit, Aggregators.CommaList);
-			var p3 = new Field<Test1Row, string>(nameof(Test1Row.Group), r => r.Group, Aggregators.CommaList);
-			var p4 = new Field<Test1Row, string>(nameof(Test1Row.Name), r => r.Name, Aggregators.CommaList);
-			var p5 = new Field<Test1Row, string>(nameof(Test1Row.Country), r => r.Country, Aggregators.CommaList);
-			var p6 = new Field<Test1Row, string>(nameof(Test1Row.Company), r => r.Company, Aggregators.CommaList);
-			var p7 = new Field<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
-			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);// vals => vals.DefaultIfEmpty(0d).Average());// Aggregators.AverageOr(vals, 0d));
-			var p9 = new Field<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
-			var p10 = new Field<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, v => v.ToString(), Aggregators.CommaList);//  vals => Aggregators.CommaList(vals.Select(v => v.ToString())));
+			var p1 = Field.Create<Test1Row, string>(nameof(Test1Row.Site), r => r.Site, Aggregators.CommaList);
+			var p2 = Field.Create<Test1Row, string>(nameof(Test1Row.Unit), r => r.Unit, Aggregators.CommaList);
+			var p3 = Field.Create<Test1Row, string>(nameof(Test1Row.Group), r => r.Group, Aggregators.CommaList);
+			var p4 = Field.Create<Test1Row, string>(nameof(Test1Row.Name), r => r.Name, Aggregators.CommaList);
+			var p5 = Field.Create<Test1Row, string>(nameof(Test1Row.Country), r => r.Country, Aggregators.CommaList);
+			var p6 = Field.Create<Test1Row, string>(nameof(Test1Row.Company), r => r.Company, Aggregators.CommaList);
+			var p7 = Field.Create<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
+			var p8 = Field.Create<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);// vals => vals.DefaultIfEmpty(0d).Average());// Aggregators.AverageOr(vals, 0d));
+			var p9 = Field.Create<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
+			var p10 = Field.Create<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, v => v.ToString(), Aggregators.CommaList);//  vals => Aggregators.CommaList(vals.Select(v => v.ToString())));
 
-			var p15 = new Field<Test1Row, DateTime, string>("MaxTime", r => r.Time, Enumerable.Max, v => v.ToString("o"));
+			var p15 = Field.Create<Test1Row, DateTime, string>("MaxTime", r => r.Time, Enumerable.Max, v => v.ToString("o"));
 			//var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, vals => vals.Min().ToString("o"));
-			var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, Enumerable.Min, v => v.ToString("o"));// vals => vals.Min().ToString("o"));
+			var p16 = Field.Create<Test1Row, DateTime, string>("MinTime", r => r.Time, Enumerable.Min, v => v.ToString("o"));// vals => vals.Min().ToString("o"));
 
-			var fields = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p15, p16 };
+			var fields = new IField<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p15, p16 };
 
 			var piv = new Pivoter<Test1Row>(rows, fields);
 			var piv2 = new Pivoter2<Test1Row>(rows, fields);

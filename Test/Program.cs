@@ -52,35 +52,33 @@ namespace Test
 
 			
 
-			var fields = new List<Field<CsvRow>>();
+			var fields = new List<IField<CsvRow>>();
 
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Region), r => r.Region, Aggregators.CommaList)
-			{
-				GroupIndex = 0,
-				Area = Area.Row,
-				SortOrder = SortOrder.Asc
-			});
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), r => r.Country, Aggregators.CommaList)
-			{
-				GroupIndex = 1,
-				Area = Area.Row,
-				SortOrder = SortOrder.Desc
-			});
+			var f1 = Field.Create<CsvRow, string>(nameof(CsvRow.Region), r => r.Region, Aggregators.CommaList);
+			f1.GroupIndex = 0;
+			f1.Area = Area.Row;
+			f1.SortOrder = SortOrder.Asc;
+			fields.Add(f1);
 
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), r => r.ItemType, Aggregators.CommaList)
-			{
-				GroupIndex = 0,
-				Area = Area.Column,
-				SortOrder = SortOrder.Desc
-			});
-			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), r => r.SalesChannel, Aggregators.CommaList)
-			{
-				GroupIndex = 1,
-				Area = Area.Column,
-				SortOrder = SortOrder.Asc
-			});
+			var f2 = Field.Create<CsvRow, string>(nameof(CsvRow.Country), r => r.Country, Aggregators.CommaList);
+			f2.GroupIndex = 1;
+			f2.Area = Area.Row;
+			f2.SortOrder = SortOrder.Desc;
+			fields.Add(f2);
 
-			fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), r => r.UnitsSold, Enumerable.Sum));
+			var f3 = Field.Create<CsvRow, string>(nameof(CsvRow.ItemType), r => r.ItemType, Aggregators.CommaList);
+			f3.GroupIndex = 0;
+			f3.Area = Area.Column;
+			f3.SortOrder = SortOrder.Desc;
+			fields.Add(f3);
+
+			var f4 = Field.Create<CsvRow, string>(nameof(CsvRow.SalesChannel), r => r.SalesChannel, Aggregators.CommaList);
+			f4.GroupIndex = 1;
+			f4.Area = Area.Column;
+			f4.SortOrder = SortOrder.Asc;
+			fields.Add(f4);
+
+			fields.Add(Field.Create<CsvRow, long>(nameof(CsvRow.UnitsSold), r => r.UnitsSold, Enumerable.Sum));
 
 			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
 			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
@@ -361,7 +359,7 @@ namespace Test
 
 
 
-		private Field<CsvRow> GetField(IEnumerable<Field<CsvRow>> fieldsss, string v)
+		private IField<CsvRow> GetField(IEnumerable<IField<CsvRow>> fieldsss, string v)
 		{
 			return fieldsss.Where(f => f.Name == v).Single();
 		}

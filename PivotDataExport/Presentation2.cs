@@ -76,7 +76,7 @@ namespace PivotDataExport
 		/// <summary>
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, Field<TRow>[] rowFieldsInGroupOrder, List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
+		private List<object?[]> GetFullRows(IField<TRow>[] dataFields, IField<TRow>[] rowFieldsInGroupOrder, List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
 			out bool partialIntersects, bool createEmptyIntersects = false)
 		{
 			partialIntersects = false;
@@ -492,7 +492,7 @@ namespace PivotDataExport
 			return combName;
 		}
 
-		private List<TableColumn> CreateTableCols(Field<TRow>[] dataFields, Field<TRow>[] rowGroupFields, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */)
+		private List<TableColumn> CreateTableCols(IField<TRow>[] dataFields, IField<TRow>[] rowGroupFields, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */)
 		{
 			List<TableColumn> tablecols = new();
 			// fill rowGroups

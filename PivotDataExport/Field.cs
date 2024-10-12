@@ -1,16 +1,96 @@
 ﻿using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace PivotDataExport
 {
-	public class Field<TRow>
+	public interface IField<TRow> //where TRow : class
 	{
-		public Area Area;
+		Area Area { get; set; }
+		SortOrder SortOrder { get; set; }
+		string Name { get; set; }
+		int GroupIndex { get; set; }
+		IEqualityComparer<object?> GroupComparer { get; set; }
 
-		public string Name = null!;
+		IComparer<object?> SortComparer { get; set; }
 
-		public SortOrder SortOrder;
+		object? GetDisplayTypeDefaultValue();
+		object? GetDisplayValue(object? value);
+		object? GetRowsValue(IEnumerable<TRow> rows);
+		object? GetRowValue(TRow row);
 
-		public int GroupIndex;
+		TableColumn ToTableColumn();
+		TableColumn ToTableColumn(string combName, object?[] objects);
+	}
+
+	public static class Field
+	{
+		public static Field<TRow, TProp, TProp> Create<TRow, TProp>(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TProp> getRowsValue)
+		{
+			var f = new Field<TRow, TProp, TProp /* disp */>();
+			f.Name = fieldName;
+			f.GetRowValue = row => getRowValue(row);
+			f.GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
+			f.GetDisplayValue = v => v;
+			f.DataType = typeof(TProp);
+			f.DisplayType = typeof(TProp);
+			return f;
+		}
+
+		public static Field<TRow, TProp, TDisp> Create<TRow, TProp, TDisp>(string fieldName,
+			Func<TRow, TProp> getRowValue,
+			Func<IEnumerable<TProp>, TProp> getRowsValue,
+			Func<TProp, TDisp> getDisplayValue)
+		{
+			var f = new Field<TRow, TProp, TDisp /* disp */>();
+			f.Name = fieldName;
+			f.GetRowValue = row => getRowValue(row);
+			f.GetRowsValue = rows => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
+			f.GetDisplayValue = v => getDisplayValue(v);
+			f.DataType = typeof(TProp);
+			f.DisplayType = typeof(TDisp);
+			return f;
+		}
+
+		public static Field<TRow, TProp, TDisp> Create<TRow, TProp, TDisp>(string fieldName, 
+			Func<TRow, TProp> getRowValue, 
+			Func<IEnumerable<TProp>, TDisp> getRowsValue, 
+			Func<TProp, TDisp> getDisplayValue)
+		{
+			var f = new Field<TRow, TProp, TDisp /* disp */>();
+			f.Name = fieldName;
+			f.GetRowValue = row => getRowValue(row);
+			f.GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
+			f.GetDisplayValue = v => getDisplayValue(v);
+			f.DataType = typeof(TProp);
+			f.DisplayType = typeof(TDisp);
+			return f;
+		}
+
+		public static Field<TRow, TProp, TDisp> Create<TRow, TProp, TDisp>(string fieldName,
+			Func<TRow, TProp> getRowValue,
+			Func<TProp, TDisp> getDisplayValue,
+			Func<IEnumerable<TDisp>, TDisp> getRowsValue)
+		{
+			var f = new Field<TRow, TProp, TDisp /* disp */>();
+			f.Name = fieldName;
+			f.GetRowValue = row => getRowValue(row);
+			f.GetDisplayValue = v => getDisplayValue(v);
+			f.GetRowsValue = rows => getRowsValue(rows.Select(getRowValue).Select(getDisplayValue));
+			f.DataType = typeof(TProp);
+			f.DisplayType = typeof(TDisp);
+			return f;
+		}
+	}
+
+	public class Field<TRow, TProp, TDisp> : IField<TRow>
+	{
+		public Area Area { get; set; }
+
+		public string Name { get; set; } = null!;
+
+		public SortOrder SortOrder { get; set; }
+
+		public int GroupIndex { get; set; }
 
 		//public Func<object?, object?> GetRowValue = null!;
 
@@ -23,22 +103,29 @@ namespace PivotDataExport
 
 		/// <summary>
 		/// User to get the value to group on (the value will be of type DataType)
-		/// 
-		/// TODO: is this ever used for display??
-		/// 
 		/// </summary>
-		public Func<TRow, object?> GetRowValue = null!;
+		public Func<TRow, TProp> GetRowValue = null!;
+
+		object? IField<TRow>.GetRowsValue(IEnumerable<TRow> rows) => GetRowsValue(rows);
+
+		object? IField<TRow>.GetRowValue(TRow row) => GetRowValue(row);
 
 		/// <summary>
 		/// In: TProp (DataType)
 		/// Out: TDisp (DisplayType)
 		/// </summary>
-		public Func<object?, object?> GetDisplayValue = o => o;
+		public Func<TProp, TDisp> GetDisplayValue = null!; //o => o;
+
+		object? IField<TRow>.GetDisplayValue(object? value) => GetDisplayValue((TProp)value);
+	
 
 		// TODO: need both GroupComparer and SortComparer?
-		public IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
+		public IEqualityComparer<object?> GroupComparer { get; set; } = EqualityComparer<object?>.Default;
 
-		public IComparer<object?> SortComparer = Comparer<object?>.Default;
+		/// <summary>
+		/// TODO: sort by display or data?
+		/// </summary>
+		public IComparer<object?> SortComparer { get; set; } = Comparer<object?>.Default;
 
 		//public Func<object?, object?> GetDisplayValue = (o) => o;
 
@@ -54,7 +141,10 @@ namespace PivotDataExport
 
 		public DefaultValue? DisplayTypeDefaultValue;
 
-		internal object? GetDisplayTypeDefaultValue()
+		internal Field()
+		{ }
+
+		public object? GetDisplayTypeDefaultValue()
 		{
 			if (DisplayTypeDefaultValue != null)
 				return DisplayTypeDefaultValue.Value;
@@ -83,7 +173,7 @@ namespace PivotDataExport
 		//	}
 		//}
 
-		internal TableColumn ToTableColumn()
+		public TableColumn ToTableColumn()
 		{
 			return new()
 			{
@@ -96,7 +186,7 @@ namespace PivotDataExport
 			};
 		}
 
-		internal TableColumn ToTableColumn(string combName, object?[] groupVals)
+		public TableColumn ToTableColumn(string combName, object?[] groupVals)
 		{
 			return new()
 			{
@@ -115,41 +205,32 @@ namespace PivotDataExport
 			return $"Name: {Name}, Area: {Area}";
 		}
 
-		public static List<Field<object>> CreateFieldsFromType<T>()
+		public static List<IField<TRow>> CreateFieldsFromType<T>()
 		{
 			return CreateFieldsFromProperties(TypeDescriptor.GetProperties(typeof(T)));
 		}
 
-		public static List<Field<object>> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
+		public static List<IField<TRow>> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
 		{
-			return props.Select(pd => new Field<object>
+			return props.Select(pd => new Field<TRow, object?, object?>()
 			{
 				Name = pd.Name,
 				DataType = pd.PropertyType,
 				DisplayType = pd.PropertyType,
-				GetRowValue = pd.GetValue,
+				GetRowValue = row => pd.GetValue(row),
 				GetRowsValue = pd.GetValue,
-			}).ToList();
+			}).Cast<IField<TRow>>().ToList();
 		}
 
-		public static List<Field<object>> CreateFieldsFromProperties(PropertyDescriptorCollection props)
+		public static List<IField<TRow>> CreateFieldsFromProperties(PropertyDescriptorCollection props)
 		{
 			return CreateFieldsFromProperties(props.Cast<PropertyDescriptor>());
 		}
 
-		public static List<Field<object>> CreateFieldsFromTypedList(ITypedList props)
+		public static List<IField<TRow>> CreateFieldsFromTypedList(ITypedList props)
 		{
 			return CreateFieldsFromProperties(props.GetItemProperties(null));
 		}
-
-		//public void SetGetRowsValue<TProp>(Func<IEnumerable<TRow>, TProp> getRowsValue)
-		//{
-		//	GetRowsValue = rows => getRowsValue(rows);//.Cast<TRow>());
-		//}
-		//public void SetGetRowValue<TProp>(Func<IEnumerable<TRow>, TProp> getRowValue)
-		//{
-		//	GetRowValue = row => getRowValue(row);//.Cast<TRow>());
-		//}
 	}
 
 	public class DefaultValue
@@ -162,59 +243,21 @@ namespace PivotDataExport
 		}
 	}
 
-	public class Field<TRow, TProp> : Field<TRow>
-	{
-		public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TProp> getRowsValue)
-		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
-			DataType = typeof(TProp);
-			DisplayType = typeof(TProp);
-		}
-	}
+	//public class Field<TRow, TProp> : Field<TRow, TProp, TProp>
+	//{
+	//	public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TProp> getRowsValue) : base(fieldName, getRowValue, getRowsValue)
+	//	{
+	//		//Name = fieldName;
+	//		//GetRowValue = row => getRowValue(row);
+	//		//GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
+	//		//DataType = typeof(TProp);
+	//		//DisplayType = typeof(TProp);
+	//	}
+	//}
 
-	public class Field<TRow, TProp, TDisp> : Field<TRow>
-	{
-		public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TDisp> getRowsValue)
-		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
-			DataType = typeof(TProp);
-			DisplayType = typeof(TDisp);
-		}
-
-		public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TProp> getRowsValue, Func<TProp, TDisp> getDisplayValue)
-		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetRowsValue = rows => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
-			GetDisplayValue = v => getDisplayValue((TProp)v);
-			DataType = typeof(TProp);
-			DisplayType = typeof(TDisp);
-		}
-
-		public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<IEnumerable<TProp>, TDisp> getRowsValue, Func<TProp, TDisp> getDisplayValue)
-		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
-			GetDisplayValue = v => getDisplayValue((TProp)v);
-			DataType = typeof(TProp);
-			DisplayType = typeof(TDisp);
-		}
-
-		public Field(string fieldName, Func<TRow, TProp> getRowValue, Func<TProp, TDisp> getDisplayValue, Func<IEnumerable<TDisp>, TDisp> getRowsValue)
-		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetDisplayValue = v => getDisplayValue((TProp)v);
-			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue).Select(getDisplayValue));
-			DataType = typeof(TProp);
-			DisplayType = typeof(TDisp);
-		}
-	}
+	//public class Field<TRow> : Field<TRow, object?, object?>
+	//{
+	//}
 
 	public enum Area
 	{

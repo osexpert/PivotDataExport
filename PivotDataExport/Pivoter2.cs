@@ -11,12 +11,12 @@ namespace PivotDataExport
 	/// <typeparam name="TRow"></typeparam>
 	public class Pivoter2<TRow> where TRow : class // class notnull
 	{
-		List<Field<TRow>> _fields;
+		List<IField<TRow>> _fields;
 		IEnumerable<TRow> _rows;
 
-		public List<Field<TRow>> Fields => _fields;
+		public List<IField<TRow>> Fields => _fields;
 
-		public Pivoter2(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
+		public Pivoter2(IEnumerable<TRow> rows, IEnumerable<IField<TRow>> fields)
 		{
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
@@ -47,7 +47,7 @@ namespace PivotDataExport
 		//	return res;
 		//}
 
-		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<IField<TRow>> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
 		{
 			List<List<Group<TRow>>> listRes = new();
 
@@ -63,7 +63,7 @@ namespace PivotDataExport
 			//			List<Group<T>> lastGroups = new List<Group<T>>();
 			//		lastGroups.Add(new Group<T> { Rows = _list, IsRoot = true });
 
-			foreach (Field<TRow> gf in fields)
+			foreach (IField<TRow> gf in fields)
 			{
 				//var getter = _props[gf.FieldName];
 
@@ -110,7 +110,7 @@ namespace PivotDataExport
 		}
 
 
-		private IEnumerable<Field<TRow>> GetDataFields()
+		private IEnumerable<IField<TRow>> GetDataFields()
 		{
 			return _fields.Where(f => f.Area == Area.Data);//.OrderBy(f => f.Index);
 		}
@@ -197,12 +197,12 @@ namespace PivotDataExport
 
 	public class GroupedData2<TRow, TAggregates> where TRow : class
 	{
-		public Field<TRow>[] rowFieldsInGroupOrder = null!;
-		public Field<TRow>[] colFieldsInGroupOrder = null!;
+		public IField<TRow>[] rowFieldsInGroupOrder = null!;
+		public IField<TRow>[] colFieldsInGroupOrder = null!;
 
-		public Field<TRow>[] dataFields = null!;
+		public IField<TRow>[] dataFields = null!;
 
-		public List<Field<TRow>> fields = null!;
+		public List<IField<TRow>> fields = null!;
 
 		public PivotTable<TRow, TAggregates> table = null!;
 		public IEnumerable<IGroup<TRow, TAggregates>> lastCols = null!;
