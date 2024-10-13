@@ -36,18 +36,18 @@ namespace PivotDataExport
 				throw new ArgumentException("More than one field with same fieldName");
 		}
 
-		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field<TRow>> fields, RootType rootType)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field<TRow>> fields, RootType rootType)
 		{
 			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
 			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
 
-			var res = GroupRows(lastGroups, fields);//, sort: sort);
+			var res = GroupRows(lastGroups, fields);
 //			if (!res.Any())
 	//			return new List<List<Group<TRow>>>() { lastGroups };
 			return res;
 		}
 
-		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)
 		{
 			List<List<Group<TRow>>> listRes = new();
 
@@ -71,7 +71,7 @@ namespace PivotDataExport
 
 				foreach (var go in lastGroups)
 				{
-					var subGroups = go.Rows.GroupBy(r => gf.GetRowValue(r), gf.GroupComparer).Select(g => new Group<TRow>()
+					var subGroups = go.Rows.GroupBy(r => gf.GetGroupValue(gf.GetRowValue(r)), gf.GroupComparer).Select(g => new Group<TRow>()
 					{
 						Key = g.Key,
 						Rows = g,
@@ -89,12 +89,6 @@ namespace PivotDataExport
 						go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
 					}
 
-					//if (sort)
-					//{
-					//	throw new Exception("never called");
-					//	allSubGroups.AddRange(subGroups.OrderBy(sg => sg.Key)); // displayText or value?
-					//}
-					//else
 					allSubGroups.AddRange(subGroups);
 				}
 
@@ -109,13 +103,10 @@ namespace PivotDataExport
 			return listRes;
 		}
 
-
 		private IEnumerable<Field<TRow>> GetDataFields()
 		{
 			return _fields.Where(f => f.Area == Area.Data);//.OrderBy(f => f.Index);
 		}
-
-
 
 		/// <summary>
 		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
@@ -205,7 +196,6 @@ namespace PivotDataExport
 				//props = _props
 			};
 		}
-
 
 		/// <summary>
 		/// Return only col groups, so need to strip off the row groups in front.

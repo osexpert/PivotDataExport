@@ -47,10 +47,9 @@ namespace PivotDataExport
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
-			var lastRowGroupsSorted = lastRowGroups.ToList();// SortGroups(lastRowGroups, rowFieldsInSortOrder).ToList();
+			var lastRowGroupsSorted = lastRowGroups.ToList();
 
-			var lastColGroupsSorted = lastColGroups.ToList();// SortGroups(lastColGroups, colFieldsInSortOrder).ToList();
-
+			var lastColGroupsSorted = lastColGroups.ToList();
 
 			// TODO: when writing to json, instead of writing full rows we could write objects........
 			// I guess the method could have ended at this point....and some other code could work on this.
@@ -76,8 +75,13 @@ namespace PivotDataExport
 		/// <summary>
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, Field<TRow>[] rowFieldsInGroupOrder, List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
-			out bool partialIntersects, bool createEmptyIntersects = false)
+		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, 
+			Field<TRow>[] rowFieldsInGroupOrder, 
+			List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, 
+			List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
+			out bool partialIntersects, 
+			bool createEmptyIntersects = false
+			)
 		{
 			partialIntersects = false;
 
@@ -287,7 +291,7 @@ namespace PivotDataExport
 		/// </summary>
 		internal static IEnumerable<IGroup<TRow, TAgg>> GetParentsAndMe(IGroup<TRow, TAgg> grp)//bool includeMeIfRoot)
 		{
-			if (/*grp.Parent == null &&*/ grp.Field == null)//.IsRoot)
+			if (grp.Field == null)//.IsRoot)
 			{
 				//if (includeMeIfRoot)
 				//	return this.Yield();
@@ -335,8 +339,6 @@ namespace PivotDataExport
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
 
-			//var lastColGroupsSorted = SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder).ToList();
-
 			var lastRowGroups = _data.lastRows.ToList();
 
 			if (!lastRowGroups.Any())
@@ -347,7 +349,7 @@ namespace PivotDataExport
 				lastRowGroups.Add(row);
 			}
 
-			foreach (var rg in lastRowGroups.Cast<Row<TRow, TAgg>>())// SortGroups(_data.PT_lastRows, _data.rowFieldsInGroupOrder).Cast<Row<TAgg>>())
+			foreach (var rg in lastRowGroups.Cast<Row<TRow, TAgg>>())
 			{
 				KeyValueList row = new();
 				rows.Add(row);
@@ -358,8 +360,6 @@ namespace PivotDataExport
 				}
 
 				//				var flippedCols = Flatten(rg.ColumnAggregates).Where(c => !c.Children.Any());
-
-				//var sortedColData = SortGroups<TAgg>(flippedCols, _data.colFieldsInGroupOrder);
 
 				Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals = null!;
 				Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists = new();
@@ -377,7 +377,7 @@ namespace PivotDataExport
 				}
 			}
 
-			var lastColGroupsSorted = _data.lastCols.ToList();// SortGroups<TAgg>(_data.PT_lastCols, _data.colFieldsInGroupOrder).ToList();
+			var lastColGroupsSorted = _data.lastCols.ToList();
 
 			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
 
@@ -393,7 +393,12 @@ namespace PivotDataExport
 
 		Row<TRow, TAgg> _fakeRoot = new Row<TRow, TAgg>();
 
-		private void AddData(KeyValueList row, Column<TRow, TAgg> cg, Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists, ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals)
+		private void AddData(KeyValueList row, 
+			Column<TRow, TAgg> cg, 
+			Dictionary<IGroup<TRow, TAgg>,
+			List<KeyValueList>> groupToLists, 
+			ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals
+			)
 		{
 			KeyValueList keyVals = GetCreateKeyVals(cg, row, ref groupToKeyVals, groupToLists);
 
@@ -412,7 +417,11 @@ namespace PivotDataExport
 			}
 		}
 
-		private KeyValueList GetCreateKeyVals(IGroup<TRow, TAgg> cg, KeyValueList r, ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals, Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists)
+		private KeyValueList GetCreateKeyVals(IGroup<TRow, TAgg> cg, 
+			KeyValueList row, 
+			ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals, 
+			Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists
+			)
 		{
 			var cg_ParentOrFake = cg.Parent ?? _fakeRoot;
 
@@ -420,7 +429,7 @@ namespace PivotDataExport
 			if (groupToKeyVals == null)
 			{
 				groupToKeyVals = new();
-				groupToKeyVals.Add(cg_ParentOrFake, r);
+				groupToKeyVals.Add(cg_ParentOrFake, row);
 				if (cg.Parent != null)
 					throw new Exception("not root");
 			}

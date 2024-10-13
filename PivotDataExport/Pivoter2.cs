@@ -47,7 +47,7 @@ namespace PivotDataExport
 		//	return res;
 		//}
 
-		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)//, bool sort = false)
+		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)
 		{
 			List<List<Group<TRow>>> listRes = new();
 
@@ -71,7 +71,7 @@ namespace PivotDataExport
 
 				foreach (var go in lastGroups)
 				{
-					var subGroups = go.Rows.GroupBy(r => gf.GetRowValue(r), gf.GroupComparer).Select(g => new Group<TRow>()
+					var subGroups = go.Rows.GroupBy(r => gf.GetGroupValue(gf.GetRowValue(r)), gf.GroupComparer).Select(g => new Group<TRow>()
 					{
 						Key = g.Key,
 						Rows = g,
@@ -89,12 +89,6 @@ namespace PivotDataExport
 						go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
 					}
 
-					//if (sort)
-					//{
-					//	throw new Exception("never called");
-					//	allSubGroups.AddRange(subGroups.OrderBy(sg => sg.Key)); // displayText or value?
-					//}
-					//else
 					allSubGroups.AddRange(subGroups);
 				}
 

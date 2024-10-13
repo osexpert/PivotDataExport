@@ -121,11 +121,11 @@ namespace PivotDataExport
 			
 			if (field.SortOrder == SortOrder.Asc)
 			{
-				rows = rows.OrderBy(c => c.Value, field.SortComparer).ToList();
+				rows = rows.OrderBy(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 			}
 			else if (field.SortOrder == SortOrder.Desc)
 			{
-				rows = rows.OrderByDescending(c => c.Value, field.SortComparer).ToList();
+				rows = rows.OrderByDescending(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 			}
 
 			return rows;
@@ -170,11 +170,11 @@ namespace PivotDataExport
 
 			if (field.SortOrder == SortOrder.Asc)
 			{
-				columns = columns.OrderBy(c => c.Value, field.SortComparer).ToList();
+				columns = columns.OrderBy(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 			}
 			else if (field.SortOrder == SortOrder.Desc)
 			{
-				columns = columns.OrderByDescending(c => c.Value, field.SortComparer).ToList();
+				columns = columns.OrderByDescending(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 			}
 
 			return columns;

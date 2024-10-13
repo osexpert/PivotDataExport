@@ -315,11 +315,15 @@ namespace PivotDataExport
 			};
 		}
 
-		private KeyValueList GetCreateKeyVals(Group<TRow> cg, KeyValueList r, ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, Dictionary<Group<TRow>, List<KeyValueList>> groupToLists)
+		private KeyValueList GetCreateKeyVals(Group<TRow> cg, 
+			KeyValueList row,
+			ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, 
+			Dictionary<Group<TRow>, List<KeyValueList>> groupToLists
+			)
 		{
 			if (cg.IsRoot)
 			{
-				return r;
+				return row;
 			}
 
 			KeyValueList keyVals = null!;
@@ -330,7 +334,7 @@ namespace PivotDataExport
 				if (groupToKeyVals == null)
 				{
 					groupToKeyVals = new();
-					groupToKeyVals.Add(colGrp.ParentGroup!, r);
+					groupToKeyVals.Add(colGrp.ParentGroup!, row);
 					if (!colGrp.ParentGroup!.IsRoot)
 						throw new Exception("not root");
 				}
@@ -485,12 +489,12 @@ namespace PivotDataExport
 
 					if (sorter == null)
 						sorter = colField.SortOrder == SortOrder.Asc ?
-							grops.OrderBy(r => getGroup(r).GetKeyByField(colField), colField.SortComparer)
-							: grops.OrderByDescending(r => getGroup(r).GetKeyByField(colField), colField.SortComparer);
+							grops.OrderBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
+							: grops.OrderByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
 					else
 						sorter = colField.SortOrder == SortOrder.Asc ?
-							sorter.ThenBy(r => getGroup(r).GetKeyByField(colField), colField.SortComparer)
-							: sorter.ThenByDescending(r => getGroup(r).GetKeyByField(colField), colField.SortComparer);
+							sorter.ThenBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
+							: sorter.ThenByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
 
 					colFieldIdx++;
 				}
