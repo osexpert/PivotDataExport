@@ -16,7 +16,7 @@
     <PackageLicenseUrl></PackageLicenseUrl>
     <RepositoryUrl>https://github.com/osexpert/PivotDataExport.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>See https://github.com/osexpert/PivotDataExport/blob/master/CHANGELOG.md for details</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/osexpert/PivotDataExport/blob/main/CHANGELOG.md for details</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>osexpert</Company>      
     
