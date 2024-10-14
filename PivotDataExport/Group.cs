@@ -39,7 +39,7 @@ namespace PivotDataExport
 					return Area.Column;
 				if (RootType == RootType.Row)
 					return Area.Row;
-				throw new Exception("Invalid: neither Field not IsRoot is set correctly");
+				throw new Exception("Invalid: neither Field nor RootType is set correctly");
 			}
 		}
 
@@ -60,11 +60,6 @@ namespace PivotDataExport
 
 			throw new Exception($"Bug: field '{colField.Name}' not found");
 		}
-
-		//internal IEnumerable<Group<T>> GetParents()
-		//{
-		//	throw new NotImplementedException();
-		//}
 
 		/// <summary>
 		/// Get top parent first and me last

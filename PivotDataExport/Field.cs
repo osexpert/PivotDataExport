@@ -1,15 +1,24 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace PivotDataExport
 {
-	public class Field<TRow>
+	public class Field<TRow> where TRow : class
 	{
+		/// <summary>
+		/// If not set, Name is used as caption
+		/// TODO: not used
+		/// </summary>
+//		public string? Caption;
+
 		public Area Area;
 		public string Name = null!;
 		public SortOrder SortOrder;
 		public SortMode SortMode;
 		public int GroupIndex;
 		public GroupMode GroupMode;
+
 
 		/// <summary>
 		/// Used to get aggregated value.
@@ -60,21 +69,6 @@ namespace PivotDataExport
 			return null;
 		}
 
-		//public bool DisplayViaGetRowsValue => DisplayType != DataType;
-
-		//internal object? GetDisplayValue(object? key)
-		//{
-		//	if (DisplayType != DataType)
-		//	{
-		//		// hmmm...we don't have the rows here...
-		//		return GetRowsValue();
-		//	}
-		//	else
-		//	{
-		//		return key;
-		//	}
-		//}
-
 		internal TableColumn ToTableColumn()
 		{
 			return new()
@@ -114,6 +108,7 @@ namespace PivotDataExport
 
 		public static List<Field<TRow>> CreateFieldsFromProperties(IEnumerable<PropertyDescriptor> props)
 		{
+			// pd.ComponentType should be TRow
 			return props.Select(pd => new Field<TRow>
 			{
 				Name = pd.Name,
@@ -144,14 +139,18 @@ namespace PivotDataExport
 			return GroupMode == GroupMode.DataValue ? v : GetDisplayValue(v);
 		}
 
-		//public void SetGetRowsValue<TData>(Func<IEnumerable<TRow>, TData> getRowsValue)
-		//{
-		//	GetRowsValue = rows => getRowsValue(rows);//.Cast<TRow>());
-		//}
-		//public void SetGetRowValue<TData>(Func<IEnumerable<TRow>, TData> getRowValue)
-		//{
-		//	GetRowValue = row => getRowValue(row);//.Cast<TRow>());
-		//}
+		HybridDictionary? _tags = null;
+
+		public IDictionary Tags
+		{
+			get
+			{
+				if (_tags == null)
+					_tags = new();
+				return _tags;
+			}
+		}
+
 	}
 
 	public class DefaultValue
@@ -164,7 +163,7 @@ namespace PivotDataExport
 		}
 	}
 
-	public class Field<TRow, TData> : Field<TRow>
+	public class Field<TRow, TData> : Field<TRow> where TRow : class
 	{
 		public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TData> getRowsValue)
 		{
@@ -176,7 +175,7 @@ namespace PivotDataExport
 		}
 	}
 
-	public class Field<TRow, TData, TDisp> : Field<TRow>
+	public class Field<TRow, TData, TDisp> : Field<TRow> where TRow : class
 	{
 		public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TDisp> getRowsValue)
 		{

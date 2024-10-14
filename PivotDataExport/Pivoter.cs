@@ -187,12 +187,12 @@ namespace PivotDataExport
 
 			return new GroupedData<TRow>()
 			{
-				colFieldsInGroupOrder = colFieldsInGroupOrder,
-				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
-				dataFields = dataFields,
-				lastRowGroups = allRowGroups.Last(),
-				lastColGroups = allColGroups.Last(),
-				fields = _fields,
+				ColFieldsInGroupOrder = colFieldsInGroupOrder,
+				RowFieldsInGroupOrder = rowFieldsInGroupOrder,
+				DataFields = dataFields,
+				LastRowGroups = allRowGroups.Last(),
+				LastColGroups = allColGroups.Last(),
+				Fields = _fields,
 				//props = _props
 			};
 		}
@@ -268,7 +268,6 @@ namespace PivotDataExport
 		private Group<TRow> GetLastRowGroup(Group<TRow> lastG)
 		{
 			// FIXME: handle IsRoot
-
 			var current = lastG;
 			while (current.ParentGroup != null && current.FieldType != Area.Row)
 			{
@@ -282,14 +281,14 @@ namespace PivotDataExport
 
 	public class GroupedData<TRow> where TRow : class
 	{
-		public Field<TRow>[] rowFieldsInGroupOrder = null!;
-		public Field<TRow>[] colFieldsInGroupOrder = null!;
+		public Field<TRow>[] RowFieldsInGroupOrder = null!;
+		public Field<TRow>[] ColFieldsInGroupOrder = null!;
 
-		public Field<TRow>[] dataFields = null!;
+		public Field<TRow>[] DataFields = null!;
 
-		public List<Group<TRow>> lastRowGroups = null!;
-		public List<Group<TRow>> lastColGroups = null!;
+		public List<Group<TRow>> LastRowGroups = null!;
+		public List<Group<TRow>> LastColGroups = null!;
 
-		public List<Field<TRow>> fields = null!;
+		public List<Field<TRow>> Fields = null!;
 	}
 }

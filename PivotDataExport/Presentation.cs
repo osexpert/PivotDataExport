@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Data;
-using System.Net;
 
 namespace PivotDataExport
 {
 	public class Presentation<TRow> where TRow : class
 	{
-
 		GroupedData<TRow> _data;
 
 		public Presentation(GroupedData<TRow> data)
@@ -23,31 +21,28 @@ namespace PivotDataExport
 		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool createEmptyIntersects = false)
 			where TTableRow : class, IEnumerable
 		{
-			var lastRowGroups = _data.lastRowGroups;// OrDefault() ?? [];
-			var lastColGroups = _data.lastColGroups;// OrDefault() ?? [];
+			var lastRowGroups = _data.LastRowGroups;// OrDefault() ?? [];
+			var lastColGroups = _data.LastColGroups;// OrDefault() ?? [];
 
-			var colFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Column)
+			var colFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Column)
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
-			var rowFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Row)
+			var rowFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Row)
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
 			var lastRowGroupsSorted = SortGroups(lastRowGroups, rowFieldsInSortOrder).ToList();
-
 			var lastColGroupsSorted = SortGroups(lastColGroups, colFieldsInSortOrder).ToList();
-
 
 			// TODO: when writing to json, instead of writing full rows we could write objects........
 			// I guess the method could have ended at this point....and some other code could work on this.
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rows = GetFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, createEmptyIntersects);
+			List<object?[]> rows = GetFullRows(_data.DataFields, _data.RowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, createEmptyIntersects);
 
-			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
-			//rowsss = SortRows(rowsss, tableCols);
+			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
 			Table<TTableRow> t = new Table<TTableRow>() { PartialIntersects = partialIntersects };
 			t.Rows = rows.Select(r => toRow(r, tableCols));
@@ -62,8 +57,13 @@ namespace PivotDataExport
 		/// <summary>
 		/// Add rows with columns: rowGroupCount + (colGroupCount * dataFieldCount)
 		/// </summary>
-		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, Field<TRow>[] rowFieldsInGroupOrder, List<Group<TRow>> lastRowGroups /* sorted */, List<Group<TRow>> lastColGroups /* sorted */, out bool partialIntersects,
-			bool createEmptyIntersects = false)
+		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, 
+			Field<TRow>[] rowFieldsInGroupOrder, 
+			List<Group<TRow>> lastRowGroups /* sorted */, 
+			List<Group<TRow>> lastColGroups /* sorted */, 
+			out bool partialIntersects,
+			bool createEmptyIntersects = false
+			)
 		{
 			partialIntersects = false;
 
@@ -133,8 +133,7 @@ namespace PivotDataExport
 								foreach (var df in dataFields)
 								{
 									//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
-														//defVals[i++] = df.DefaultValue;//.GetRowsValue(Enumerable.Empty<TRow>());
-									defVals[i++] = df.GetDisplayTypeDefaultValue();//.DefaultValue;//.GetRowsValue(Enumerable.Empty<TRow>());
+									defVals[i++] = df.GetDisplayTypeDefaultValue();
 								}
 								defaultValues = defVals;
 							}
@@ -196,30 +195,18 @@ namespace PivotDataExport
 		{
 			return GetTableCore((row, tcols) =>
 			{
-//				List<KeyValueList> dictRows = new();
-
-//				foreach (var row in rows)
-	//			{
-				//Dictionary<string, object?> dictRow = new();
 				var dictRow = new KeyValueList();
 				foreach (var v in row.ZipForceEqual(tcols, (f, s) => new { First = f, Second = s }))
 					dictRow.Add(v.Second.Name, v.First);
 
-				// perf: to avoid creating one dict per row
-				//var dictRow = new KeyValueZipList(row, tcols);
-
 				return dictRow;
-		//		dictRows.Add(dictRow);
-//				}
-
-	//			return dictRows;
 
 			}, createEmptyIntersects: createEmptyIntersects);
 		}
 
 		public DataTable GetDataTable(bool createEmptyIntersects = false)
 		{
-			var t = GetTable_Array(createEmptyIntersects);
+			var t = GetTable_Array(createEmptyIntersects: createEmptyIntersects);
 
 			DataTable res = new("row");
 
@@ -249,10 +236,10 @@ namespace PivotDataExport
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
 
-			var lastColGroupsSorted = SortGroups(_data.lastColGroups, _data.colFieldsInGroupOrder).ToList();
+			var lastColGroupsSorted = SortGroups(_data.LastColGroups, _data.ColFieldsInGroupOrder).ToList();
 
 			//object?[] defaultValues = null!;
-			foreach (var rg in SortGroups(_data.lastRowGroups, _data.rowFieldsInGroupOrder))
+			foreach (var rg in SortGroups(_data.LastRowGroups, _data.RowFieldsInGroupOrder))
 			{
 				KeyValueList r = new();
 				rows.Add(r);
@@ -266,7 +253,7 @@ namespace PivotDataExport
 				Dictionary<Group<TRow>, List<KeyValueList>> groupToLists = new();
 
 				// Add the data
-				foreach (var cg in lastColGroupsSorted)//SortGroups(_data.allColGroups.Last(), _data.colFieldsInGroupOrder))
+				foreach (var cg in lastColGroupsSorted)
 				{
 					var hasData = rg.IntersectData.TryGetValue(cg, out var data);
 					// createEmptyIntersects did work here, but not in Presentation3, so removed from here for now. Maybe add back again if find out how to implement in Presentation3
@@ -291,7 +278,7 @@ namespace PivotDataExport
 						KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
 
 						// dataField order
-						foreach (var z in _data.dataFields.ZipForceEqual(data, (f, s) => new { First = f, Second = s }))
+						foreach (var z in _data.DataFields.ZipForceEqual(data, (f, s) => new { First = f, Second = s }))
 						{
 							keyVals.Add(z.First.Name, z.Second);
 						}
@@ -303,7 +290,7 @@ namespace PivotDataExport
 				}
 			}
 
-			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
+			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
 			return new Table<KeyValueList>()
 			{
@@ -357,7 +344,6 @@ namespace PivotDataExport
 
 					groupToKeyVals.Add(colGrp, keyVals);
 				}
-
 			}
 
 			return keyVals;
@@ -456,7 +442,6 @@ namespace PivotDataExport
 
 			return tablecols;
 		}
-
 
 		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields) where TEle : Group<TRow>
 		{

@@ -170,13 +170,13 @@ namespace PivotDataExport
 
 			return new GroupedData2<TRow, Lazy<KeyValueList>>()
 			{
-				colFieldsInGroupOrder = colFieldsInGroupOrder,
-				rowFieldsInGroupOrder = rowFieldsInGroupOrder,
-				dataFields = dataFields,
-				table = rbl,
-				fields = _fields,
-				lastCols = lastCols,
-				lastRows = lastRows
+				ColFieldsInGroupOrder = colFieldsInGroupOrder,
+				RowFieldsInGroupOrder = rowFieldsInGroupOrder,
+				DataFields = dataFields,
+				Table = rbl,
+				Fields = _fields,
+				LastCols = lastCols,
+				LastRows = lastRows
 			};
 		}
 
@@ -191,15 +191,15 @@ namespace PivotDataExport
 
 	public class GroupedData2<TRow, TAggregates> where TRow : class
 	{
-		public Field<TRow>[] rowFieldsInGroupOrder = null!;
-		public Field<TRow>[] colFieldsInGroupOrder = null!;
+		public Field<TRow>[] RowFieldsInGroupOrder = null!;
+		public Field<TRow>[] ColFieldsInGroupOrder = null!;
 
-		public Field<TRow>[] dataFields = null!;
+		public Field<TRow>[] DataFields = null!;
 
-		public List<Field<TRow>> fields = null!;
+		public List<Field<TRow>> Fields = null!;
 
-		public PivotTable<TRow, TAggregates> table = null!;
-		public IEnumerable<IGroup<TRow, TAggregates>> lastCols = null!;
-		public IEnumerable<IGroup<TRow, TAggregates>> lastRows = null!;
+		public PivotTable<TRow, TAggregates> Table = null!;
+		public IEnumerable<IGroup<TRow, TAggregates>> LastCols = null!;
+		public IEnumerable<IGroup<TRow, TAggregates>> LastRows = null!;
 	}
 }

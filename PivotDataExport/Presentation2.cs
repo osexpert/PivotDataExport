@@ -1,11 +1,8 @@
 ﻿using System.Collections;
 using System.Data;
-using System.Diagnostics;
-using System.Net;
 
 namespace PivotDataExport
 {
-
 	public class Presentation2<TRow> : Presentation2<TRow, Lazy<KeyValueList>>
 		where TRow : class
 	{
@@ -13,7 +10,6 @@ namespace PivotDataExport
 		{
 		}
 	}
-
 
 	public class Presentation2<TRow, TAgg> 
 		where TRow : class
@@ -36,19 +32,18 @@ namespace PivotDataExport
 		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool createEmptyIntersects = false)
 			where TTableRow : class, IEnumerable
 		{
-			var lastRowGroups = _data.lastRows;// OrDefault() ?? [];
-			var lastColGroups = _data.lastCols;// OrDefault() ?? [];
+			var lastRowGroups = _data.LastRows;// OrDefault() ?? [];
+			var lastColGroups = _data.LastCols;// OrDefault() ?? [];
 
-			var colFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Column)
+			var colFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Column)
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
-			var rowFieldsInSortOrder = _data.fields.Where(f => f.Area == Area.Row)
+			var rowFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Row)
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
 			var lastRowGroupsSorted = lastRowGroups.ToList();
-
 			var lastColGroupsSorted = lastColGroups.ToList();
 
 			// TODO: when writing to json, instead of writing full rows we could write objects........
@@ -56,11 +51,10 @@ namespace PivotDataExport
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rows = GetFullRows(_data.dataFields, _data.rowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, 
+			List<object?[]> rows = GetFullRows(_data.DataFields, _data.RowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, 
 				createEmptyIntersects: createEmptyIntersects);
 
-			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
-			//rowsss = SortRows(rowsss, tableCols);
+			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
 			Table<TTableRow> t = new Table<TTableRow>() { PartialIntersects = partialIntersects };
 			t.Rows = rows.Select(r => toRow(r, tableCols));
@@ -111,8 +105,8 @@ namespace PivotDataExport
 			if (!lastRowGroups.Any())
 			{
 				var row = new Row<TRow, TAgg>();
-				row.ColumnAggregates = _data.table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
-				row.Aggregates = _data.table.Aggregates;
+				row.ColumnAggregates = _data.Table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.Table.Aggregates;
 				lastRowGroups.Add(row);
 				fakeRow = true;
 			}
@@ -160,7 +154,6 @@ namespace PivotDataExport
 									foreach (var df in dataFields)
 									{
 										//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
-										//defVals[i++] = df.DefaultValue;// .GetRowsValue(Enumerable.Empty<TRow>());
 										defVals[i++] = df.GetDisplayTypeDefaultValue();
 									}
 									defaultValues = defVals;
@@ -175,7 +168,7 @@ namespace PivotDataExport
 							//var values = lastRowGroup.IntersectData[lastColGroup];
 							// write values
 							//Array.Copy(values, 0, row, startIdx, values.Length);
-							if (values.Length != _data.dataFields.Length)
+							if (values.Length != _data.DataFields.Length)
 								throw new Exception("mismatch in length..");
 
 							Array.Copy(values, 0, row, startIdx, values.Length);
@@ -192,7 +185,7 @@ namespace PivotDataExport
 					// no col grouping
 					var agg = lastRowGroup.Aggregates;
 					var values = agg.Value.Select(a => a.Value).ToArray();
-					if (values.Length != _data.dataFields.Length)
+					if (values.Length != _data.DataFields.Length)
 						throw new Exception("mismatch in length..");
 					Array.Copy(values, 0, row, totalStartIdx, values.Length);
 				}
@@ -242,23 +235,11 @@ namespace PivotDataExport
 		{
 			return GetTableCore((row, tcols) =>
 			{
-				//				List<KeyValueList> dictRows = new();
-
-				//				foreach (var row in rows)
-				//			{
-				//Dictionary<string, object?> dictRow = new();
 				var dictRow = new KeyValueList();
 				foreach (var v in row.ZipForceEqual(tcols, (f, s) => new { First = f, Second = s }))
 					dictRow.Add(v.Second.Name, v.First);
 
-				// perf: to avoid creating one dict per row
-				//var dictRow = new KeyValueZipList(row, tcols);
-
 				return dictRow;
-				//		dictRows.Add(dictRow);
-				//				}
-
-				//			return dictRows;
 
 			}, createEmptyIntersects: createEmptyIntersects);
 		}
@@ -339,13 +320,13 @@ namespace PivotDataExport
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
 
-			var lastRowGroups = _data.lastRows.ToList();
+			var lastRowGroups = _data.LastRows.ToList();
 
 			if (!lastRowGroups.Any())
 			{
 				var row = new Row<TRow, TAgg>();
-				row.ColumnAggregates = _data.table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
-				row.Aggregates = _data.table.Aggregates;
+				row.ColumnAggregates = _data.Table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.Table.Aggregates;
 				lastRowGroups.Add(row);
 			}
 
@@ -359,13 +340,10 @@ namespace PivotDataExport
 					row.Add(parentG.Field.Name, parentG.Field.GetDisplayValue(parentG.Value));
 				}
 
-				//				var flippedCols = Flatten(rg.ColumnAggregates).Where(c => !c.Children.Any());
-
 				Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals = null!;
 				Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists = new();
 
-
-				if (_data.lastCols.Any())
+				if (_data.LastCols.Any())
 				{
 					foreach (var cg in rg.ColumnAggregates)
 						AddData(row, cg, groupToLists, ref groupToKeyVals);
@@ -377,9 +355,9 @@ namespace PivotDataExport
 				}
 			}
 
-			var lastColGroupsSorted = _data.lastCols.ToList();
+			var lastColGroupsSorted = _data.LastCols.ToList();
 
-			var tableCols = CreateTableCols(_data.dataFields, _data.rowFieldsInGroupOrder, lastColGroupsSorted);
+			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
 			return new Table<KeyValueList>()
 			{
