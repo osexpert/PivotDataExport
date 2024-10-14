@@ -328,10 +328,6 @@ namespace Tests
 
 			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 
-			//			nested.Columns = null;
-			//		nested.ColumnGroups = null;
-			//	nested.RowGroups = null;
-
 			var json_ptb = ToJson(nested_tbl_ptb);
 			var json_fis = ToJson(nested_tbl_fis);
 
@@ -400,16 +396,6 @@ namespace Tests
 			var piv = new Pivoter<Test1Row>(rows, fields);
 			var piv2 = new Pivoter2<Test1Row>(rows, fields);
 			return (piv, piv2);
-		}
-
-		private static string GetItemName(int itemId)
-		{
-			return "AllHaveTheSameName";
-		}
-
-		private static object getDisp(object arg)
-		{
-			return arg;
 		}
 	}
 

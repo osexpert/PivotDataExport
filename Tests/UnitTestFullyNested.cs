@@ -332,7 +332,7 @@ namespace Tests
 			var p5 = new Field<Test1Row, string>(nameof(Test1Row.Country), r => r.Country, Aggregators.CommaList);
 			var p6 = new Field<Test1Row, string>(nameof(Test1Row.Company), r => r.Company, Aggregators.CommaList);
 			var p7 = new Field<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
-			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);// vals => vals.DefaultIfEmpty(0d).Average());
+			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);
 			var p9 = new Field<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
 			var p10 = new Field<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, v => v.ToString(), Aggregators.CommaList);
 			// Another variant that works almost the same, except here rowId is always string. The above will do group and sort on int, but display as string, just like this.

@@ -256,7 +256,7 @@ namespace PivotDataExport
 				foreach (var cg in lastColGroupsSorted)
 				{
 					var hasData = rg.IntersectData.TryGetValue(cg, out var data);
-					// createEmptyIntersects did work here, but not in Presentation3, so removed from here for now. Maybe add back again if find out how to implement in Presentation3
+					// createEmptyIntersects did work here, but not in Presentation2, so removed from here for now. Maybe add back again if find out how to implement in Presentation2
 					if (hasData)// || createEmptyIntersects)
 					{
 						//if (!hasData)

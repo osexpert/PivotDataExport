@@ -8,36 +8,18 @@ using Kazinix.PivotTable;
 using PivotDataExport;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Test
+namespace Examples
 {
 	public class Program
 	{
 		public static void Main()
 		{
-			Kazinixx.test();
-
 			var t = new Program();
 			t.Test();
 		}
 
 		public void Test()
 		{
-
-			//using (var f = File.Open(@"d:\testwrite.json", FileMode.Create))
-			//{
-			//	JsonSerializer.Serialize(f, listtt, new JsonSerializerOptions { WriteIndented = true });
-			//}
-
-			//var datas = new CsvTextFieldParser(@"d:\5m Sales Records.csv");
-
-			//while (!datas.EndOfData)
-			//{
-			//	var fields = datas.ReadFields();
-			//}
-
-
-
-
 			List<CsvRow> salesRecords = null!;
 
 			using (var reader = new StreamReader(@"d:\5m Sales Records.csv"))
@@ -47,10 +29,9 @@ namespace Test
 				salesRecords = records.ToList();
 			}
 
+			Kazinixx.test(salesRecords);
+
 			//var props = TypeDescriptor.GetProperties(typeof(CsvRow));
-
-
-			
 
 			var fields = new List<Field<CsvRow>>();
 
@@ -82,52 +63,11 @@ namespace Test
 
 			fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), r => r.UnitsSold, Enumerable.Sum));
 
-			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderPriority), rows => Aggregators.CommaList(rows, row => row.OrderPriority)));
-			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.OrderDate), rows => rows.Max(r => r.OrderDate)));
-			//props.Add(new Property<CsvRow, string>(nameof(CsvRow.OrderID), rows => Aggregators.SingleOrCount(rows, row => row.OrderID)));
-			//props.Add(new Property<CsvRow, int>("RowCount", rows => rows.Count()));
-			//props.Add(new Property<CsvRow, DateTime>(nameof(CsvRow.ShipDate), rows => rows.Max(r => r.ShipDate)));
-			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitPrice), rows => rows.Sum(r => r.UnitPrice)));
-			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.UnitCost), rows => rows.Sum(r => r.UnitCost)));
-			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalRevenue), rows => rows.Sum(r => r.TotalRevenue)));
-			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalCost), rows => rows.Sum(r => r.TotalCost)));
-			//props.Add(new Property<CsvRow, double>(nameof(CsvRow.TotalProfit), rows => rows.Sum(r => r.TotalProfit)));
-
-			//var fieldsss = Field.CreateFieldsFromType<CsvRow>();// (props);
-			//var fieldsss = Field.CreateFieldsFromProperties(props);
-
-
-
 			// TODO: Should maybe had a way to set index after all? That was independent of order by ienumerable?
 			//		MoveToTop(fieldsss, "OrderDate");
 			//			MoveToTop(fieldsss, "ItemType");
 			//MoveToTop(fieldsss, "OrderID");
 			//MoveToTop(fieldsss, "ItemType");
-
-			//GetField(fields, "Region").Area = Area.Row;
-			//GetField(fields, "Region").GroupIndex = 1;
-			////			GetField(fieldsss, "Region").SortOrder = SortOrder.Asc;
-
-			//GetField(fields, "Country").Area = Area.Row;
-			//GetField(fields, "Country").GroupIndex = 2;
-			////GetField(fieldsss, "Country").SortOrder = SortOrder.Asc;
-
-			//GetField(fields, "ItemType").Area = Area.Column;
-			////GetField(fieldsss, "ItemType").SortOrder = SortOrder.Asc;
-			//GetField(fields, "ItemType").GroupIndex = 0;
-
-			//GetField(fields, "SalesChannel").Area = Area.Column;
-			////			GetField(fieldsss, "SalesChannel").SortOrder = SortOrder.Asc;
-			//GetField(fields, "SalesChannel").GroupIndex = 3;
-
-
-			//GetField(fieldsss, "Country").Area = Area.Group;
-			//GetField(fieldsss, "Country").Sort = Sort.Asc;
-
-			//GetField(fieldsss, "ShipDate").Sort = Sort.Desc;
-
-			//			fieldsss.Add(new Field { FieldType = FieldType.Data, FieldName = "RowCount", SortOrder = SortOrder.None, DataType = typeof(int) });
-
 
 
 			//var sw3 = Stopwatch.StartNew();
@@ -136,31 +76,20 @@ namespace Test
 			//var res = allRTows.ToPivotArray(cs => new { cs.ItemType, cs.SalesChannel }
 			//	, rs => new { rs.Region, rs.Country }, ds => ds.Any() ? ds.Sum(x => x.UnitsSold) : 0);
 
-
 			//sw3.Stop(); // 6.9 sec
 
-
-
 			////			TypeValue: object, name, fullname
-
 
 			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 			var pivot2 = new Pivoter2<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
-			//Console.WriteLine("start?");
-			//Console.ReadKey();
-			//Console.WriteLine("start!");
-
 			var s3 = Stopwatch.StartNew();
 			var gdata_ptb = pivot2.GetGroupedData_PivotTableBuilder();
-			s3.Stop(); // 29 ?? mem?? now that we get single row value directly, its much faster. But it did show that PTB aggregate a lot more than FIS.
-
-			//Console.WriteLine("done");
-			//Console.ReadKey();
+			s3.Stop(); // 11.8 sec ?? mem?? now that we get single row value directly, its much faster. But it did show that PTB aggregate a lot more than FIS.
 
 			var s = Stopwatch.StartNew();
 			var gdata_fis = pivot.GetGroupedData_FastIntersect();
-			s.Stop(); // 14.4 sec
+			s.Stop(); // 6.14 sec
 
 
 			//			var pivotTable = salesRecords
@@ -361,10 +290,10 @@ namespace Test
 
 
 
-		private Field<CsvRow> GetField(IEnumerable<Field<CsvRow>> fieldsss, string v)
-		{
-			return fieldsss.Where(f => f.Name == v).Single();
-		}
+		//private Field<CsvRow> GetField(IEnumerable<Field<CsvRow>> fieldsss, string v)
+		//{
+		//	return fieldsss.Where(f => f.Name == v).Single();
+		//}
 
 		//private void MoveToTop(List<Field> fieldsss, string field)
 		//{
