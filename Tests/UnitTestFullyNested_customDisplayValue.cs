@@ -35,7 +35,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "5",
 			                  "MaxTime": "2024-03-02T03:04:05.0000000",
-			                  "MinTime": "2024-03-02T03:04:05.0000000"
+			                  "MinTime": "2024-03-02T03:04:05.0000000",
+			                  "Combine": 5.6
 			                }
 			              ]
 			            }
@@ -61,7 +62,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "1",
 			                  "MaxTime": "2024-01-02T03:04:05.0000000",
-			                  "MinTime": "2024-01-02T03:04:05.0000000"
+			                  "MinTime": "2024-01-02T03:04:05.0000000",
+			                  "Combine": 1.1
 			                }
 			              ]
 			            },
@@ -76,7 +78,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "2",
 			                  "MaxTime": "2024-01-02T03:04:05.0000000",
-			                  "MinTime": "2024-01-02T03:04:05.0000000"
+			                  "MinTime": "2024-01-02T03:04:05.0000000",
+			                  "Combine": 2.4
 			                }
 			              ]
 			            }
@@ -102,7 +105,8 @@ namespace Tests
 			                  "RowCount": 2,
 			                  "RowId": "3, 4",
 			                  "MaxTime": "2024-02-22T03:04:05.0000000",
-			                  "MinTime": "2024-02-02T03:04:05.0000000"
+			                  "MinTime": "2024-02-02T03:04:05.0000000",
+			                  "Combine": 21
 			                }
 			              ]
 			            }
@@ -128,7 +132,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "6",
 			                  "MaxTime": "2024-03-02T03:04:05.0000000",
-			                  "MinTime": "2024-03-02T03:04:05.0000000"
+			                  "MinTime": "2024-03-02T03:04:05.0000000",
+			                  "Combine": 214.2
 			                }
 			              ]
 			            }
@@ -154,7 +159,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "11",
 			                  "MaxTime": "2024-01-02T03:04:06.0000000",
-			                  "MinTime": "2024-01-02T03:04:06.0000000"
+			                  "MinTime": "2024-01-02T03:04:06.0000000",
+			                  "Combine": 379.5
 			                }
 			              ]
 			            }
@@ -180,7 +186,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "10",
 			                  "MaxTime": "2024-01-02T03:05:05.0000000",
-			                  "MinTime": "2024-01-02T03:05:05.0000000"
+			                  "MinTime": "2024-01-02T03:05:05.0000000",
+			                  "Combine": 3936.1
 			                }
 			              ]
 			            }
@@ -206,7 +213,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "7",
 			                  "MaxTime": "2024-01-02T04:04:05.0000000",
-			                  "MinTime": "2024-01-02T04:04:05.0000000"
+			                  "MinTime": "2024-01-02T04:04:05.0000000",
+			                  "Combine": 3526.4
 			                }
 			              ]
 			            }
@@ -232,7 +240,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "8",
 			                  "MaxTime": "2024-01-02T04:04:05.0000000",
-			                  "MinTime": "2024-01-02T04:04:05.0000000"
+			                  "MinTime": "2024-01-02T04:04:05.0000000",
+			                  "Combine": 341.6
 			                }
 			              ]
 			            }
@@ -258,7 +267,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "9",
 			                  "MaxTime": "2024-01-02T03:05:05.0000000",
-			                  "MinTime": "2024-01-02T03:05:05.0000000"
+			                  "MinTime": "2024-01-02T03:05:05.0000000",
+			                  "Combine": 0
 			                },
 			                {
 			                  "Group": "Group42",
@@ -268,7 +278,8 @@ namespace Tests
 			                  "RowCount": 1,
 			                  "RowId": "12",
 			                  "MaxTime": "2024-01-02T03:04:06.0000000",
-			                  "MinTime": "2024-01-02T03:04:06.0000000"
+			                  "MinTime": "2024-01-02T03:04:06.0000000",
+			                  "Combine": 3853.1
 			                }
 			              ]
 			            }
@@ -375,15 +386,16 @@ namespace Tests
 			var p5 = new Field<Test1Row, string>(nameof(Test1Row.Country), r => r.Country, Aggregators.CommaList);
 			var p6 = new Field<Test1Row, string>(nameof(Test1Row.Company), r => r.Company, Aggregators.CommaList);
 			var p7 = new Field<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
-			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);// vals => vals.DefaultIfEmpty(0d).Average());// Aggregators.AverageOr(vals, 0d));
+			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);
 			var p9 = new Field<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
-			var p10 = new Field<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, v => v.ToString(), Aggregators.CommaList);//  vals => Aggregators.CommaList(vals.Select(v => v.ToString())));
+			var p10 = new Field<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, v => v.ToString(), Aggregators.CommaList);
 
 			var p15 = new Field<Test1Row, DateTime, string>("MaxTime", r => r.Time, Enumerable.Max, v => v.ToString("o"));
-			//var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, vals => vals.Min().ToString("o"));
-			var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, Enumerable.Min, v => v.ToString("o"));// vals => vals.Min().ToString("o"));
+			var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, Enumerable.Min, v => v.ToString("o"));
 
-			var fields = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p15, p16 };
+			var p17 = new Field<Test1Row, double>("Combine", r => r.Weight * r.Number, Enumerable.Sum, v => Math.Round(v, 1));
+
+			var fields = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p15, p16, p17 };
 
 			var piv = new Pivoter<Test1Row>(rows, fields);
 			var piv2 = new Pivoter2<Test1Row>(rows, fields);

@@ -58,7 +58,7 @@ namespace Test
 			{
 				GroupIndex = 0,
 				Area = Area.Row,
-				SortOrder = SortOrder.Asc
+				SortOrder = SortOrder.Asc,
 			});
 			fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), r => r.Country, Aggregators.CommaList)
 			{
