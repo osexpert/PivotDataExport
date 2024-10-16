@@ -81,14 +81,14 @@ namespace Examples
 			////			TypeValue: object, name, fullname
 
 			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
-			var pivot2 = new Pivoter2<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
+			var pivot2 = new PivoterPtb<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
 			var s3 = Stopwatch.StartNew();
-			var gdata_ptb = pivot2.GetGroupedData_PivotTableBuilder();
+			var gdata_ptb = pivot2.GetGroupedData();
 			s3.Stop(); // 11.8 sec ?? mem?? now that we get single row value directly, its much faster. But it did show that PTB aggregate a lot more than FIS.
 
 			var s = Stopwatch.StartNew();
-			var gdata_fis = pivot.GetGroupedData_FastIntersect();
+			var gdata_fis = pivot.GetGroupedData();
 			s.Stop(); // 6.14 sec
 
 
@@ -125,7 +125,7 @@ namespace Examples
 
 			var s4 = Stopwatch.StartNew();
 
-			var pres_ptb = new Presentation2<CsvRow>(gdata_ptb);
+			var pres_ptb = new PresentationPtb<CsvRow>(gdata_ptb);
 			var nested_kv_tbl2 = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 
 			s4.Stop();

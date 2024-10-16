@@ -6,7 +6,7 @@ using System.Data;
 namespace PivotDataExport
 {
 	/// <summary>
-	/// Group and aggregate rows
+	/// Group and aggregate rows (fast intersect)
 	/// </summary>
 	/// <typeparam name="TRow"></typeparam>
 	public class Pivoter<TRow> where TRow : class // class notnull
@@ -109,10 +109,10 @@ namespace PivotDataExport
 		}
 
 		/// <summary>
-		/// For a 5 million rows example, this takes 19sec. So 13 times faster than SlowIntersect.
+		/// GetGroupedData (fast intersect)
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow> GetGroupedData_FastIntersect()//bool createEmptyIntersects = false)
+		public GroupedData<TRow> GetGroupedData()//bool createEmptyIntersects = false)
 		{
 			Validate();
 

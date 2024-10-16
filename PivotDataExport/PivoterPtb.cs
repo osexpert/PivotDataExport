@@ -6,17 +6,17 @@ using System.Data;
 namespace PivotDataExport
 {
 	/// <summary>
-	/// Group and aggregate rows
+	/// Group and aggregate rows (uses PivotTableBuilder/Ptb)
 	/// </summary>
 	/// <typeparam name="TRow"></typeparam>
-	public class Pivoter2<TRow> where TRow : class // class notnull
+	public class PivoterPtb<TRow> where TRow : class // class notnull
 	{
 		List<Field<TRow>> _fields;
 		IEnumerable<TRow> _rows;
 
 		public List<Field<TRow>> Fields => _fields;
 
-		public Pivoter2(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
+		public PivoterPtb(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 		{
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
@@ -117,15 +117,12 @@ namespace PivotDataExport
 
 
 		/// <summary>
-		/// Don't remeber why I made both GetGroupedData_FastIntersec and GetGroupedData_PivotTableBuilder
-		/// But It seems GetGroupedData_PivotTableBuilder is 2 times slower than GetGroupedData_FastIntersect?
-		/// This seemss weird thou.
-		/// And I see this one uses Lazy, but not the other one.
-		/// 
-		/// PS: this seems to be a lot slower than Kazinix.PivotTable.Test.cs?
+		/// GetGroupedData (uses PivotTableBuilder/Ptb)
+		/// I see this one uses Lazy, but not the other one (fast intersect).
+		/// PS: this seems to be a lot slower than Kazinix.PivotTable.Test.cs? It was because of using Yield/IEnumerable to get row value. Now has own method for this.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData2<TRow, Lazy<KeyValueList>> GetGroupedData_PivotTableBuilder()//bool createEmptyIntersects = false)
+		public GroupedDataPtb<TRow, Lazy<KeyValueList>> GetGroupedData()//bool createEmptyIntersects = false)
 		{
 			Validate();
 
@@ -168,7 +165,7 @@ namespace PivotDataExport
 			var lastRows = GetLast(rbl.Rows).ToList();// Flatten(rbl.Rows).Where(r => !r.Children.Any()).ToList();
 			var lastCols = GetLast(rbl.ColumnAggregates).ToList();// Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
 
-			return new GroupedData2<TRow, Lazy<KeyValueList>>()
+			return new GroupedDataPtb<TRow, Lazy<KeyValueList>>()
 			{
 				ColFieldsInGroupOrder = colFieldsInGroupOrder,
 				RowFieldsInGroupOrder = rowFieldsInGroupOrder,
@@ -189,7 +186,7 @@ namespace PivotDataExport
 		}
 	}
 
-	public class GroupedData2<TRow, TAggregates> where TRow : class
+	public class GroupedDataPtb<TRow, TAggregates> where TRow : class
 	{
 		public Field<TRow>[] RowFieldsInGroupOrder = null!;
 		public Field<TRow>[] ColFieldsInGroupOrder = null!;

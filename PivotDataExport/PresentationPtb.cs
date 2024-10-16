@@ -3,22 +3,31 @@ using System.Data;
 
 namespace PivotDataExport
 {
-	public class Presentation2<TRow> : Presentation2<TRow, Lazy<KeyValueList>>
+	/// <summary>
+	/// Ptb = PivotTableBuilder
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	public class PresentationPtb<TRow> : PresentationPtb<TRow, Lazy<KeyValueList>>
 		where TRow : class
 	{
-		public Presentation2(GroupedData2<TRow, Lazy<KeyValueList>> data) : base(data)
+		public PresentationPtb(GroupedDataPtb<TRow, Lazy<KeyValueList>> data) : base(data)
 		{
 		}
 	}
 
-	public class Presentation2<TRow, TAgg> 
+	/// <summary>
+	/// Ptb = PivotTableBuilder
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	/// <typeparam name="TAgg"></typeparam>
+	public class PresentationPtb<TRow, TAgg> 
 		where TRow : class
 		where TAgg : Lazy<KeyValueList>
 	{
 
-		GroupedData2<TRow, TAgg> _data;
+		GroupedDataPtb<TRow, TAgg> _data;
 
-		public Presentation2(GroupedData2<TRow, TAgg> data)
+		public PresentationPtb(GroupedDataPtb<TRow, TAgg> data)
 		{
 			_data = data;
 		}

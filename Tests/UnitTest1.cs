@@ -200,7 +200,7 @@ namespace Tests
 		[TestMethod]
 		public void TestCompareFastAndSlow_RowGroupOnSite()
 		{
-			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
+			(Pivoter<Test1Row> p, PivoterPtb<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 			fields[nameof(Test1Row.Site)].Area = Area.Row;
@@ -208,11 +208,11 @@ namespace Tests
 
 			fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Asc;
 
-			var gdata_fis = p.GetGroupedData_FastIntersect();
-			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();
+			var gdata_fis = p.GetGroupedData();
+			var gdata_ptb = p2.GetGroupedData();
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
-			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable();
 			var dt_ptb = pres_ptb.GetDataTable();
@@ -482,7 +482,7 @@ namespace Tests
 		[TestMethod]
 		public void TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName()
 		{
-			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
+			(Pivoter<Test1Row> p, PivoterPtb<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 			fields[nameof(Test1Row.Site)].Area = Area.Row;
@@ -491,11 +491,11 @@ namespace Tests
 			fields[nameof(Test1Row.Name)].Area = Area.Column;
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
-			var gdata_fis = p.GetGroupedData_FastIntersect();// createEmptyIntersects: true);
-			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();// createEmptyIntersects: true);
+			var gdata_fis = p.GetGroupedData();// createEmptyIntersects: true);
+			var gdata_ptb = p2.GetGroupedData();// createEmptyIntersects: true);
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
-			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable(createEmptyIntersects: true);
 			var dt_ptb = pres_ptb.GetDataTable(createEmptyIntersects: true);
@@ -628,18 +628,18 @@ namespace Tests
 	// Expected: when only group in col, 1 row in the result with only totalt
 		public void TestCompareFastAndSlow_ColGroupOnName()
 		{
-			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
+			(Pivoter<Test1Row> p, PivoterPtb<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 
 			fields[nameof(Test1Row.Name)].Area = Area.Column;
 			fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
 
-			var gdata_fis = p.GetGroupedData_FastIntersect();
-			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();
+			var gdata_fis = p.GetGroupedData();
+			var gdata_ptb = p2.GetGroupedData();
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
-			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable();
 			var dt_ptb = pres_ptb.GetDataTable();
@@ -738,15 +738,15 @@ namespace Tests
 		// Expected: 1 row with totals
 		public void TestCompareFastAndSlow_NoGroup()
 		{
-			(Pivoter<Test1Row> p, Pivoter2<Test1Row> p2) = GetPivoterTestData();
+			(Pivoter<Test1Row> p, PivoterPtb<Test1Row> p2) = GetPivoterTestData();
 
 			var fields = p.Fields.ToDictionary(k => k.Name);
 
-			var gdata_fis = p.GetGroupedData_FastIntersect();
-			var gdata_ptb = p2.GetGroupedData_PivotTableBuilder();
+			var gdata_fis = p.GetGroupedData();
+			var gdata_ptb = p2.GetGroupedData();
 
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
-			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable();
 			var dt_ptb = pres_ptb.GetDataTable();
@@ -1049,7 +1049,7 @@ namespace Tests
 		[TestMethod]
 		public void TestGroupSiteThenUnitSortBoth()
 		{
-			(Pivoter<Test1Row> td, Pivoter2<Test1Row> td2) = GetPivoterTestData();
+			(Pivoter<Test1Row> td, PivoterPtb<Test1Row> td2) = GetPivoterTestData();
 			var sf = td.Fields.Single(f => f.Name == "Site");
 			sf.Area = Area.Row;
 			sf.GroupIndex = 0;
@@ -1076,9 +1076,9 @@ namespace Tests
 			sg2.GroupIndex = 0;
 			sg2.SortOrder = SortOrder.Desc;
 
-			var gdata_ptb = td2.GetGroupedData_PivotTableBuilder();
-			var gdata_fis = td.GetGroupedData_FastIntersect();
-			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var gdata_ptb = td2.GetGroupedData();
+			var gdata_fis = td.GetGroupedData();
+			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
 			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
@@ -1109,7 +1109,7 @@ namespace Tests
 			
 		}
 
-		private static (Pivoter<Test1Row>, Pivoter2<Test1Row>) GetPivoterTestData()
+		private static (Pivoter<Test1Row>, PivoterPtb<Test1Row>) GetPivoterTestData()
 		{
 			var r1 = new Test1Row { RowId = 1, Site = "Site1", Unit = "Unit1", Group = "Group1", Name = "Name1", Number = 1, Weight = 1.1, Time = new DateTime(2024, 1, 2, 3, 4, 5) };
 			var r2 = new Test1Row { RowId = 2, Site = "Site1", Unit = "Unit1", Group = "Group2", Name = "Name1", Number = 2, Weight = 1.2, Time = new DateTime(2024, 1, 3, 3, 4, 5) };
@@ -1130,7 +1130,7 @@ namespace Tests
 			var props = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8 };
 
 			var pivot = new Pivoter<Test1Row>(rows, props);
-			var pivot2 = new Pivoter2<Test1Row>(rows, props);
+			var pivot2 = new PivoterPtb<Test1Row>(rows, props);
 			return (pivot, pivot2);
 		}
 
@@ -1365,7 +1365,7 @@ namespace Tests
 		[TestMethod]
 		public void GroupOnTime()
 		{
-			(Pivoter<Test1Row> td, Pivoter2<Test1Row> td2) = GetPivoterTestData();
+			(Pivoter<Test1Row> td, PivoterPtb<Test1Row> td2) = GetPivoterTestData();
 			var sf = td.Fields.Single(f => f.Name == "Time");
 			sf.Area = Area.Row;
 			sf.GroupIndex = 0;
@@ -1376,9 +1376,9 @@ namespace Tests
 			sf2.GroupIndex = 0;
 			sf2.SortOrder = SortOrder.Asc;
 
-			var gdata_ptb = td2.GetGroupedData_PivotTableBuilder();
-			var gdata_fis = td.GetGroupedData_FastIntersect();
-			var pres_ptb = new Presentation2<Test1Row>(gdata_ptb);
+			var gdata_ptb = td2.GetGroupedData();
+			var gdata_fis = td.GetGroupedData();
+			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
 			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();

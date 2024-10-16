@@ -200,14 +200,14 @@ namespace PivotDataExport
 
 			if (addHeaderRow && !HasHeaderRow)
 			{
-				w.WriteLine(FormatCsvRow(separator, Columns.Select(c => XLinq_GetStringValue(c.Name))));
+				w.WriteLine(CsvFormatter.FormatCsvRow(separator, Columns.Select(c => XLinq_GetStringValue(c.Name))));
 			}
 
 			foreach (var row in Rows)
 			{
 				if (row is KeyValueList kvl)
 				{
-					w.WriteLine(FormatCsvRow(separator, kvl.Select(o =>
+					w.WriteLine(CsvFormatter.FormatCsvRow(separator, kvl.Select(o =>
 					{
 						if (o.Value is KeyValueList)
 							throw new InvalidOperationException("Nested keyValueList. Should never get here, PartialRows should be true in this case");
@@ -216,7 +216,7 @@ namespace PivotDataExport
 					})));
 				}
 				else
-					w.WriteLine(FormatCsvRow(separator, row.Cast<object>().Select(o => XLinq_GetStringValue(o))));
+					w.WriteLine(CsvFormatter.FormatCsvRow(separator, row.Cast<object>().Select(o => XLinq_GetStringValue(o))));
 			}
 		}
 
@@ -230,17 +230,17 @@ namespace PivotDataExport
 
 			if (addHeaderRow && !HasHeaderRow)
 			{
-				sb.AppendLine(FormatCsvRow(separator, Columns.Select(c => XLinq_GetStringValue(c.Name))));
+				sb.AppendLine(CsvFormatter.FormatCsvRow(separator, Columns.Select(c => XLinq_GetStringValue(c.Name))));
 			}
 
 			foreach (var row in Rows)
 			{
 				if (row is KeyValueList kvl)
 				{
-					sb.AppendLine(FormatCsvRow(separator, kvl.Select(o => XLinq_GetStringValue(o.Value!))));
+					sb.AppendLine(CsvFormatter.FormatCsvRow(separator, kvl.Select(o => XLinq_GetStringValue(o.Value!))));
 				}
 				else
-					sb.AppendLine(FormatCsvRow(separator, row.Cast<object>().Select(o => XLinq_GetStringValue(o))));
+					sb.AppendLine(CsvFormatter.FormatCsvRow(separator, row.Cast<object>().Select(o => XLinq_GetStringValue(o))));
 			}
 			return sb.ToString();
 		}
@@ -303,38 +303,9 @@ namespace PivotDataExport
 			return XmlConvert.ToString(value, XmlDateTimeSerializationMode.RoundtripKind);
 		}
 
-		// https://stackoverflow.com/questions/12963117/is-there-a-write-counterpart-to-microsoft-visualbasic-fileio-textfieldparser
-		// https://stackoverflow.com/questions/6377454/escaping-tricky-string-to-csv-format
-		private static string FormatCsvCell(char separator, string cell, bool alwaysQuote = false)
-		{
-			bool mustQuote(string str) => str.IndexOfAny(new char[] { separator, '"', '\r', '\n' }) > -1;
 
-			if (alwaysQuote || mustQuote(cell))
-			{
-				StringBuilder sb = new();
-				sb.Append('\"');
-				foreach (char nextChar in cell)
-				{
-					sb.Append(nextChar);
-					if (nextChar == '"')
-						sb.Append('\"');
-				}
-				sb.Append('\"');
-				return sb.ToString();
-			}
-
-			return cell;
-		}
-
-		private static string FormatCsvRow(char separator, IEnumerable<string> cells, bool alwaysQuote = false)
-		{
-			return string.Join(separator.ToString(), cells.Select(cell => FormatCsvCell(separator, cell, alwaysQuote)));
-		}
 
 	}
-
-
-
 
 	public class TableColumn
 	{
