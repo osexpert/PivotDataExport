@@ -6,9 +6,7 @@ Csv or json with or without header row.
 Built on an idea: receive field definitions via api. Fetch, process and return data as result from api,
 alternatively queue it up and save a file somewhere, that later can be downloaded.
 So the idea is a dynamic report/export engine that can power a single api (per topic/data source).
-Kind of similar to GraphQL, but only for reporting/exports.
-Maybe an api that implement this concept, could be called PivotQL.
-This library is not PivotQL thou, it is an engine that could power such api.
+This hypotetical api is not a part of this project, but such api could use PivotDataExport as an engine.
 
 Example:
 
