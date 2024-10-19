@@ -145,7 +145,6 @@ namespace PivotDataExport
 					{
 						var startIdx = grpStartIdx[lastColGroup];
 
-						//if (lastRowGroup.IntersectData.TryGetValue(lastColGroup, out var values))
 						var hasData = intersectData.TryGetValue(lastColGroup.Value, out var data);
 						if (hasData || createEmptyIntersects)
 						{
@@ -174,12 +173,8 @@ namespace PivotDataExport
 								values = data.Aggregates.Value.Select(a => a.Value).ToArray();
 							}
 
-							//var values = lastRowGroup.IntersectData[lastColGroup];
-							// write values
-							//Array.Copy(values, 0, row, startIdx, values.Length);
 							if (values.Length != _data.DataFields.Length)
 								throw new Exception("mismatch in length..");
-
 							Array.Copy(values, 0, row, startIdx, values.Length);
 						}
 						else

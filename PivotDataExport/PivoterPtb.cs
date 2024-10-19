@@ -24,7 +24,6 @@ namespace PivotDataExport
 			//	_list = (IEnumerable<T>)list;
 			_rows = rows;
 			_fields = fields.ToList();
-			//_props = props.ToDictionary(pd => pd.Name);
 		}
 
 		private void Validate()
@@ -35,74 +34,6 @@ namespace PivotDataExport
 			if (_fields.GroupBy(f => f.Name).Any(g => g.Count() > 1))
 				throw new ArgumentException("More than one field with same fieldName");
 		}
-
-		//private List<List<Group<TRow>>> GroupRows(IEnumerable<Field> fields, RootType rootType)//, bool sort = false)
-		//{
-		//	List<Group<TRow>> lastGroups = new List<Group<TRow>>();
-		//	lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
-
-		//	var res = GroupRows(lastGroups, fields);//, sort: sort);
-		//											//			if (!res.Any())
-		//											//			return new List<List<Group<TRow>>>() { lastGroups };
-		//	return res;
-		//}
-
-		private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)
-		{
-			List<List<Group<TRow>>> listRes = new();
-
-			//if (!fields.Any())
-			//{
-			//	// make sure we include root
-			//	listRes.Add(lastGroups);
-			//	return listRes;
-			//}
-
-			List<Group<TRow>> originalLastGroups = lastGroups;
-
-			//			List<Group<T>> lastGroups = new List<Group<T>>();
-			//		lastGroups.Add(new Group<T> { Rows = _list, IsRoot = true });
-
-			foreach (Field<TRow> gf in fields)
-			{
-				//var getter = _props[gf.FieldName];
-
-				var allSubGroups = new List<Group<TRow>>();
-
-				foreach (var go in lastGroups)
-				{
-					var subGroups = go.Rows.GroupBy(r => gf.GetGroupValue(gf.GetRowValue(r)), gf.GroupComparer).Select(g => new Group<TRow>()
-					{
-						Key = g.Key,
-						Rows = g,
-						Field = gf,
-						ParentGroup = go
-					});
-
-					if (lastGroups == originalLastGroups)
-					{
-						if (freeOriginalLastGroupsMem)
-							go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
-					}
-					else
-					{
-						go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
-					}
-
-					allSubGroups.AddRange(subGroups);
-				}
-
-				listRes.Add(allSubGroups);
-
-				lastGroups = allSubGroups;
-			}
-
-			//return lastGroups;
-			if (!listRes.Any())
-				listRes.Add(originalLastGroups);
-			return listRes;
-		}
-
 
 		private IEnumerable<Field<TRow>> GetDataFields()
 		{
@@ -133,22 +64,17 @@ namespace PivotDataExport
 
 			var ptb = new PivotTableBuilder<TRow, Lazy<KeyValueList>>(_rows, rows =>
 			{
-				// only leafs
-				//if ((agg_ctx == AggregateContext.Row_ColumnAggregates || agg_ctx == AggregateContext.Row_Aggregates) && group is IGroup<KeyValueList?> g && !g.Children.Any())
+				// Lazy: avoid calling GetRowsValue "too much" (performance). We won't read all of them.
+				return new Lazy<KeyValueList>(() =>
 				{
-					return new Lazy<KeyValueList>(() =>
+					KeyValueList res = new();
+					foreach (var dataField in dataFields)
 					{
-						KeyValueList res = new();
-						foreach (var dataField in dataFields)
-						{
-							var theValue = dataField.GetRowsValue(rows);
-							res.Add(dataField.Name, theValue);
-						}
-						return res;
-					});
-				}
-
-				//return null;
+						var theValue = dataField.GetRowsValue(rows);
+						res.Add(dataField.Name, theValue);
+					}
+					return res;
+				});
 			});
 
 			foreach (var rowF in rowFieldsInGroupOrder)
@@ -162,8 +88,8 @@ namespace PivotDataExport
 			var rbl = ptb.Build();
 
 			// flip so we get the last groups (they have no children)
-			var lastRows = GetLast(rbl.Rows).ToList();// Flatten(rbl.Rows).Where(r => !r.Children.Any()).ToList();
-			var lastCols = GetLast(rbl.ColumnAggregates).ToList();// Flatten(rbl.ColumnAggregates).Where(r => !r.Children.Any()).ToList();
+			var lastRows = GetLast(rbl.Rows).ToList();
+			var lastCols = GetLast(rbl.ColumnAggregates).ToList();
 
 			return new GroupedDataPtb<TRow, Lazy<KeyValueList>>()
 			{

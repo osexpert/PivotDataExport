@@ -64,8 +64,6 @@ namespace PivotDataExport
 			}
 		}
 
-
-
 		public static IEnumerable<T> TopogicalSequenceDFS<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> deps)
 		{
 			var yielded = new HashSet<T>();

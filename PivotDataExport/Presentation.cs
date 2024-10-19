@@ -140,8 +140,6 @@ namespace PivotDataExport
 							values = defaultValues;
 						}
 
-						//var values = lastRowGroup.IntersectData[lastColGroup];
-						// write values
 						Array.Copy(values, 0, row, startIdx, values.Length);
 					}
 					else

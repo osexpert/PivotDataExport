@@ -24,7 +24,6 @@ namespace PivotDataExport
 			//	_list = (IEnumerable<T>)list;
 			_rows = rows;
 			_fields = fields.ToList();
-			//_props = props.ToDictionary(pd => pd.Name);
 		}
 
 		private void Validate()
@@ -65,8 +64,6 @@ namespace PivotDataExport
 
 			foreach (Field<TRow> gf in fields)
 			{
-				//var getter = _props[gf.FieldName];
-
 				var allSubGroups = new List<Group<TRow>>();
 
 				foreach (var go in lastGroups)
@@ -149,8 +146,6 @@ namespace PivotDataExport
 				int dataFieldIdx = 0;
 				foreach (var dataField in dataFields)
 				{
-					//var getter =  _props[dataField.FieldName];
-
 					var theValue = dataField.GetRowsValue(lastRowThenColGroup.Rows);
 
 					lastRowG.IntersectData ??= new();
@@ -192,8 +187,7 @@ namespace PivotDataExport
 				DataFields = dataFields,
 				LastRowGroups = allRowGroups.Last(),
 				LastColGroups = allColGroups.Last(),
-				Fields = _fields,
-				//props = _props
+				Fields = _fields
 			};
 		}
 
