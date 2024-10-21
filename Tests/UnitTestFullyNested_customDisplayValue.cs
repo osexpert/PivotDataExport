@@ -323,7 +323,7 @@ namespace Tests
 			var pres_fis = new Presentation<Test1Row>(gdata_fis);
 			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
 
-			// FIXME: currently no supporty for SortOrder
+			// FIXME: currently no support for SortOrder
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
 
 			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();

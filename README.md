@@ -58,7 +58,7 @@ Create fields:
 Group, aggregate, sort:
 
 	var pivot = new Pivoter<CsvRow>(salesRecords, fields);
-	var data = pivot.GetGroupedData_FastIntersect();
+	var data = pivot.GetGroupedData();
 	var pres = new Presentation<CsvRow>(data);
 Get table:
 	

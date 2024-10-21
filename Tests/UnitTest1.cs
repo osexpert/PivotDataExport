@@ -251,11 +251,9 @@ namespace Tests
 			var nested_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 			var nest_json_fis = ToJson(nested_fis);
 			Assert.AreEqual(nested_TestCompareFastAndSlow_RowGroupOnSite, nest_json_fis);
-			// FIXME: ptb is empty
-//			var nested_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
-	//		var nest_json_ptb = ToJson(nested_ptb);
-		//	Assert.AreEqual(nest_json_ptb, nest_json_fis);
-
+			var nested_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
+			var nest_json_ptb = ToJson(nested_ptb);
+			Assert.AreEqual(nest_json_ptb, nest_json_fis);
 
 			//			var nestCsv = nested.ToCsv();
 			//			Assert.Equal(TestCompareFastAndSlow_RowGroupOnSite_nestcsv, nestCsv);
@@ -520,10 +518,8 @@ namespace Tests
 
 			var nested_json_fis = ToJson(pres_fis.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
 			Assert.AreEqual(nest_TestCompareFastAndSlow_RowGroupOnSite_ColGroupOnName, nested_json_fis);
-			
-			// fixme: PTB is empty
-			//var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
-			//Assert.AreEqual(nested_json_ptb, nested_json_fis);
+			var nested_json_ptb = ToJson(pres_ptb.GetTable_NestedKeyValueList_VariableColumns());// createEmptyIntersects: true));
+			Assert.AreEqual(nested_json_ptb, nested_json_fis);
 		}
 
 		const string str_TestCompareFastAndSlow_ColGroupOnName = """

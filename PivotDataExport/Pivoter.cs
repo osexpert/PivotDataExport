@@ -214,7 +214,7 @@ namespace PivotDataExport
 				var g = st.Pop();
 
 				// TODO: lookup existing groups, based on level (or field) and key
-				// Teh same level will always have same field so its same same.
+				// The same level will always have same field so its same same.
 
 				lookupGroups[lvl] ??= new();
 
