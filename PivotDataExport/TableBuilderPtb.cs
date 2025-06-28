@@ -3,13 +3,33 @@ using System.Data;
 
 namespace PivotDataExport
 {
-	public class Presentation<TRow> where TRow : class
+	/// <summary>
+	/// Ptb = PivotTableBuilder
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	internal class TableBuilderPtb<TRow> : PresentationPtb<TRow, Lazy<KeyValueList>>
+		where TRow : class
 	{
-		GroupedData<TRow> _data;
-
-		public Presentation(GroupedData<TRow> data)
+		public TableBuilderPtb(GroupedDataPtb<TRow, Lazy<KeyValueList>> data) : base(data)
 		{
-			_data = data;			
+		}
+	}
+
+	/// <summary>
+	/// Ptb = PivotTableBuilder
+	/// </summary>
+	/// <typeparam name="TRow"></typeparam>
+	/// <typeparam name="TAgg"></typeparam>
+	internal class PresentationPtb<TRow, TAgg> 
+		where TRow : class
+		where TAgg : Lazy<KeyValueList>
+	{
+
+		GroupedDataPtb<TRow, TAgg> _data;
+
+		public PresentationPtb(GroupedDataPtb<TRow, TAgg> data)
+		{
+			_data = data;
 		}
 
 		/// <summary>
@@ -21,8 +41,8 @@ namespace PivotDataExport
 		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool createEmptyIntersects = false)
 			where TTableRow : class, IEnumerable
 		{
-			var lastRowGroups = _data.LastRowGroups;// OrDefault() ?? [];
-			var lastColGroups = _data.LastColGroups;// OrDefault() ?? [];
+			var lastRowGroups = _data.LastRows;// OrDefault() ?? [];
+			var lastColGroups = _data.LastCols;// OrDefault() ?? [];
 
 			var colFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Column)
 				.Where(f => f.SortOrder != SortOrder.None)
@@ -32,15 +52,16 @@ namespace PivotDataExport
 				.Where(f => f.SortOrder != SortOrder.None)
 				.OrderBy(f => f.GroupIndex).ToArray();
 
-			var lastRowGroupsSorted = SortGroups(lastRowGroups, rowFieldsInSortOrder).ToList();
-			var lastColGroupsSorted = SortGroups(lastColGroups, colFieldsInSortOrder).ToList();
+			var lastRowGroupsSorted = lastRowGroups.ToList();
+			var lastColGroupsSorted = lastColGroups.ToList();
 
 			// TODO: when writing to json, instead of writing full rows we could write objects........
 			// I guess the method could have ended at this point....and some other code could work on this.
 			// The code below work on it to produce flat tables.
 			// But some other code could produce json nested objects...
 
-			List<object?[]> rows = GetFullRows(_data.DataFields, _data.RowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, createEmptyIntersects);
+			List<object?[]> rows = GetFullRows(_data.DataFields, _data.RowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, 
+				createEmptyIntersects: createEmptyIntersects);
 
 			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
@@ -48,8 +69,8 @@ namespace PivotDataExport
 			t.Rows = rows.Select(r => toRow(r, tableCols));
 			t.Columns = tableCols;
 			t.HeaderRow = toRow(tableCols.Select(c => c.Name).ToArray(), tableCols);
-//			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
-	//		t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
+			//			t.RowGroups = _data.rowFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
+			//		t.ColumnGroups = _data.colFieldsInGroupOrder.Select(f => f.ToTableColumn()).ToList();
 
 			return t;
 		}
@@ -59,9 +80,9 @@ namespace PivotDataExport
 		/// </summary>
 		private List<object?[]> GetFullRows(Field<TRow>[] dataFields, 
 			Field<TRow>[] rowFieldsInGroupOrder, 
-			List<Group<TRow>> lastRowGroups /* sorted */, 
-			List<Group<TRow>> lastColGroups /* sorted */, 
-			out bool partialIntersects,
+			List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, 
+			List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
+			out bool partialIntersects, 
 			bool createEmptyIntersects = false
 			)
 		{
@@ -76,7 +97,7 @@ namespace PivotDataExport
 			else
 				colCount += dataFields.Length;
 
-			Dictionary<Group<TRow>, int> grpStartIdx = new();
+			Dictionary<IGroup<TRow, TAgg>, int> grpStartIdx = new();
 			int totalStartIdx = rowFieldsInGroupOrder.Length;
 			foreach (var colGrp in lastColGroups)
 			{
@@ -88,64 +109,89 @@ namespace PivotDataExport
 			}
 
 			object?[] defaultValues = null!;
-			foreach (var lastRowGroup in lastRowGroups)
+
+			bool fakeRow = false;
+			if (!lastRowGroups.Any())
+			{
+				var row = new Row<TRow, TAgg>();
+				row.ColumnAggregates = _data.Table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.Table.Aggregates;
+				lastRowGroups.Add(row);
+				fakeRow = true;
+			}
+
+			foreach (var lastRowGroup in lastRowGroups.Cast<Row<TRow, TAgg>>())
 			{
 				var row = new object?[colCount];
 
-				// TODO: write rowGroup values
-				//int rowFieldIdx = 0;
-				//foreach (var rowField in rowFieldsInGroupOrder)
-				//{
-				//	row[rowFieldIdx] = lastRowGroup.GetKeyByField(rowField);
-				//	rowFieldIdx++;
-				//}
-
-				if (!lastRowGroup.IsRoot)
+				if (!fakeRow)
 				{
 					var current = lastRowGroup;
 					int par_idx = rowFieldsInGroupOrder.Length - 1;
 					do
 					{
-						row[par_idx] = current.Field.GetDisplayValue(current.Key);
-						current = current.ParentGroup;
+						row[par_idx] = current.Field.GetDisplayValue(current.Value);
+						current = current.Parent;
 						par_idx--;
-					} while (current != null && !current.IsRoot);
+					} while (current != null);// && !current.IsRoot);
 				}
 
-				// this produce one row in the table
-				foreach (var lastColGroup in lastColGroups)
+				if (lastColGroups.Any())
 				{
-					var startIdx = grpStartIdx[lastColGroup];
+					var intersectData = lastRowGroup.ColumnAggregates.ToDictionary(ks => ks.Value);
 
-					var hasData = lastRowGroup.IntersectData.TryGetValue(lastColGroup, out var values);
-					if (hasData || createEmptyIntersects)
+					// this produce one row in the table
+					foreach (var lastColGroup in lastColGroups)
 					{
-						if (!hasData)
+						var startIdx = grpStartIdx[lastColGroup];
+
+						var hasData = intersectData.TryGetValue(lastColGroup.Value, out var data);
+						if (hasData || createEmptyIntersects)
+						{
+							object?[]? values = null;
+
+							if (!hasData)
+							{
+								// createEmptyIntersects is true and no data
+								// write default values
+								if (defaultValues == null)
+								{
+									// aggregate with no rows = default value
+									var defVals = new object?[dataFields.Length];
+									int i = 0;
+									foreach (var df in dataFields)
+									{
+										//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
+										defVals[i++] = df.GetDisplayTypeDefaultValue();
+									}
+									defaultValues = defVals;
+								}
+								values = defaultValues;
+							}
+							else
+							{
+								values = data.Aggregates.Value.Select(a => a.Value).ToArray();
+							}
+
+							if (values.Length != _data.DataFields.Length)
+								throw new Exception("mismatch in length..");
+							Array.Copy(values, 0, row, startIdx, values.Length);
+						}
+						else
 						{
 							// Use createEmptyIntersects = true if you always want data (instead of lack of data)
-
-							// write default values
-							if (defaultValues == null)
-							{
-								// aggregate with no rows = default value
-								var defVals = new object?[dataFields.Length];
-								int i = 0;
-								foreach (var df in dataFields)
-								{
-									//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
-									defVals[i++] = df.GetDisplayTypeDefaultValue();
-								}
-								defaultValues = defVals;
-							}
-							values = defaultValues;
+							partialIntersects = true;
 						}
-
-						Array.Copy(values, 0, row, startIdx, values.Length);
 					}
-					else
-					{
-						partialIntersects = true;
-					}
+				}
+				else
+				{
+					// no col grouping
+					var agg = lastRowGroup.Aggregates;
+					var values = agg.Value.Select(a => a.Value).ToArray();
+					if (values.Length != _data.DataFields.Length)
+						throw new Exception("mismatch in length..");
+					Array.Copy(values, 0, row, totalStartIdx, values.Length);
 				}
 
 				rows.Add(row);
@@ -156,7 +202,7 @@ namespace PivotDataExport
 
 		public Table<object?[]> GetTable_Array(bool createEmptyIntersects = false)
 		{
-			return GetTableCore((rows, tcols) => rows, createEmptyIntersects);
+			return GetTableCore((rows, tcols) => rows, createEmptyIntersects: createEmptyIntersects);
 		}
 
 		/*
@@ -217,13 +263,57 @@ namespace PivotDataExport
 			foreach (var oarr in t.Rows)
 				res.LoadDataRow(oarr, fAcceptChanges: false /* ?? */);
 
-//			if (t.GrandTotalRow != null)
-//				res.LoadDataRow(t.GrandTotalRow, fAcceptChanges: false /* ?? */);
+			//			if (t.GrandTotalRow != null)
+			//				res.LoadDataRow(t.GrandTotalRow, fAcceptChanges: false /* ?? */);
 
 			res.EndLoadData();
 
 			return res;
 		}
+
+		/// <summary>
+		/// Get top parent first and me last
+		/// </summary>
+		internal static IEnumerable<IGroup<TRow, TAgg>> GetParentsAndMe(IGroup<TRow, TAgg> grp)//bool includeMeIfRoot)
+		{
+			if (grp.Field == null)//.IsRoot)
+			{
+				//if (includeMeIfRoot)
+				//	return this.Yield();
+				//else
+				return Enumerable.Empty<IGroup<TRow, TAgg>>();
+			}
+
+			var st = new Stack<IGroup<TRow, TAgg>>();
+
+			var current = grp;
+			do
+			{
+				st.Push(current);
+				current = current.Parent!;
+			} while (current != null);// !current.IsRoot);
+
+			return st;
+		}
+
+		static IEnumerable<IGroup<TRow, TAgg>> Flatten(IEnumerable<IGroup<TRow, TAgg>> collection)
+		{
+			foreach (var o in collection)
+			{
+				foreach (var t in Flatten(o.Children))
+					yield return t;
+
+				yield return o;
+				//if (o. is IEnumerable<IGroup<TAgg>> oo)// oo && !(o is T))
+				//{
+				//	foreach (var t in Flatten(oo))
+				//		yield return t;
+				//}
+				//else
+				//	yield return o;
+			}
+		}
+
 
 		/// <summary>
 		/// Variable columns\every row may  have different columns
@@ -234,114 +324,115 @@ namespace PivotDataExport
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();
 
-			var lastColGroupsSorted = SortGroups(_data.LastColGroups, _data.ColFieldsInGroupOrder).ToList();
+			var lastRowGroups = _data.LastRows.ToList();
 
-			//object?[] defaultValues = null!;
-			foreach (var rg in SortGroups(_data.LastRowGroups, _data.RowFieldsInGroupOrder))
+			if (!lastRowGroups.Any())
 			{
-				KeyValueList r = new();
-				rows.Add(r);
+				var row = new Row<TRow, TAgg>();
+				row.ColumnAggregates = _data.Table.ColumnAggregates;// lastColGroups.Cast<Column<TAgg>>(); // not _data.PT.ColumnAggregates?? that seems to work too.....
+				row.Aggregates = _data.Table.Aggregates;
+				lastRowGroups.Add(row);
+			}
 
-				foreach (Group<TRow> parentG in rg.GetParentsAndMe())//includeMeIfRoot: false))
+			foreach (var rg in lastRowGroups.Cast<Row<TRow, TAgg>>())
+			{
+				KeyValueList row = new();
+				rows.Add(row);
+
+				foreach (var parentG in GetParentsAndMe(rg))//includeMeIfRoot: false))
 				{
-					r.Add(parentG.Field.Name, parentG.Field.GetDisplayValue(parentG.Key));
+					row.Add(parentG.Field.Name, parentG.Field.GetDisplayValue(parentG.Value));
 				}
 
-				Dictionary<Group<TRow>, KeyValueList> groupToKeyVals = null!;
-				Dictionary<Group<TRow>, List<KeyValueList>> groupToLists = new();
+				Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals = null!;
+				Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists = new();
 
-				// Add the data
-				foreach (var cg in lastColGroupsSorted)
+				if (_data.LastCols.Any())
 				{
-					var hasData = rg.IntersectData.TryGetValue(cg, out var data);
-					// createEmptyIntersects did work here, but not in Presentation2, so removed from here for now. Maybe add back again if find out how to implement in Presentation2
-					if (hasData)// || createEmptyIntersects)
-					{
-						//if (!hasData)
-						//{
-						//	if (defaultValues == null)
-						//	{
-						//		// aggregate with no rows = default value
-						//		var defVals = new object?[_data.dataFields.Length];
-						//		int i = 0;
-						//		foreach (var df in _data.dataFields)
-						//		{
-						//			defVals[i++] = df.GetValue(Enumerable.Empty<TRow>());
-						//		}
-						//		defaultValues = defVals;
-						//	}
-						//	data = defaultValues;
-						//}
-
-						KeyValueList keyVals = GetCreateKeyVals(cg, r, ref groupToKeyVals, groupToLists);
-
-						// dataField order
-						foreach (var z in _data.DataFields.ZipForceEqual(data, (f, s) => new { First = f, Second = s }))
-						{
-							keyVals.Add(z.First.Name, z.Second);
-						}
-					}
-					else
-					{ 
-						partialIntersects = true;
-					}
+					foreach (var cg in rg.ColumnAggregates)
+						AddData(row, cg, groupToLists, ref groupToKeyVals);
+				}
+				else
+				{
+					foreach (var cg in rg.Aggregates.Value)
+						row.Add(cg);
 				}
 			}
+
+			var lastColGroupsSorted = _data.LastCols.ToList();
 
 			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
 			return new Table<KeyValueList>()
 			{
 				Rows = rows.ToList(),
-				PartialRows = true, 
+				PartialRows = true,
 				PartialIntersects = partialIntersects,
 				Columns = tableCols,
 				HeaderRow = new KeyValueList(tableCols.Select(c => new KeyValuePair<string, object?>(c.Name, null)))
 			};
 		}
 
-		private KeyValueList GetCreateKeyVals(Group<TRow> cg, 
-			KeyValueList row,
-			ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, 
-			Dictionary<Group<TRow>, List<KeyValueList>> groupToLists
+		Row<TRow, TAgg> _fakeRoot = new Row<TRow, TAgg>();
+
+		private void AddData(KeyValueList row, 
+			Column<TRow, TAgg> cg, 
+			Dictionary<IGroup<TRow, TAgg>,
+			List<KeyValueList>> groupToLists, 
+			ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals
 			)
 		{
-			if (cg.IsRoot)
+			KeyValueList keyVals = GetCreateKeyVals(cg, row, ref groupToKeyVals, groupToLists);
+
+			// only leafs
+			if (!cg.Children.Any())
 			{
-				return row;
+				foreach (var v in cg.Aggregates.Value)
+				{
+					keyVals.Add(v);
+				}
 			}
 
-			KeyValueList keyVals = null!;
-
-			foreach (var colGrp in cg.GetParentsAndMe())//includeMeIfRoot: true))
+			foreach (var child in cg.Children)
 			{
-				// add the root group
-				if (groupToKeyVals == null)
-				{
-					groupToKeyVals = new();
-					groupToKeyVals.Add(colGrp.ParentGroup!, row);
-					if (!colGrp.ParentGroup!.IsRoot)
-						throw new Exception("not root");
-				}
+				AddData(keyVals, child, groupToLists, ref groupToKeyVals);
+			}
+		}
 
-				if (!groupToLists.TryGetValue(colGrp.ParentGroup!, out var list))
-				{
-					list = new();
-					groupToLists.Add(colGrp.ParentGroup!, list);
+		private KeyValueList GetCreateKeyVals(IGroup<TRow, TAgg> cg, 
+			KeyValueList row, 
+			ref Dictionary<IGroup<TRow, TAgg>, KeyValueList> groupToKeyVals, 
+			Dictionary<IGroup<TRow, TAgg>, List<KeyValueList>> groupToLists
+			)
+		{
+			var cg_ParentOrFake = cg.Parent ?? _fakeRoot;
 
-					var parKeyVals = groupToKeyVals[colGrp.ParentGroup!];
-					parKeyVals.Add(colGrp.Field.Name + "List", list);
-				}
+			// add the root group
+			if (groupToKeyVals == null)
+			{
+				groupToKeyVals = new();
+				groupToKeyVals.Add(cg_ParentOrFake, row);
+				if (cg.Parent != null)
+					throw new Exception("not root");
+			}
 
-				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals!))
-				{
-					keyVals = new KeyValueList();
-					keyVals.Add(colGrp.Field.Name, colGrp.Key);
+			if (!groupToLists.TryGetValue(cg_ParentOrFake, out var list))
+			{
+				list = new();
+				groupToLists.Add(cg_ParentOrFake, list);
 
-					list.Add(keyVals);
+				var parKeyVals = groupToKeyVals[cg_ParentOrFake];
+				parKeyVals.Add(cg.Field.Name + "List", list);
+			}
 
-					groupToKeyVals.Add(colGrp, keyVals);
-				}
+			if (!groupToKeyVals.TryGetValue(cg, out var keyVals))
+			{
+				keyVals = new KeyValueList();
+				keyVals.Add(cg.Field.Name, cg.Value);
+
+				list.Add(keyVals);
+
+				groupToKeyVals.Add(cg, keyVals);
 			}
 
 			return keyVals;
@@ -392,7 +483,7 @@ namespace PivotDataExport
 			return combName;
 		}
 
-		private List<TableColumn> CreateTableCols(Field<TRow>[] dataFields, Field<TRow>[] rowGroupFields, List<Group<TRow>> lastColGroups /* sorted */)
+		private List<TableColumn> CreateTableCols(Field<TRow>[] dataFields, Field<TRow>[] rowGroupFields, List<IGroup<TRow, TAgg>> lastColGroups /* sorted */)
 		{
 			List<TableColumn> tablecols = new();
 			// fill rowGroups
@@ -400,92 +491,61 @@ namespace PivotDataExport
 			tablecols.AddRange(rowGroupFields.Select(f => f.ToTableColumn()));
 
 			List<TableColumn> tablecols_after = new();
-			// dont get this logix...
-			foreach (var gr in lastColGroups)
+
+			if (lastColGroups.Any())
 			{
-				if (gr.IsRoot)
+				// dont get this logix...
+				foreach (var gr in lastColGroups)
 				{
-					tablecols_after.AddRange(dataFields.Select(df => df.ToTableColumn()));
-				}
-				else
-				{
-					Stack<TableGroup> tgs = new();
-
-
-					var parent = gr;
-					do
+					//if (gr.Parent == null)//.IsRoot)
+					//{
+					//	tablecols_after.AddRange(dataFields.Select(df => df.ToTableColumn()));
+					//}
+					//else
 					{
-						tgs.Push(new TableGroup
+						Stack<TableGroup> tgs = new();
+
+
+						var parent = gr;
+						do
 						{
-							Name = parent.Field.Name,
-							//DataType = parent.Field.DataType,
-							Value = parent.Key
-						});
+							tgs.Push(new TableGroup
+							{
+								Name = parent.Field.Name,
+								//DataType = parent.Field.DataType,
+								Value = parent.Value
+							});
 
-						parent = parent.ParentGroup;
-					} while (parent != null && !parent.IsRoot);
+							parent = parent.Parent;
+						} while (parent != null);// && !parent.IsRoot);
 
-					foreach (var dataField in dataFields)
-					{
-						var combName = ColumnNameGenerator(tgs, dataField.Name);
+						foreach (var dataField in dataFields)
+						{
+							var combName = ColumnNameGenerator(tgs, dataField.Name);
 
-						tablecols_after.Add(dataField.ToTableColumn(combName, tgs.Select(tg => tg.Value).ToArray()));
+							tablecols_after.Add(dataField.ToTableColumn(combName, tgs.Select(tg => tg.Value).ToArray()));
+						}
 					}
 				}
+
+				//			tablecols_after = SortColGroupsCols(tablecols_after, colGroupFields);
+
+				tablecols.AddRange(tablecols_after);
 			}
+			else
+			{
+				// no col grouping
+				foreach (var dataField in dataFields)
+				{
+					//var combName = ColumnNameGenerator(tgs, dataField.Name);
 
-			//			tablecols_after = SortColGroupsCols(tablecols_after, colGroupFields);
-
-			tablecols.AddRange(tablecols_after);
+					tablecols.Add(dataField.ToTableColumn());
+						//dataField.ToTableColumn(combName, tgs.Select(tg => tg.Value).ToArray()));
+				}
+			}
 
 			return tablecols;
 		}
 
-		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields) where TEle : Group<TRow>
-		{
-			return SortGroups<TEle>(grops, groupFields, ele => ele);
-		}
-
-		/// <summary>
-		/// Sort the last group level.
-		/// Sort by checking parent values
-		/// </summary>
-		private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields, Func<TEle, Group<TRow>> getGroup)
-		{
-			//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
-
-			//var sortFields = _fields.Where(f => f.Grouping == Grouping.Col)
-			//	.Where(f => f.SortOrder != SortOrder.None)
-			//	.OrderBy(f => f.SortIndex)
-			//	.ToArray();
-
-			var sortedGroupFields = groupFields.Where(f => f.SortOrder != SortOrder.None);
-
-			if (sortedGroupFields.Any())
-			{
-				IOrderedEnumerable<TEle> sorter = null!;
-
-				int colFieldIdx = 0;
-				foreach (var colField in sortedGroupFields)
-				{
-					int colFieldIdx_local_capture = colFieldIdx;
-
-					if (sorter == null)
-						sorter = colField.SortOrder == SortOrder.Asc ?
-							grops.OrderBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
-							: grops.OrderByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
-					else
-						sorter = colField.SortOrder == SortOrder.Asc ?
-							sorter.ThenBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
-							: sorter.ThenByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
-
-					colFieldIdx++;
-				}
-
-				grops = sorter;//.ToList(); // tolist needed?
-			}
-
-			return grops;
-		}
 	}
 }

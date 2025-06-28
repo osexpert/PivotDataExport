@@ -20,7 +20,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>osexpert</Company>      
     
-    <VersionPrefix>0.0.2</VersionPrefix>
+    <VersionPrefix>0.0.3</VersionPrefix>
     <PackageTags>group aggregate sort pivot json xml csv data-table export</PackageTags>
     <Description>Idea: send report/field definition to an api. Get json, xml, csv etc. back</Description>        
 		        

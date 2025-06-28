@@ -9,14 +9,14 @@ namespace PivotDataExport
 	/// Group and aggregate rows (uses PivotTableBuilder/Ptb)
 	/// </summary>
 	/// <typeparam name="TRow"></typeparam>
-	public class PivoterPtb<TRow> where TRow : class // class notnull
+	internal class PivotBuilderPtb<TRow> where TRow : class // class notnull
 	{
 		List<Field<TRow>> _fields;
 		IEnumerable<TRow> _rows;
 
 		public List<Field<TRow>> Fields => _fields;
 
-		public PivoterPtb(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
+		public PivotBuilderPtb(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 		{
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
@@ -112,7 +112,7 @@ namespace PivotDataExport
 		}
 	}
 
-	public class GroupedDataPtb<TRow, TAggregates> where TRow : class
+	internal class GroupedDataPtb<TRow, TAggregates> where TRow : class
 	{
 		public Field<TRow>[] RowFieldsInGroupOrder = null!;
 		public Field<TRow>[] ColFieldsInGroupOrder = null!;

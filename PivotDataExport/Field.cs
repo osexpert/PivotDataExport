@@ -44,7 +44,7 @@ namespace PivotDataExport
 		internal IComparer<object?> SortComparer = Comparer<object?>.Default;
 
 		/// <summary>
-		/// Currently unused. But imagine a field being DateTime but the display type is DateOnly.
+		/// Example: field being DateTime but the display type is DateOnly.
 		/// </summary>
 		public Type DisplayType { get; internal set; } = null!;
 

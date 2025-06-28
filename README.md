@@ -57,12 +57,12 @@ Create fields:
 
 Group, aggregate, sort:
 
-	var pivot = new Pivoter<CsvRow>(salesRecords, fields);
-	var data = pivot.GetGroupedData();
-	var pres = new Presentation<CsvRow>(data);
+	var pb = new PivotBuilder<CsvRow>(salesRecords, fields);
+	var data = pb.GetGroupedData();
+	var tb = new TableBuilder<CsvRow>(data);
 Get table:
 	
-	var nested_kv_tbl = pres.GetTable_NestedKeyValueList_VariableColumns();
+	var nested_kv_tbl = tb.GetTable_NestedKeyValueList_VariableColumns();
 
 Code:
 
@@ -136,7 +136,7 @@ Code:
 
 Get table:
 
-	var flat_kv_tbl = pres.GetTable_FlatKeyValueList_CompleteColumns();
+	var flat_kv_tbl = tb.GetTable_FlatKeyValueList_CompleteColumns();
 
 Code:
 
@@ -234,7 +234,7 @@ Produce:
 
 Get table:
 
-	var array_tbl = pres.GetTable_Array();
+	var array_tbl = tb.GetTable_Array();
 
 Code:
 

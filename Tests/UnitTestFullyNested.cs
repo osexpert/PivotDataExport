@@ -269,8 +269,8 @@ namespace Tests
 			var gdata_fis = pivoter.GetGroupedData();
 			var gdata_ptb = pivoter2.GetGroupedData();
 
-			var pres_fis = new Presentation<Test1Row>(gdata_fis);
-			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
+			var pres_fis = new TableBuilder<Test1Row>(gdata_fis);
+			var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 			// FIXME: currently no supporty for SortOrder
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
@@ -306,7 +306,7 @@ namespace Tests
 			public int RowId { get; set; }
 		}
 
-		private static (Pivoter<Test1Row>, PivoterPtb<Test1Row>) GetPivoterTestData()
+		private static (PivotBuilder<Test1Row>, PivotBuilderPtb<Test1Row>) GetPivoterTestData()
 		{
 			var r1 = new Test1Row { Site = "Site1", Unit = "Unit1", Group = "Group1", Name = "Name1", Number = 1, Weight = 1.1, Country = "Oman", Company = "VG" };
 			var r2 = new Test1Row { Site = "Site1", Unit = "Unit1", Group = "Group2", Name = "Name1", Number = 2, Weight = 1.2, Country = "Oman", Company = "Soft" };
@@ -339,8 +339,8 @@ namespace Tests
 			//var p10_v2 = new Field<Test1Row, string>(nameof(Test1Row.RowId), r => r.RowId.ToString(), Aggregators.CommaList);
 			var fields = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p10 };
 
-			var piv = new Pivoter<Test1Row>(rows, fields);
-			var piv2 = new PivoterPtb<Test1Row>(rows, fields);
+			var piv = new PivotBuilder<Test1Row>(rows, fields);
+			var piv2 = new PivotBuilderPtb<Test1Row>(rows, fields);
 			return (piv, piv2);
 		}
 	}

@@ -1,3 +1,10 @@
+## 0.0.3
+* Rename Pivoter -> PivotBuider
+* Rename Presentation -> TableBuilder
+* Make the Pivoter2\PivoterPtb and co. internal, its only used for regression testing.
+* GetTable_NestedKeyValueList_VariableColumns: add argument (bool createEmptyIntersects = false) back again
+* Rename GetGroupedData_FastIntersect -> GetGroupedData
+
 ## 0.0.2
 * Change new Field syntax, from
   `new Field<CsvRow, string>(nameof(CsvRow.Region), rows => Aggregators.CommaList(rows, row => row.Region)`

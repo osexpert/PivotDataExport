@@ -2,6 +2,10 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleToAttribute("Tests")]
+[assembly: InternalsVisibleToAttribute("Examples")]
 
 namespace PivotDataExport
 {

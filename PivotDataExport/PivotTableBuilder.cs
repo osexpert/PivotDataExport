@@ -38,7 +38,7 @@ namespace PivotDataExport
 	/// </summary>
 	/// <typeparam name="TRow"></typeparam>
 	/// <typeparam name="TAgg"></typeparam>
-	public class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggregates>
+	internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggregates>
 		   where TRow : class
 	{
 		private readonly IList<(Func<TRow, object?>, Field<TRow>)> _rowFunctions;
@@ -192,7 +192,7 @@ namespace PivotDataExport
 		Field<TRow> Field { get; }
 	}
 
-	public class Row<TRow, TAgg> : IGroup<TRow, TAgg> where TRow : class
+	internal class Row<TRow, TAgg> : IGroup<TRow, TAgg> where TRow : class
 	{
 		internal Row() { }
 		public object? Value { get; set; }
@@ -208,7 +208,7 @@ namespace PivotDataExport
 		IGroup<TRow, TAgg>? IGroup<TRow, TAgg>.Parent => Parent;
 	}
 
-	public class Column<TRow, TAgg> : IGroup<TRow, TAgg> where TRow : class
+	internal class Column<TRow, TAgg> : IGroup<TRow, TAgg> where TRow : class
 	{
 		internal Column() { }
 		public object? Value { get; set; }
@@ -226,7 +226,7 @@ namespace PivotDataExport
 	// This one is kind of similar to a row and share all 3 things with a row: Aggregates, ColumnAggregates and Rows (Children)
 	// Could this be extracted into an iface? Or could a row inherit PivotTable?
 	// So its kind of weid that the table is kind of a row?
-	public class PivotTable<TRow, TAgg> where TRow : class
+	internal class PivotTable<TRow, TAgg> where TRow : class
 	{
 		internal PivotTable() { }
 		public TAgg Aggregates { get; set; }

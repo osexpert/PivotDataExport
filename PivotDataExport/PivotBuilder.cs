@@ -9,14 +9,14 @@ namespace PivotDataExport
 	/// Group and aggregate rows (fast intersect)
 	/// </summary>
 	/// <typeparam name="TRow"></typeparam>
-	public class Pivoter<TRow> where TRow : class // class notnull
+	public class PivotBuilder<TRow> where TRow : class // class notnull
 	{
 		List<Field<TRow>> _fields;
 		IEnumerable<TRow> _rows;
 
 		public List<Field<TRow>> Fields => _fields;
 
-		public Pivoter(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
+		public PivotBuilder(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 		{
 			//			if (list is not IEnumerable<T>)
 			//			throw new ArgumentException("list must be IEnumerable<T>");
@@ -247,7 +247,6 @@ namespace PivotDataExport
 						{
 							//res.Rows = g.Rows;// new List<T>(g.Rows);//.ToList(); // clone?
 							res.Rows = g.Rows.ToList();
-
 						}
 					}
 				}

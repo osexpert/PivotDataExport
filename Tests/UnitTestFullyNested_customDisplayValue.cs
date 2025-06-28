@@ -320,8 +320,8 @@ namespace Tests
 			var gdata_fis = pivoter.GetGroupedData();
 			var gdata_ptb = pivoter2.GetGroupedData();
 
-			var pres_fis = new Presentation<Test1Row>(gdata_fis);
-			var pres_ptb = new PresentationPtb<Test1Row>(gdata_ptb);
+			var pres_fis = new TableBuilder<Test1Row>(gdata_fis);
+			var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 			// FIXME: currently no support for SortOrder
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
@@ -356,7 +356,7 @@ namespace Tests
 			public DateTime Time { get; set; }
 		}
 
-		private static (Pivoter<Test1Row>, PivoterPtb<Test1Row>) GetPivoterTestData()
+		private static (PivotBuilder<Test1Row>, PivotBuilderPtb<Test1Row>) GetPivoterTestData()
 		{
 			var r1 = new Test1Row { Site = "Site1", Unit = "Unit1", Group = "Group1", Name = "Name1", Number = 1, Weight = 1.1, Country = "Oman", Company = "VG", ItemId = 1, Time = new DateTime(2024, 1, 2, 3, 4, 5) };
 			var r2 = new Test1Row { Site = "Site1", Unit = "Unit1", Group = "Group2", Name = "Name1", Number = 2, Weight = 1.2, Country = "Oman", Company = "Soft", ItemId = 1, Time = new DateTime(2024, 1, 2, 3, 4, 5) };
@@ -393,8 +393,8 @@ namespace Tests
 
 			var fields = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p15, p16, p17 };
 
-			var piv = new Pivoter<Test1Row>(rows, fields);
-			var piv2 = new PivoterPtb<Test1Row>(rows, fields);
+			var piv = new PivotBuilder<Test1Row>(rows, fields);
+			var piv2 = new PivotBuilderPtb<Test1Row>(rows, fields);
 			return (piv, piv2);
 		}
 	}

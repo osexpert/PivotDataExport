@@ -80,8 +80,8 @@ namespace Examples
 
 			////			TypeValue: object, name, fullname
 
-			var pivot = new Pivoter<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
-			var pivot2 = new PivoterPtb<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
+			var pivot = new PivotBuilder<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
+			var pivot2 = new PivotBuilderPtb<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
 			var s3 = Stopwatch.StartNew();
 			var gdata_ptb = pivot2.GetGroupedData();
@@ -118,14 +118,14 @@ namespace Examples
 
 			var s2 = Stopwatch.StartNew();
 
-			var pres_fis = new Presentation<CsvRow>(gdata_fis);
+			var pres_fis = new TableBuilder<CsvRow>(gdata_fis);
 			var nested_kv_tbl = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 
 			s2.Stop();
 
 			var s4 = Stopwatch.StartNew();
 
-			var pres_ptb = new PresentationPtb<CsvRow>(gdata_ptb);
+			//var pres_ptb = new PresentationPtb<CsvRow>(gdata_ptb);
 			var nested_kv_tbl2 = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
 
 			s4.Stop();
