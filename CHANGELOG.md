@@ -1,3 +1,6 @@
+## 0.0.4
+* Update example in readme
+
 ## 0.0.3
 * Rename Pivoter -> PivotBuider
 * Rename Presentation -> TableBuilder
