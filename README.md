@@ -62,7 +62,7 @@ Group, aggregate, sort:
 	var tb = new TableBuilder<CsvRow>(data);
 Get table:
 	
-	var nested_kv_tbl = tb.GetTable_NestedKeyValueList_VariableColumns();
+	var nested_kv_tbl = tb.GetNestedKeyValueListTable();
 
 Code:
 
@@ -136,7 +136,7 @@ Code:
 
 Get table:
 
-	var flat_kv_tbl = tb.GetTable_FlatKeyValueList_CompleteColumns();
+	var flat_kv_tbl = tb.GetKeyValueListTable();
 
 Code:
 
@@ -234,7 +234,7 @@ Produce:
 
 Get table:
 
-	var array_tbl = tb.GetTable_Array();
+	var array_tbl = tb.GetObjectArrayTable();
 
 Code:
 
