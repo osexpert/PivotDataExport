@@ -30,7 +30,7 @@ namespace PivotDataExport
 
 
 		/// <summary>
-		/// At least one intersect without data. Means that createEmptyIntersects = false.
+		/// At least one intersect without data. Means that padEmptyIntersects = false.
 		/// Used for debug\informational purpose.
 		/// </summary>
 		[JsonIgnore]

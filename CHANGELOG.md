@@ -4,6 +4,11 @@
 * Make the Pivoter2\PivoterPtb and co. internal, its only used for regression testing.
 * GetTable_NestedKeyValueList_VariableColumns: add argument (bool createEmptyIntersects = false) back again
 * Rename GetGroupedData_FastIntersect -> GetGroupedData
+* Rename GetTable_Array -> GetObjectArrayTable
+* Rename createEmptyIntersects -> padEmptyIntersects
+* Rename GetTable_FlatKeyValueList_CompleteColumns -> GetKeyValueListTable
+* Rename GetTable_NestedKeyValueList_VariableColumns -> GetNestedKeyValueListTable
+* Rename GetTableCore => GetTable
 
 ## 0.0.2
 * Change new Field syntax, from

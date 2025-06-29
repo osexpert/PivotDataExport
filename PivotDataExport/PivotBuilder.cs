@@ -109,7 +109,7 @@ namespace PivotDataExport
 		/// GetGroupedData (fast intersect)
 		/// </summary>
 		/// <returns></returns>
-		public GroupedData<TRow> GetGroupedData()//bool createEmptyIntersects = false)
+		public GroupedData<TRow> GetGroupedData()//bool padEmptyIntersects = false)
 		{
 			Validate();
 

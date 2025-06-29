@@ -326,7 +326,7 @@ namespace Tests
 			// FIXME: currently no support for SortOrder
 			var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
 
-			var nested_tbl_fis = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
+			var nested_tbl_fis = pres_fis.GetNestedKeyValueListTable();
 
 			var json_ptb = ToJson(nested_tbl_ptb);
 			var json_fis = ToJson(nested_tbl_fis);

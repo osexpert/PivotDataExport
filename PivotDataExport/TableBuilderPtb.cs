@@ -38,7 +38,7 @@ namespace PivotDataExport
 		/// <typeparam name="TTableRow"></typeparam>
 		/// <param name="toRow"></param>
 		/// <returns></returns>
-		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool createEmptyIntersects = false)
+		public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool padEmptyIntersects = false)
 			where TTableRow : class, IEnumerable
 		{
 			var lastRowGroups = _data.LastRows;// OrDefault() ?? [];
@@ -61,7 +61,7 @@ namespace PivotDataExport
 			// But some other code could produce json nested objects...
 
 			List<object?[]> rows = GetFullRows(_data.DataFields, _data.RowFieldsInGroupOrder, lastRowGroupsSorted, lastColGroupsSorted, out var partialIntersects, 
-				createEmptyIntersects: createEmptyIntersects);
+				padEmptyIntersects: padEmptyIntersects);
 
 			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
@@ -83,7 +83,7 @@ namespace PivotDataExport
 			List<IGroup<TRow, TAgg>> lastRowGroups /* sorted */, 
 			List<IGroup<TRow, TAgg>> lastColGroups /* sorted */,
 			out bool partialIntersects, 
-			bool createEmptyIntersects = false
+			bool padEmptyIntersects = false
 			)
 		{
 			partialIntersects = false;
@@ -146,13 +146,13 @@ namespace PivotDataExport
 						var startIdx = grpStartIdx[lastColGroup];
 
 						var hasData = intersectData.TryGetValue(lastColGroup.Value, out var data);
-						if (hasData || createEmptyIntersects)
+						if (hasData || padEmptyIntersects)
 						{
 							object?[]? values = null;
 
 							if (!hasData)
 							{
-								// createEmptyIntersects is true and no data
+								// padEmptyIntersects is true and no data
 								// write default values
 								if (defaultValues == null)
 								{
@@ -179,7 +179,7 @@ namespace PivotDataExport
 						}
 						else
 						{
-							// Use createEmptyIntersects = true if you always want data (instead of lack of data)
+							// Use padEmptyIntersects = true if you always want data (instead of lack of data)
 							partialIntersects = true;
 						}
 					}
@@ -200,9 +200,9 @@ namespace PivotDataExport
 			return rows;
 		}
 
-		public Table<object?[]> GetTable_Array(bool createEmptyIntersects = false)
+		public Table<object?[]> GetTable_Array(bool padEmptyIntersects = false)
 		{
-			return GetTableCore((rows, tcols) => rows, createEmptyIntersects: createEmptyIntersects);
+			return GetTableCore((rows, tcols) => rows, padEmptyIntersects: padEmptyIntersects);
 		}
 
 		/*
@@ -235,7 +235,7 @@ namespace PivotDataExport
 		/// Every row has all columns
 		/// </summary>
 		/// <returns></returns>
-		public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns(bool createEmptyIntersects = false)
+		public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns(bool padEmptyIntersects = false)
 		{
 			return GetTableCore((row, tcols) =>
 			{
@@ -245,12 +245,12 @@ namespace PivotDataExport
 
 				return dictRow;
 
-			}, createEmptyIntersects: createEmptyIntersects);
+			}, padEmptyIntersects: padEmptyIntersects);
 		}
 
-		public DataTable GetDataTable(bool createEmptyIntersects = false)
+		public DataTable GetDataTable(bool padEmptyIntersects = false)
 		{
-			var t = GetTable_Array(createEmptyIntersects: createEmptyIntersects);
+			var t = GetTable_Array(padEmptyIntersects: padEmptyIntersects);
 
 			DataTable res = new("row");
 
@@ -319,7 +319,7 @@ namespace PivotDataExport
 		/// Variable columns\every row may  have different columns
 		/// </summary>
 		/// <returns></returns>
-		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()//bool createEmptyIntersects = false)
+		public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()//bool padEmptyIntersects = false)
 		{
 			bool partialIntersects = false;
 			List<KeyValueList> rows = new List<KeyValueList>();

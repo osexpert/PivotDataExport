@@ -53,7 +53,7 @@ namespace PivotDataExport
 		/// PS: this seems to be a lot slower than Kazinix.PivotTable.Test.cs? It was because of using Yield/IEnumerable to get row value. Now has own method for this.
 		/// </summary>
 		/// <returns></returns>
-		public GroupedDataPtb<TRow, Lazy<KeyValueList>> GetGroupedData()//bool createEmptyIntersects = false)
+		public GroupedDataPtb<TRow, Lazy<KeyValueList>> GetGroupedData()//bool padEmptyIntersects = false)
 		{
 			Validate();
 

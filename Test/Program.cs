@@ -119,14 +119,14 @@ namespace Examples
 			var s2 = Stopwatch.StartNew();
 
 			var pres_fis = new TableBuilder<CsvRow>(gdata_fis);
-			var nested_kv_tbl = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
+			var nested_kv_tbl = pres_fis.GetNestedKeyValueListTable();
 
 			s2.Stop();
 
 			var s4 = Stopwatch.StartNew();
 
 			//var pres_ptb = new PresentationPtb<CsvRow>(gdata_ptb);
-			var nested_kv_tbl2 = pres_fis.GetTable_NestedKeyValueList_VariableColumns();
+			var nested_kv_tbl2 = pres_fis.GetNestedKeyValueListTable();
 
 			s4.Stop();
 
@@ -159,7 +159,7 @@ namespace Examples
 			//	nested_kv_tbl.WriteCsv(f);
 			//}
 
-			var flat_kv_tbl = pres_fis.GetTable_FlatKeyValueList_CompleteColumns();
+			var flat_kv_tbl = pres_fis.GetKeyValueListTable();
 
 			using (var f = File.Open(@"d:\pivottest\test5mill_flat_kv.json", FileMode.Create))
 			{
@@ -176,7 +176,7 @@ namespace Examples
 				flat_kv_tbl.WriteCsv(f);
 			}
 
-			var array_tbl = pres_fis.GetTable_Array();
+			var array_tbl = pres_fis.GetObjectArrayTable();
 
 			using (var f = File.Open(@"d:\pivottest\test5mill_array.json", FileMode.Create))
 			{
