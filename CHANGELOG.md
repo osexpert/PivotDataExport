@@ -2,7 +2,7 @@
 * Update example in readme
 
 ## 0.0.3
-* Rename Pivoter -> PivotBuider
+* Rename Pivoter -> PivotBuilder
 * Rename Presentation -> TableBuilder
 * Make the Pivoter2\PivoterPtb and co. internal, its only used for regression testing.
 * GetTable_NestedKeyValueList_VariableColumns: add argument (bool createEmptyIntersects = false) back again
