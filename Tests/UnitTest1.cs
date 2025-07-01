@@ -215,7 +215,9 @@ namespace Tests
 			var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable();
+			dt_fis.TableName = "row";
 			var dt_ptb = pres_ptb.GetDataTable();
+			dt_ptb.TableName = "row";
 
 			string xml_ptb = dt_ptb.ToXml();
 			string xml_fis = dt_fis.ToXml();
@@ -496,7 +498,9 @@ namespace Tests
 			var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable(padEmptyIntersects: true);
+			dt_fis.TableName = "row";
 			var dt_ptb = pres_ptb.GetDataTable(padEmptyIntersects: true);
+			dt_ptb.TableName = "row";
 
 			string xml_ptb = dt_ptb.ToXml();
 			string xml_fis = dt_fis.ToXml();
@@ -638,7 +642,9 @@ namespace Tests
 			var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable();
+			dt_fis.TableName = "row";
 			var dt_ptb = pres_ptb.GetDataTable();
+			dt_ptb.TableName = "row";
 
 			string xml_fis = dt_fis.ToXml();
 			string xml_ptb = dt_ptb.ToXml();
@@ -745,7 +751,9 @@ namespace Tests
 			var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 			var dt_fis = pres_fis.GetDataTable();
+			dt_fis.TableName = "row";
 			var dt_ptb = pres_ptb.GetDataTable();
+			dt_ptb.TableName = "row";
 
 			string xml_ptb = dt_ptb.ToXml();
 			string xml_fis = dt_fis.ToXml();

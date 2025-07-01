@@ -20,7 +20,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>osexpert</Company>      
     
-    <VersionPrefix>0.0.4</VersionPrefix>
+    <VersionPrefix>0.0.5</VersionPrefix>
     <PackageTags>group aggregate sort pivot json xml csv data-table export</PackageTags>
     <Description>Dynamic group, aggregate, sort, pivot data. Output to json, xml, csv or via DataTable.</Description>        
 		        

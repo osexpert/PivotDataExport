@@ -1,3 +1,7 @@
+## 0.0.5
+* Add ListSuffix property
+* Change DataTable name from "row" to "Row"
+
 ## 0.0.4
 * Update example in readme
 

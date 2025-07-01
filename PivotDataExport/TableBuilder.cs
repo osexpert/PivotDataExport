@@ -206,7 +206,7 @@ namespace PivotDataExport
 		{
 			var t = GetObjectArrayTable(padEmptyIntersects: padEmptyIntersects);
 
-			DataTable res = new("row");
+			DataTable res = new("Row");
 
 			foreach (var f in t.Columns)
 			{
@@ -302,6 +302,8 @@ namespace PivotDataExport
 			};
 		}
 
+		public string ListSuffix { get; set; } = "List";
+
 		private KeyValueList GetCreateKeyVals(Group<TRow> cg, 
 			KeyValueList row,
 			ref Dictionary<Group<TRow>, KeyValueList> groupToKeyVals, 
@@ -332,7 +334,7 @@ namespace PivotDataExport
 					groupToLists.Add(colGrp.ParentGroup!, list);
 
 					var parKeyVals = groupToKeyVals[colGrp.ParentGroup!];
-					parKeyVals.Add(colGrp.Field.Name + "List", list);
+					parKeyVals.Add(colGrp.Field.Name + ListSuffix, list);
 				}
 
 				if (!groupToKeyVals.TryGetValue(colGrp, out keyVals!))
