@@ -384,7 +384,7 @@ namespace Tests
 			var p7 = new Field<Test1Row, int>(nameof(Test1Row.Number), r => r.Number, Enumerable.Sum);
 			var p8 = new Field<Test1Row, double>(nameof(Test1Row.Weight), r => r.Weight, Enumerable.Average);
 			var p9 = new Field<Test1Row, int>("RowCount", r => 1, Enumerable.Count);
-			var p10 = new Field<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, v => v.ToString(), Aggregators.CommaList);
+			var p10 = new Field<Test1Row, int, string>(nameof(Test1Row.RowId), r => r.RowId, Aggregators.CommaList);
 
 			var p15 = new Field<Test1Row, DateTime, string>("MaxTime", r => r.Time, Enumerable.Max, v => v.ToString("o"));
 			var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, Enumerable.Min, v => v.ToString("o"));

@@ -19,10 +19,26 @@ namespace PivotDataExport
 		//	return string.Join(", ", rows.Select(value).Distinct().OrderBy(v => v));
 		//}
 
-		public static string CommaList(IEnumerable<string> values)//, string noValue = "", string separator = ", ")
+		//public static string CommaList(IEnumerable<string> values)//, string noValue = "", string separator = ", ")
+		//{
+		//	if (GetCountZeroOrOneAndSingle(values, out var count, out var single))
+		//		return count == 0 ? "" : single!;
+
+		//	return string.Join(", ", values.Distinct().OrderBy(v => v));
+		//}
+
+		//public static string CommaList(IEnumerable<int> values)//, string noValue = "", string separator = ", ")
+		//{
+		//	if (GetCountZeroOrOneAndSingle(values, out var count, out var single))
+		//		return count == 0 ? "" : single!.ToString();
+
+		//	return string.Join(", ", values.Distinct().OrderBy(v => v));
+		//}
+
+		public static string CommaList<T>(IEnumerable<T> values)//, string noValue = "", string separator = ", ")
 		{
 			if (GetCountZeroOrOneAndSingle(values, out var count, out var single))
-				return count == 0 ? "" : single!;
+				return count == 0 ? "" : single!.ToString();
 
 			return string.Join(", ", values.Distinct().OrderBy(v => v));
 		}

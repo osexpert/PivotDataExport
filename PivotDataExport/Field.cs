@@ -163,25 +163,15 @@ namespace PivotDataExport
 		}
 	}
 
-	public class Field<TRow, TData> : Field<TRow> where TRow : class
+	public class Field<TRow, TData> : Field<TRow, TData, TData> where TRow : class
 	{
-		public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TData> getRowsValue)
+		public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TData> getRowsValue) 
+			: base(fieldName, getRowValue, getRowsValue)
 		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
-			DataType = typeof(TData);
-			DisplayType = typeof(TData);
 		}
-
 		public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TData> getRowsValue, Func<TData, TData> getDisplayValue)
+			: base(fieldName, getRowValue, getRowsValue, getDisplayValue)
 		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			GetRowsValue = rows => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
-			GetDisplayValue = v => getDisplayValue((TData)v);
-			DataType = typeof(TData);
-			DisplayType = typeof(TData);
 		}
 	}
 
@@ -201,28 +191,6 @@ namespace PivotDataExport
 			Name = fieldName;
 			GetRowValue = row => getRowValue(row);
 			GetRowsValue = rows => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
-			GetDisplayValue = v => getDisplayValue((TData)v);
-			DataType = typeof(TData);
-			DisplayType = typeof(TDisp);
-		}
-
-		//public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TDisp> getRowsValue, Func<TData, TDisp> getDisplayValue)
-		//{
-		//	Name = fieldName;
-		//	GetRowValue = row => getRowValue(row);
-		//	GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
-		//	GetDisplayValue = v => getDisplayValue((TData)v);
-		//	DataType = typeof(TData);
-		//	DisplayType = typeof(TDisp);
-		//}
-
-		public Field(string fieldName, Func<TRow, TData> getRowValue, Func<TData, TDisp> getDisplayValue, Func<IEnumerable<TDisp>, TDisp> getRowsValue)
-		{
-			Name = fieldName;
-			GetRowValue = row => getRowValue(row);
-			// FIXME: here we capture getRowValue/getDisplayValue when we should have used dynamic GetRowValue/GetDisplayValue...
-			// So if GetRowValue/GetDisplayValue is changed after this point, GetRowsValue won't get the message...
-			GetRowsValue = rows => getRowsValue(rows.Select(getRowValue).Select(getDisplayValue));
 			GetDisplayValue = v => getDisplayValue((TData)v);
 			DataType = typeof(TData);
 			DisplayType = typeof(TDisp);
