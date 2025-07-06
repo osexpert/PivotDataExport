@@ -145,9 +145,9 @@ namespace PivotDataExport
 
 		public void WriteXml(Stream s)
 		{
-			XmlSerializer xsSubmit = new XmlSerializer(this.GetType());
+			var xsSubmit = new XmlSerializer(this.GetType());
 
-			using (XmlTextWriter writer = new XmlTextWriter(s, new UTF8Encoding(false)) { Formatting = Formatting.Indented })
+			using (var writer = new XmlTextWriter(s, new UTF8Encoding(false)) { Formatting = Formatting.Indented })
 			{
 				xsSubmit.Serialize(writer, this);
 			}
@@ -155,10 +155,10 @@ namespace PivotDataExport
 
 		public string ToXml()
 		{
-			XmlSerializer xsSubmit = new XmlSerializer(this.GetType());
+			var xsSubmit = new XmlSerializer(this.GetType());
 			using (var sww = new ExtentedStringWriter(Encoding.UTF8))
 			{
-				using (XmlTextWriter writer = new XmlTextWriter(sww) { Formatting = Formatting.Indented })
+				using (var writer = new XmlTextWriter(sww) { Formatting = Formatting.Indented })
 				{
 					xsSubmit.Serialize(writer, this);
 					return sww.ToString();

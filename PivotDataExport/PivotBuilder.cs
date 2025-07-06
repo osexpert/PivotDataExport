@@ -37,7 +37,7 @@ namespace PivotDataExport
 
 		private List<List<Group<TRow>>> GroupRows(IEnumerable<Field<TRow>> fields, RootType rootType)
 		{
-			List<Group<TRow>> lastGroups = new List<Group<TRow>>();
+			var lastGroups = new List<Group<TRow>>();
 			lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
 
 			var res = GroupRows(lastGroups, fields);
@@ -125,7 +125,7 @@ namespace PivotDataExport
 
 			Dictionary<(Group<TRow>?, object?), Group<TRow>>[] htSynthMergedAllColGroups = new Dictionary<(Group<TRow>?, object?), Group<TRow>>[colFieldsInGroupOrder.Length];
 
-			var rootColGroup = new Group<TRow> { Rows = _rows, RootType = RootType.Col };
+			var rootColGroup = new Group<TRow> { Rows = _rows, RootType = RootType.Column };
 
 			foreach (var lastRowThenColGroup in lastRowThenColGroups)
 			{

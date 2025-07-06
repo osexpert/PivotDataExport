@@ -7,13 +7,13 @@ namespace PivotDataExport
 {
 	public static class Extensions
 	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IEnumerable<T> Yield<T>(this T t)
-		{
-			// Alternative: return new[] { t };
-			//yield return t;
-			return new[] { t };
-		}
+		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		//public static IEnumerable<T> Yield<T>(this T t)
+		//{
+		//	// Alternative: return new[] { t };
+		//	//yield return t;
+		//	return new[] { t };
+		//}
 
 		public static string ToXml(this DataTable dt)
 		{
@@ -64,7 +64,7 @@ namespace PivotDataExport
 			}
 		}
 
-		public static IEnumerable<T> TopogicalSequenceDFS<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> deps)
+		internal static IEnumerable<T> TopogicalSequenceDFS<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> deps)
 		{
 			var yielded = new HashSet<T>();
 			var visited = new HashSet<T>();

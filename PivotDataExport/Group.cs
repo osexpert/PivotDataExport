@@ -5,7 +5,7 @@ namespace PivotDataExport
 	{
 		NotRoot = 0,
 		Row = 1,
-		Col = 2,
+		Column = 2,
 	}
 
 	public class Group<TRow> where TRow : class
@@ -35,7 +35,7 @@ namespace PivotDataExport
 			{
 				if (Field != null)
 					return Field.Area;
-				if (RootType == RootType.Col)
+				if (RootType == RootType.Column)
 					return Area.Column;
 				if (RootType == RootType.Row)
 					return Area.Row;

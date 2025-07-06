@@ -191,7 +191,7 @@ namespace PivotDataExport
 			Name = fieldName;
 			GetRowValue = row => getRowValue(row);
 			GetRowsValue = rows => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
-			GetDisplayValue = v => getDisplayValue((TData)v);
+			GetDisplayValue = v => getDisplayValue((TData)v!);
 			DataType = typeof(TData);
 			DisplayType = typeof(TDisp);
 		}

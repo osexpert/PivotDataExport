@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿#if false
+using System.Text;
 
 namespace PivotDataExport
 {
@@ -108,3 +109,5 @@ namespace PivotDataExport
 
 	}
 }
+
+#endif

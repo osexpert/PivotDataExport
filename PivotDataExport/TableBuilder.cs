@@ -44,7 +44,7 @@ namespace PivotDataExport
 
 			var tableCols = CreateTableCols(_data.DataFields, _data.RowFieldsInGroupOrder, lastColGroupsSorted);
 
-			Table<TTableRow> t = new Table<TTableRow>() { PartialIntersects = partialIntersects };
+			var t = new Table<TTableRow>() { PartialIntersects = partialIntersects };
 			t.Rows = rows.Select(r => toRow(r, tableCols));
 			t.Columns = tableCols;
 			t.HeaderRow = toRow(tableCols.Select(c => c.Name).ToArray(), tableCols);
@@ -233,7 +233,7 @@ namespace PivotDataExport
 		public Table<KeyValueList> GetNestedKeyValueListTable(bool padEmptyIntersects = false)
 		{
 			bool partialIntersects = false;
-			List<KeyValueList> rows = new List<KeyValueList>();
+			var rows = new List<KeyValueList>();
 
 			var lastColGroupsSorted = SortGroups(_data.LastColGroups, _data.ColFieldsInGroupOrder).ToList();
 
@@ -367,17 +367,16 @@ namespace PivotDataExport
 		public static string SlashedColumnNameGeneratorWithFieldNames(IEnumerable<TableGroup> tgs, string dataField)
 		{
 			// /Country:USA/Region:Florida/CarCount
-			var middle = string.Join("/", tgs.Select(tg => $"{Escaper.Escape(tg.Name)}:{Escaper.Escape(Convert.ToString(tg.Value) ?? string.Empty)}"));
-			var combName = $"/{middle}/{Escaper.Escape(dataField)}";
+			var middle = string.Join("/", tgs.Select(tg => $"{tg.Name}:{tg.Value}"));
+			var combName = $"/{middle}/{dataField}";
 			return combName;
 		}
 
 		public static string SlashedColumnNameGenerator(IEnumerable<TableGroup> tgs, string dataField)
 		{
-			// TODO: escape?
 			// /USA/Florida/CarCount
 			var middle = string.Join("/", tgs.Select(tg => tg.Value));
-			var combName = $"/{middle}.{dataField}";
+			var combName = $"/{middle}/{dataField}";
 			return combName;
 		}
 
@@ -389,7 +388,6 @@ namespace PivotDataExport
 		/// <returns></returns>
 		public static string DottedColumnNameGenerator(IEnumerable<TableGroup> tgs, string dataField)
 		{
-			// TODO: escape?
 			// USA.Florida.CarCount
 			var middle = string.Join(".", tgs.Select(tg => tg.Value));
 			var combName = $"{middle}.{dataField}";

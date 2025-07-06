@@ -77,7 +77,7 @@ namespace PivotDataExport
 		/// return count 0, 1 or null
 		/// if Count is 1, a single is also returned
 		/// </summary>
-		private static bool GetCountZeroOrOneAndSingle<TRow>(IEnumerable<TRow> rows, out int count, out TRow? single)
+		public static bool GetCountZeroOrOneAndSingle<TRow>(IEnumerable<TRow> rows, out int count, out TRow? single)
 		{
 			if (TryGetCountWithoutEnumerating(rows, out count, out single) && count <= 1)
 			{
