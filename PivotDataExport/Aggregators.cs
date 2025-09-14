@@ -13,8 +13,8 @@ public static class Aggregators
 {
 	public static string CommaList<T>(IEnumerable<T> values)//, string noValue = "", string separator = ", ")
 	{
-		if (GetCountZeroOrOneAndSingle(values, out var count, out var single))
-			return count == 0 ? "" : single!.ToString();
+		if (GetCountZeroOrOneFaster(values, out var count))
+			return count == 0 ? "" : values.First()?.ToString() ?? "";
 
 		return string.Join(", ", values.Distinct().OrderBy(v => v));
 	}
@@ -53,62 +53,25 @@ public static class Aggregators
 	/// return count 0, 1 or null
 	/// if Count is 1, a single is also returned
 	/// </summary>
-	public static bool GetCountZeroOrOneAndSingle<TRow>(IEnumerable<TRow> rows, out int count, out TRow? single)
+	public static bool GetCountZeroOrOneFaster<TRow>(IEnumerable<TRow> rows, out int count)
 	{
-		if (TryGetCountWithoutEnumerating(rows, out count, out single) && count <= 1)
+#if NET6_0_OR_GREATER
+		// System.Linq will throw ArgumentNullException if necessary
+		if (source.TryGetNonEnumeratedCount(out count) && count <= 1)
 		{
 			return true;
 		}
+#endif
 
 		// https://stackoverflow.com/a/6059711/2671330
 		int constrainedCount = rows.Take(2).Count();
 		if (constrainedCount <= 1)
 		{
 			count = constrainedCount;
-
-			if (constrainedCount == 1)
-				single = rows.Single();
-
 			return true;
 		}
 
+		count = 0;
 		return false;
-	}
-
-	public static bool TryGetCountWithoutEnumerating<TSource>(this IEnumerable<TSource> source, out int count, out TSource? single)
-	{
-#if NET6_0_OR_GREATER
-		// System.Linq will throw ArgumentNullException if necessary
-		return source.TryGetNonEnumeratedCount(out count);
-#else
-		single = default;
-
-		switch (source)
-		{
-			case null:
-				throw new ArgumentNullException(nameof(source));
-			case ICollection<TSource> genericCollection:
-				count = genericCollection.Count;
-				if (count == 1)
-				{
-					var arr = new TSource[1];
-					genericCollection.CopyTo(arr, 0);
-					single = arr[0];
-				}
-				return true;
-			case ICollection collection:
-				count = collection.Count;
-				if (count == 1)
-				{
-					var arr = new TSource[1];
-					collection.CopyTo(arr, 0);
-					single = arr[0];
-				}
-				return true;
-			default:
-				count = 0;
-				return false;
-		}
-#endif
 	}
 }

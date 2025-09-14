@@ -123,20 +123,9 @@ public class TableBuilder<TRow> where TRow : class
 					if (!hasData)
 					{
 						// Use padEmptyIntersects = true if you always want data (instead of lack of data)
-
 						// write default values
-						if (defaultValues == null)
-						{
-							// aggregate with no rows = default value
-							var defVals = new object?[dataFields.Length];
-							int i = 0;
-							foreach (var df in dataFields)
-							{
-								//defVals[i++] = df.GetRowsValue(Enumerable.Empty<TRow>());
-								defVals[i++] = df.GetDisplayTypeDefaultValue();
-							}
-							defaultValues = defVals;
-						}
+						// aggregate with no rows = default value
+						defaultValues ??= dataFields.Select(df => df.GetDisplayTypeDefaultValue()).ToArray();
 						values = defaultValues;
 					}
 
@@ -261,17 +250,8 @@ public class TableBuilder<TRow> where TRow : class
 				{
 					if (!hasData)
 					{
-						if (defaultValues == null)
-						{
-							// aggregate with no rows = default value
-							var defVals = new object?[_data.DataFields.Length];
-							int i = 0;
-							foreach (var df in _data.DataFields)
-							{
-								defVals[i++] = df.GetDisplayTypeDefaultValue();
-							}
-							defaultValues = defVals;
-						}
+						// aggregate with no rows = default value
+						defaultValues ??= _data.DataFields.Select(df => df.GetDisplayTypeDefaultValue()).ToArray();
 						data = defaultValues;
 					}
 
