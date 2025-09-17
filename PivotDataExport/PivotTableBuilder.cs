@@ -121,11 +121,11 @@ internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggre
 			rows.Add(newRow);
 		}
 		
-		if (field.SortOrder == SortOrder.Asc)
+		if (field.SortOrder == SortOrder.Ascending)
 		{
 			rows = rows.OrderBy(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 		}
-		else if (field.SortOrder == SortOrder.Desc)
+		else if (field.SortOrder == SortOrder.Descending)
 		{
 			rows = rows.OrderByDescending(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 		}
@@ -170,11 +170,11 @@ internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggre
 			columns.Add(newColumn);
 		}
 
-		if (field.SortOrder == SortOrder.Asc)
+		if (field.SortOrder == SortOrder.Ascending)
 		{
 			columns = columns.OrderBy(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 		}
-		else if (field.SortOrder == SortOrder.Desc)
+		else if (field.SortOrder == SortOrder.Descending)
 		{
 			columns = columns.OrderByDescending(c => field.GetSortValue(c.Value), field.SortComparer).ToList();
 		}

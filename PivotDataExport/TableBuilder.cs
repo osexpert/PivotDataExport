@@ -25,11 +25,11 @@ public class TableBuilder<TRow> where TRow : class
 		var lastColGroups = _data.LastColGroups;// OrDefault() ?? [];
 
 		var colFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Column)
-			.Where(f => f.SortOrder != SortOrder.None)
+			.Where(f => f.SortMode != SortMode.None)
 			.OrderBy(f => f.GroupIndex).ToArray();
 
 		var rowFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Row)
-			.Where(f => f.SortOrder != SortOrder.None)
+			.Where(f => f.SortMode != SortMode.None)
 			.OrderBy(f => f.GroupIndex).ToArray();
 
 		var lastRowGroupsSorted = SortGroups(lastRowGroups, rowFieldsInSortOrder).ToList();
@@ -416,10 +416,7 @@ public class TableBuilder<TRow> where TRow : class
 			}
 		}
 
-		//			tablecols_after = SortColGroupsCols(tablecols_after, colGroupFields);
-
 		tablecols.AddRange(tablecols_after);
-
 		return tablecols;
 	}
 
@@ -434,39 +431,23 @@ public class TableBuilder<TRow> where TRow : class
 	/// </summary>
 	private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields, Func<TEle, Group<TRow>> getGroup)
 	{
-		//.OrderBy(a => a.Key.Groups[0]).ThenBy(a => a.Key.Groups[1]).ToList();
-
-		//var sortFields = _fields.Where(f => f.Grouping == Grouping.Col)
-		//	.Where(f => f.SortOrder != SortOrder.None)
-		//	.OrderBy(f => f.SortIndex)
-		//	.ToArray();
-
-		var sortedGroupFields = groupFields.Where(f => f.SortOrder != SortOrder.None);
-
+		var sortedGroupFields = groupFields.Where(f => f.SortMode != SortMode.None);
 		if (sortedGroupFields.Any())
 		{
 			IOrderedEnumerable<TEle> sorter = null!;
-
-			int colFieldIdx = 0;
 			foreach (var colField in sortedGroupFields)
 			{
-				int colFieldIdx_local_capture = colFieldIdx;
-
 				if (sorter == null)
-					sorter = colField.SortOrder == SortOrder.Asc ?
+					sorter = colField.SortOrder == SortOrder.Ascending ?
 						grops.OrderBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
 						: grops.OrderByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
 				else
-					sorter = colField.SortOrder == SortOrder.Asc ?
+					sorter = colField.SortOrder == SortOrder.Ascending ?
 						sorter.ThenBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
 						: sorter.ThenByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
-
-				colFieldIdx++;
 			}
-
 			grops = sorter;//.ToList(); // tolist needed?
 		}
-
 		return grops;
 	}
 }

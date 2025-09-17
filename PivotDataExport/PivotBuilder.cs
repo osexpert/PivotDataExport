@@ -28,9 +28,6 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 	private void Validate()
 	{
-		if (_fields.Any(f => f.Area == Area.Column) && _fields.Any(f => f.Area == Area.Data && f.SortOrder != SortOrder.None))
-			throw new ArgumentException("Can not sort on data fields if grouping on columns");
-
 		if (_fields.GroupBy(f => f.Name).Any(g => g.Count() > 1))
 			throw new ArgumentException("More than one field with same fieldName");
 	}

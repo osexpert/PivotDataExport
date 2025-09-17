@@ -35,26 +35,26 @@ public class Program
 		{
 			GroupIndex = 0,
 			Area = Area.Row,
-			SortOrder = SortOrder.Asc,
+			SortOrder = SortOrder.Ascending,
 		});
 		fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), r => r.Country, Aggregators.CommaList)
 		{
 			GroupIndex = 1,
 			Area = Area.Row,
-			SortOrder = SortOrder.Desc
+			SortOrder = SortOrder.Descending
 		});
 
 		fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), r => r.ItemType, Aggregators.CommaList)
 		{
 			GroupIndex = 0,
 			Area = Area.Column,
-			SortOrder = SortOrder.Desc
+			SortOrder = SortOrder.Descending
 		});
 		fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), r => r.SalesChannel, Aggregators.CommaList)
 		{
 			GroupIndex = 1,
 			Area = Area.Column,
-			SortOrder = SortOrder.Asc
+			SortOrder = SortOrder.Ascending
 		});
 
 		fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), r => r.UnitsSold, Enumerable.Sum));

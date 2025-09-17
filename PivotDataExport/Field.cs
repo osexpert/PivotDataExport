@@ -131,7 +131,12 @@ public class Field<TRow> where TRow : class
 
 	internal object? GetSortValue(object? v)
 	{
-		return SortMode == SortMode.DataValue ? v : GetDisplayValue(v);
+		return SortMode switch
+		{
+			SortMode.DataValue => v,
+			SortMode.DisplayValue => GetDisplayValue(v),
+			_ => throw new NotSupportedException()
+		};
 	}
 
 	internal object? GetGroupValue(object? v)
@@ -206,15 +211,15 @@ public enum Area
 
 public enum SortOrder
 {
-	None = 0,
-	Asc = 1,
-	Desc = 2
+	Ascending = 0,
+	Descending = 1
 }
 
 public enum SortMode
 {
 	DataValue = 0,
-	DisplayValue = 1
+	DisplayValue = 1,
+	None = 2
 }
 public enum GroupMode
 {

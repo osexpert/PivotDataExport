@@ -248,20 +248,20 @@ public class UnitTestFullyNested
 		var fields = pivoter.Fields.ToDictionary(k => k.Name);
 
 		fields[nameof(Test1Row.Site)].Area = Area.Row;
-		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Ascending;
 		fields[nameof(Test1Row.Site)].GroupIndex = 0;
 
 		fields[nameof(Test1Row.Unit)].Area = Area.Row;
-		fields[nameof(Test1Row.Unit)].SortOrder = SortOrder.Desc;
+		fields[nameof(Test1Row.Unit)].SortOrder = SortOrder.Descending;
 		fields[nameof(Test1Row.Unit)].GroupIndex = 1;
 
 		fields[nameof(Test1Row.Country)].Area = Area.Column;
 		fields[nameof(Test1Row.Country)].GroupIndex = 0;
-		fields[nameof(Test1Row.Country)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Country)].SortOrder = SortOrder.Ascending;
 
 		fields[nameof(Test1Row.Company)].Area = Area.Column;
 		fields[nameof(Test1Row.Company)].GroupIndex = 1;
-		fields[nameof(Test1Row.Company)].SortOrder = SortOrder.Desc;
+		fields[nameof(Test1Row.Company)].SortOrder = SortOrder.Descending;
 
 		fields[nameof(Test1Row.Group)].Area = Area.Column;
 		fields[nameof(Test1Row.Group)].GroupIndex = 2;

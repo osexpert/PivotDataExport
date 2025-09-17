@@ -145,9 +145,9 @@ public class UnitTest1
 
 		var fields = p.Fields.ToDictionary(k => k.Name);
 		fields[nameof(Test1Row.Site)].Area = Area.Row;
-		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Ascending;
 
-		fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Number)].SortOrder = SortOrder.Ascending;
 
 		var gdata_fis = p.GetGroupedData();
 		var gdata_ptb = p2.GetGroupedData();
@@ -427,10 +427,10 @@ public class UnitTest1
 
 		var fields = p.Fields.ToDictionary(k => k.Name);
 		fields[nameof(Test1Row.Site)].Area = Area.Row;
-		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Ascending;
 
 		fields[nameof(Test1Row.Name)].Area = Area.Column;
-		fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Ascending;
 
 		var gdata_fis = p.GetGroupedData();// padEmptyIntersects: true);
 		var gdata_ptb = p2.GetGroupedData();// padEmptyIntersects: true);
@@ -574,7 +574,7 @@ public class UnitTest1
 		var fields = p.Fields.ToDictionary(k => k.Name);
 
 		fields[nameof(Test1Row.Name)].Area = Area.Column;
-		fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Asc;
+		fields[nameof(Test1Row.Name)].SortOrder = SortOrder.Ascending;
 
 		var gdata_fis = p.GetGroupedData();
 		var gdata_ptb = p2.GetGroupedData();
@@ -998,28 +998,28 @@ public class UnitTest1
 		var sf = td.Fields.Single(f => f.Name == "Site");
 		sf.Area = Area.Row;
 		sf.GroupIndex = 0;
-		sf.SortOrder = SortOrder.Asc;
+		sf.SortOrder = SortOrder.Ascending;
 		var su = td.Fields.Single(f => f.Name == "Unit");
 		su.Area = Area.Row;
 		su.GroupIndex = 1;
-		su.SortOrder = SortOrder.Desc;
+		su.SortOrder = SortOrder.Descending;
 		var sg = td.Fields.Single(f => f.Name == "Group");
 		sg.Area = Area.Column;
 		sg.GroupIndex = 0;
-		sg.SortOrder = SortOrder.Desc;
+		sg.SortOrder = SortOrder.Descending;
 
 		var sf2 = td2.Fields.Single(f => f.Name == "Site");
 		sf2.Area = Area.Row;
 		sf2.GroupIndex = 0;
-		sf2.SortOrder = SortOrder.Asc;
+		sf2.SortOrder = SortOrder.Ascending;
 		var su2 = td2.Fields.Single(f => f.Name == "Unit");
 		su2.Area = Area.Row;
 		su2.GroupIndex = 1;
-		su2.SortOrder = SortOrder.Desc;
+		su2.SortOrder = SortOrder.Descending;
 		var sg2 = td2.Fields.Single(f => f.Name == "Group");
 		sg2.Area = Area.Column;
 		sg2.GroupIndex = 0;
-		sg2.SortOrder = SortOrder.Desc;
+		sg2.SortOrder = SortOrder.Descending;
 
 		var gdata_ptb = td2.GetGroupedData();
 		var gdata_fis = td.GetGroupedData();
@@ -1314,12 +1314,12 @@ public class UnitTest1
 		var sf = td.Fields.Single(f => f.Name == "Time");
 		sf.Area = Area.Row;
 		sf.GroupIndex = 0;
-		sf.SortOrder = SortOrder.Asc;
+		sf.SortOrder = SortOrder.Ascending;
 
 		var sf2 = td2.Fields.Single(f => f.Name == "Time");
 		sf2.Area = Area.Row;
 		sf2.GroupIndex = 0;
-		sf2.SortOrder = SortOrder.Asc;
+		sf2.SortOrder = SortOrder.Ascending;
 
 		var gdata_ptb = td2.GetGroupedData();
 		var gdata_fis = td.GetGroupedData();

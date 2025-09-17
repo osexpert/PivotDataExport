@@ -45,11 +45,11 @@ internal class PresentationPtb<TRow, TAgg>
 		var lastColGroups = _data.LastCols;// OrDefault() ?? [];
 
 		var colFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Column)
-			.Where(f => f.SortOrder != SortOrder.None)
+			.Where(f => f.SortMode != SortMode.None)
 			.OrderBy(f => f.GroupIndex).ToArray();
 
 		var rowFieldsInSortOrder = _data.Fields.Where(f => f.Area == Area.Row)
-			.Where(f => f.SortOrder != SortOrder.None)
+			.Where(f => f.SortMode != SortMode.None)
 			.OrderBy(f => f.GroupIndex).ToArray();
 
 		var lastRowGroupsSorted = lastRowGroups.ToList();
