@@ -25,33 +25,33 @@ public class Field<TRow> where TRow : class
 	/// The return value can be of type DisplayType, in case, GetDisplayValue does nothing.
 	/// The return value can be of type DataType, in case, GetDisplayValue can convert from DataType to DisplayType.
 	/// </summary>
-	internal Func<IEnumerable<TRow>, object?> GetRowsValue = null!;
+	internal protected Func<IEnumerable<TRow>, object?> GetRowsValue = null!;
 
 	/// <summary>
 	/// User to get the value to group on (the value will be of type DataType)
 	/// </summary>
-	internal Func<TRow, object?> GetRowValue = null!;
+	internal protected Func<TRow, object?> GetRowValue = null!;
 
 	/// <summary>
 	/// In: TData (DataType)
 	/// Out: TDisp (DisplayType)
 	/// </summary>
-	internal Func<object?, object?> GetDisplayValue = o => o;
+	internal protected Func<object?, object?> GetDisplayValue = o => o;
 
 	// TODO: need both GroupComparer and SortComparer?
-	internal IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
+	internal protected IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
 
-	internal IComparer<object?> SortComparer = Comparer<object?>.Default;
+	internal protected IComparer<object?> SortComparer = Comparer<object?>.Default;
 
 	/// <summary>
 	/// Example: field being DateTime but the display type is DateOnly.
 	/// </summary>
-	public Type DisplayType { get; internal set; } = null!;
+	public Type DisplayType { get; internal protected set; } = null!;
 
 	// FIXME: kind of pointless...could simply used passed order
 	//public int Index { get; set; }  // 0, 1, 2
 
-	public Type DataType { get; internal set; } = null!;
+	public Type DataType { get; internal protected set; } = null!;
 
 	public DefaultValue? DisplayTypeDefaultValue { get; set; }
 
@@ -135,7 +135,7 @@ public class Field<TRow> where TRow : class
 		{
 			SortMode.DataValue => v,
 			SortMode.DisplayValue => GetDisplayValue(v),
-			_ => throw new NotSupportedException()
+			_ => throw new NotSupportedException(SortMode.ToString())
 		};
 	}
 
@@ -172,10 +172,6 @@ public class Field<TRow, TData> : Field<TRow, TData, TData> where TRow : class
 {
 	public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TData> getRowsValue) 
 		: base(fieldName, getRowValue, getRowsValue)
-	{
-	}
-	public Field(string fieldName, Func<TRow, TData> getRowValue, Func<IEnumerable<TData>, TData> getRowsValue, Func<TData, TData> getDisplayValue)
-		: base(fieldName, getRowValue, getRowsValue, getDisplayValue)
 	{
 	}
 }

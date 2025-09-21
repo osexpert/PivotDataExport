@@ -382,7 +382,7 @@ public class UnitTestFullyNested_customDisplayValue
 		var p15 = new Field<Test1Row, DateTime, string>("MaxTime", r => r.Time, Enumerable.Max, v => v.ToString("o"));
 		var p16 = new Field<Test1Row, DateTime, string>("MinTime", r => r.Time, Enumerable.Min, v => v.ToString("o"));
 
-		var p17 = new Field<Test1Row, double>("Combine", r => r.Weight * r.Number, Enumerable.Sum, v => Math.Round(v, 1));
+		var p17 = new Field<Test1Row, double>("Combine", r => r.Weight * r.Number, RoundedSum);
 
 		var fields = new Field<Test1Row>[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p15, p16, p17 };
 
@@ -390,5 +390,9 @@ public class UnitTestFullyNested_customDisplayValue
 		var piv2 = new PivotBuilderPtb<Test1Row>(rows, fields);
 		return (piv, piv2);
 	}
+
+	private static double RoundedSum(IEnumerable<double> rows)
+		=> Math.Round(Enumerable.Sum(rows), 1);
+
 }
 
