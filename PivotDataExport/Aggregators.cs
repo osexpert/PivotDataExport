@@ -13,7 +13,7 @@ public static class Aggregators
 {
 	public static string CommaList<T>(IEnumerable<T> values)//, string noValue = "", string separator = ", ")
 	{
-		if (GetCountZeroOrOneFaster(values, out var count))
+		if (GetCountZeroOrOne(values, out var count))
 			return count == 0 ? "" : values.First()?.ToString() ?? "";
 
 		return string.Join(", ", values.Distinct().OrderBy(v => v));
@@ -50,16 +50,14 @@ public static class Aggregators
 	//}
 
 	/// <summary>
-	/// return count 0, 1 or null
-	/// if Count is 1, a single is also returned
+	/// Returns true if number of values are 0 or 1.
 	/// </summary>
-	public static bool GetCountZeroOrOneFaster<TRow>(IEnumerable<TRow> rows, out int count)
+	public static bool GetCountZeroOrOne<TRow>(IEnumerable<TRow> rows, out int count)
 	{
 #if NET6_0_OR_GREATER
-		// System.Linq will throw ArgumentNullException if necessary
-		if (source.TryGetNonEnumeratedCount(out count) && count <= 1)
+		if (source.TryGetNonEnumeratedCount(out count))
 		{
-			return true;
+			return count <= 1;
 		}
 #endif
 
