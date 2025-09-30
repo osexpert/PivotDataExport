@@ -143,19 +143,6 @@ public class Field<TRow> where TRow : class
 	{
 		return GroupMode == GroupMode.DataValue ? v : GetDisplayValue(v);
 	}
-
-	HybridDictionary? _tags = null;
-
-	public IDictionary Tags
-	{
-		get
-		{
-			if (_tags == null)
-				_tags = new();
-			return _tags;
-		}
-	}
-
 }
 
 public class DefaultValue

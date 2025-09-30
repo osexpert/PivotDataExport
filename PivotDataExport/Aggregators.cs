@@ -14,7 +14,14 @@ public static class Aggregators
 	public static string CommaList<T>(IEnumerable<T> values)//, string noValue = "", string separator = ", ")
 	{
 		if (GetCountZeroOrOne(values, out var count))
-			return count == 0 ? "" : values.First()?.ToString() ?? "";
+		{
+			return count switch
+			{
+				0 => "",
+				1 => values.First()?.ToString() ?? "",
+				_ => throw new InvalidOperationException($"Unexpected count: {count}")
+			};
+		}
 
 		return string.Join(", ", values.Distinct().OrderBy(v => v));
 	}
