@@ -1,21 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="CsvHelper" />
-	  <PackageReference Include="CsvTextFieldParser" />
-	  <PackageReference Include="Kazinix.PivotTable" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PivotDataExport\PivotDataExport.csproj" />
-    <ProjectReference Include="..\Ptb\Ptb.csproj" />
   </ItemGroup>
 
 </Project>

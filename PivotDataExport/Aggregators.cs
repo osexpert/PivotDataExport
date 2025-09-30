@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleToAttribute("Tests")]
 [assembly: InternalsVisibleToAttribute("Examples")]
+[assembly: InternalsVisibleToAttribute("Ptb")]
 
 namespace PivotDataExport;
 

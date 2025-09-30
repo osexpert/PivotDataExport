@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PivotDataExport\PivotDataExport.csproj" />
+    <ProjectReference Include="..\Ptb\Ptb.csproj" />
   </ItemGroup>
 
 </Project>
