@@ -16,6 +16,8 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 	public List<Field<TRow>> Fields => _fields;
 
+	public Func<IEnumerable<TRow>, IDisposable>? CreateGroupContext { get; set; }
+
 	public PivotBuilder(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 	{
 		//			if (list is not IEnumerable<T>)
@@ -68,7 +70,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 				var subGroups = go.Rows.GroupBy(r => gf.GetGroupValue(gf.GetRowValue(r)), gf.GroupComparer).Select(g => new Group<TRow>()
 				{
 					Key = g.Key,
-					Rows = g,
+					Rows = g, // TODO: manifest/snapshot?
 					Field = gf,
 					ParentGroup = go
 				});
@@ -140,10 +142,16 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 			Group<TRow> lastRowG = GetLastRowGroup(lastRowThenColGroup);
 
+			IDisposable? groupContext = null;
+			if (CreateGroupContext != null)
+			{
+				groupContext = CreateGroupContext(lastRowThenColGroup.Rows);
+			}
+
 			int dataFieldIdx = 0;
 			foreach (var dataField in dataFields)
 			{
-				var theValue = dataField.GetRowsValue(lastRowThenColGroup.Rows);
+				var theValue = dataField.GetRowsValue(lastRowThenColGroup.Rows, groupContext);
 
 				lastRowG.IntersectData ??= new();
 
@@ -159,6 +167,9 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 				dataFieldIdx++;
 			}
+
+			groupContext?.Dispose();
+			groupContext = null;
 
 			// free mem
 			lastRowThenColGroup.Rows = null!;

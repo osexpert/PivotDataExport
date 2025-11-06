@@ -20,6 +20,8 @@ internal class PivotBuilderPtb<TRow> where TRow : class // class notnull
 
 	public List<Field<TRow>> Fields => _fields;
 
+	public Func<IEnumerable<TRow>, IDisposable>? CreateGroupContext { get; set; }
+
 	public PivotBuilderPtb(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 	{
 		//			if (list is not IEnumerable<T>)
@@ -68,12 +70,22 @@ internal class PivotBuilderPtb<TRow> where TRow : class // class notnull
 			// Lazy: avoid calling GetRowsValue "too much" (performance). We won't read all of them.
 			return new Lazy<KeyValueList>(() =>
 			{
+				IDisposable? groupContext = null;
+				if (CreateGroupContext != null)
+				{
+					groupContext = CreateGroupContext(rows);
+				}
+
 				KeyValueList res = new();
 				foreach (var dataField in dataFields)
 				{
-					var theValue = dataField.GetRowsValue(rows);
+					var theValue = dataField.GetRowsValue(rows, groupContext);
 					res.Add(dataField.Name, theValue);
 				}
+
+				groupContext?.Dispose();
+				groupContext = null;
+
 				return res;
 			});
 		});

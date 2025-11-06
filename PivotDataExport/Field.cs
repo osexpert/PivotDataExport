@@ -25,7 +25,7 @@ public class Field<TRow> where TRow : class
 	/// The return value can be of type DisplayType, in case, GetDisplayValue does nothing.
 	/// The return value can be of type DataType, in case, GetDisplayValue can convert from DataType to DisplayType.
 	/// </summary>
-	internal protected Func<IEnumerable<TRow>, object?> GetRowsValue = null!;
+	internal protected Func<IEnumerable<TRow>, IDisposable?, object?> GetRowsValue = null!;
 
 	/// <summary>
 	/// User to get the value to group on (the value will be of type DataType)
@@ -115,7 +115,7 @@ public class Field<TRow> where TRow : class
 			DataType = pd.PropertyType,
 			DisplayType = pd.PropertyType,
 			GetRowValue = row => pd.GetValue(row),
-			GetRowsValue = pd.GetValue
+			GetRowsValue = (rows, ctx) => pd.GetValue(rows)
 		}).ToList();
 	}
 
@@ -169,7 +169,7 @@ public class Field<TRow, TData, TDisp> : Field<TRow> where TRow : class
 	{
 		Name = fieldName;
 		GetRowValue = row => getRowValue(row);
-		GetRowsValue = rows => getRowsValue(rows.Select(getRowValue));
+		GetRowsValue = (rows, ctx) => getRowsValue(rows.Select(getRowValue));
 		DataType = typeof(TData);
 		DisplayType = typeof(TDisp);
 	}
@@ -178,7 +178,7 @@ public class Field<TRow, TData, TDisp> : Field<TRow> where TRow : class
 	{
 		Name = fieldName;
 		GetRowValue = row => getRowValue(row);
-		GetRowsValue = rows => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
+		GetRowsValue = (rows, ctx) => getDisplayValue(getRowsValue(rows.Select(getRowValue)));
 		GetDisplayValue = v => getDisplayValue((TData)v!);
 		DataType = typeof(TData);
 		DisplayType = typeof(TDisp);
