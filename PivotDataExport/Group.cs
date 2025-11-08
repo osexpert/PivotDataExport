@@ -22,7 +22,7 @@ public class Group<TRow> where TRow : class
 
 	//public IEnumerable<Group<T>> Groups;
 
-	public IEnumerable<TRow> Rows = null!;
+	public List<TRow> Rows = null!;
 
 	public Field<TRow> Field = null!;
 
@@ -71,7 +71,7 @@ public class Group<TRow> where TRow : class
 			//if (includeMeIfRoot)
 			//	return this.Yield();
 			//else
-			return Enumerable.Empty<Group<TRow>>();
+			return [];
 		}
 
 		var st = new Stack<Group<TRow>>();

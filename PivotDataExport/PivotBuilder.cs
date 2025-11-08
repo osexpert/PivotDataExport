@@ -12,7 +12,7 @@ namespace PivotDataExport;
 public class PivotBuilder<TRow> where TRow : class // class notnull
 {
 	List<Field<TRow>> _fields;
-	IEnumerable<TRow> _rows;
+	List<TRow> _rows;
 
 	public List<Field<TRow>> Fields => _fields;
 
@@ -24,7 +24,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 		//			throw new ArgumentException("list must be IEnumerable<T>");
 
 		//	_list = (IEnumerable<T>)list;
-		_rows = rows;
+		_rows = rows.ToList();
 		_fields = fields.ToList();
 	}
 
@@ -67,10 +67,11 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 			foreach (var go in lastGroups)
 			{
-				var subGroups = go.Rows.GroupBy(r => gf.GetGroupValue(gf.GetRowValue(r)), gf.GroupComparer).Select(g => new Group<TRow>()
+				var subGroups = go.Rows.GroupBy(r => gf.GetGroupValue(gf.GetRowValue(r)), gf.GroupComparer)
+					.Select(g => new Group<TRow>()
 				{
 					Key = g.Key,
-					Rows = g, // TODO: manifest/snapshot?
+					Rows = g.ToList(),
 					Field = gf,
 					ParentGroup = go
 				});
@@ -177,7 +178,8 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 		//var syntLastColGroups = htSynthMergedLastColGroups.Values.ToList(); // TOLIST needed?
 		var allColGroups = htSynthMergedAllColGroups
-			.Select(g => g == null ? new List<Group<TRow>>() : g.Values.ToList()).ToList();
+			.Select(g => g == null ? new List<Group<TRow>>() : g.Values.ToList())
+			.ToList();
 
 		var b1 = colFieldsInGroupOrder.Any();
 		var b2 = allColGroups.Any();
@@ -185,7 +187,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 		if (!b2)
 		{
-			allColGroups.Add(new List<Group<TRow>>() { rootColGroup }); 
+			allColGroups.Add([rootColGroup]); 
 		}
 
 		return new GroupedData<TRow>()
@@ -210,11 +212,9 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 		do
 		{
 			st.Push(current);
-
 			current = current.ParentGroup;
 		} while (current != null && current.FieldType == Area.Column);
 
-		//return new GroupingKey<object>(st.ToArray());
 		Group<TRow>? curr = rootColGroup;
 		int lvl = 0;
 		while (st.Any())
@@ -234,8 +234,8 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 				res.ParentGroup = curr;
 				if (g.Rows != null)
 				{
-					//	res.Rows = g.Rows;//.ToList(); // clone? mem vs speed?
-					res.Rows = g.Rows.ToList(); // clone? mem vs speed?
+					//	res.Rows = g.Rows;// can this mutate and corrupt the original group?
+					res.Rows = g.Rows.ToList(); // clone needed to prevent mutate and corrupt the original group?
 				}
 				lookupGroups[lvl].Add((curr, g.Key), res);
 			}
@@ -244,17 +244,15 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 				// TODO: dedup needed???
 				if (g.Rows != null)
 				{
-					//if (res.Rows is List<T> exRows)
-					//	exRows.AddRange(g.Rows);
-					if (res.Rows != null)//is List<T> exRows)
+					if (res.Rows != null)
 					{
 						//res.Rows = res.Rows.Concat(g.Rows); // mem vs speed ?
-						((List<TRow>)res.Rows).AddRange(g.Rows); // mem vs speed ?
+						res.Rows.AddRange(g.Rows);
 					}
 					else
 					{
-						//res.Rows = g.Rows;// new List<T>(g.Rows);//.ToList(); // clone?
-						res.Rows = g.Rows.ToList();
+						//res.Rows = g.Rows;// can this mutate and corrupt the original group?
+						res.Rows = g.Rows.ToList(); // clone needed to prevent mutate and corrupt the original group?
 					}
 				}
 			}
