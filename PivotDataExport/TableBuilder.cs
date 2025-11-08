@@ -418,9 +418,9 @@ public class TableBuilder<TRow> where TRow : class
 		return tablecols;
 	}
 
-	private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> grops, Field<TRow>[] groupFields) where TEle : Group<TRow>
+	private IEnumerable<TEle> SortGroups<TEle>(IEnumerable<TEle> groups, Field<TRow>[] groupFields) where TEle : Group<TRow>
 	{
-		return SortGroups<TEle>(grops, groupFields, ele => ele);
+		return SortGroups<TEle>(groups, groupFields, ele => ele);
 	}
 
 	/// <summary>
@@ -444,7 +444,7 @@ public class TableBuilder<TRow> where TRow : class
 						sorter.ThenBy(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer)
 						: sorter.ThenByDescending(r => colField.GetSortValue(getGroup(r).GetKeyByField(colField)), colField.SortComparer);
 			}
-			groups = sorter;//.ToList(); // tolist needed?
+			groups = sorter; // tolist needed? No, callers use ToList all places where enumeration can happen more than once.
 		}
 		return groups;
 	}
