@@ -9,26 +9,6 @@ using System.Text;
 
 namespace PivotDataExport;
 
-//public interface IPivotTableBuilder<TRow, TAggregates>
-//where TRow : class
-//{
-//	IPivotTableBuilder<TRow, TAggregates> SetRow(Func<TRow, object> rowFunction);
-//	IPivotTableBuilder<TRow, TAggregates> SetColumn(Func<TRow, object> columnFunction);
-//	PivotTable<TAggregates> Build();
-//}
-
-//public enum AggregateContext
-//{
-//	//Table,
-//	//Row,
-//	//Column,
-//	Row_Aggregates,
-//	Row_ColumnAggregates,
-//	Table_Aggregates,
-//	Table_ColumnAggregates,
-//	//Column_Aggregates
-//}
-
 /// <summary>
 /// Based on https://github.com/Kazinix/PivotTable
 /// Added sorting
@@ -40,15 +20,13 @@ namespace PivotDataExport;
 /// </summary>
 /// <typeparam name="TRow"></typeparam>
 /// <typeparam name="TAgg"></typeparam>
-internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggregates>
+internal class PivotTableBuilder<TRow, TAgg>
 	   where TRow : class
 {
 	private readonly IList<(Func<TRow, object?>, Field<TRow>)> _rowFunctions;
 	private readonly IList<(Func<TRow, object?>, Field<TRow>)> _columnFunctions;
 	private readonly Func<IEnumerable<TRow>, TAgg> _aggregateFunction;
 	private readonly IEnumerable<TRow> _list;
-
-	//public bool _calcRootColumnAggregates = true;
 
 	internal PivotTableBuilder(IEnumerable<TRow> list, Func<IEnumerable<TRow>, TAgg> aggregateFunction)
 	{
@@ -74,8 +52,8 @@ internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggre
 		var pivotTable = new PivotTable<TRow, TAgg>();
 
 		//compute aggregates for the whole table
-		pivotTable.Aggregates = _aggregateFunction(_list);//, null, AggregateContext.Table_Aggregates);
-		pivotTable.ColumnAggregates = ComputeColumns(null, _list, _columnFunctions);//, AggregateContext.Table_ColumnAggregates);
+		pivotTable.Aggregates = _aggregateFunction(_list);
+		pivotTable.ColumnAggregates = ComputeColumns(null, _list, _columnFunctions);
 		pivotTable.Rows = ComputeRows(null, _list, _rowFunctions, _columnFunctions);
 
 		return pivotTable;
@@ -112,11 +90,11 @@ internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggre
 
 			// ToList seems useless? At least 3 times...fixed now?
 			// Do Aggregate after Compute, so the delegate can use info from newRow to decide if to calc the agg.
-			newRow.Aggregates = _aggregateFunction(groupRows);//, newRow, AggregateContext.Row_Aggregates);
+			newRow.Aggregates = _aggregateFunction(groupRows);
 
 			newRow.Children = ComputeRows(newRow, groupRows, rowFunctionsCopy, columnFunctions);
 
-			newRow.ColumnAggregates = ComputeColumns(null /* hmm...maybe the newRow is the parent here?? in case, parent must be IGroup? */, groupRows, _columnFunctions);//, AggregateContext.Row_ColumnAggregates);
+			newRow.ColumnAggregates = ComputeColumns(null /* hmm...maybe the newRow is the parent here?? in case, parent must be IGroup? */, groupRows, _columnFunctions);
 
 			rows.Add(newRow);
 		}
@@ -134,7 +112,7 @@ internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggre
 	}
 
 	private List<Column<TRow, TAgg>> ComputeColumns(Column<TRow, TAgg>? parent, IEnumerable<TRow> list,
-		IEnumerable<(Func<TRow, object?>, Field<TRow>)> columnFunctions)//, AggregateContext agg_ctx)
+		IEnumerable<(Func<TRow, object?>, Field<TRow>)> columnFunctions)
 	{
 		var columns = new List<Column<TRow, TAgg>>();
 		if (!columnFunctions.Any())
@@ -163,9 +141,9 @@ internal class PivotTableBuilder<TRow, TAgg> //: IPivotTableBuilder<TRow, TAggre
 
 			// ToList seems useless? At least 2 times...fixed now?
 			// Do Aggregate after Compute, so the delegate can use info from newColumn to decide if to calc the agg.
-			newColumn.Aggregates = _aggregateFunction(groupRows);//, newColumn);//, agg_ctx);
+			newColumn.Aggregates = _aggregateFunction(groupRows);//, newColumn);
 
-			newColumn.Children = ComputeColumns(newColumn, groupRows, columnFunctionsCopy);//, agg_ctx);
+			newColumn.Children = ComputeColumns(newColumn, groupRows, columnFunctionsCopy);
 
 			columns.Add(newColumn);
 		}

@@ -273,7 +273,7 @@ public class UnitTestFullyNested
 		var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 		// FIXME: currently no supporty for SortOrder
-		var nested_tbl_ptb = pres_ptb.GetTable_NestedKeyValueList_VariableColumns();
+		var nested_tbl_ptb = pres_ptb.GetNestedKeyValueListTable();
 
 		var nested_tbl_fis = pres_fis.GetNestedKeyValueListTable();
 

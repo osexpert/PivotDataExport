@@ -24,10 +24,6 @@ internal class PivotBuilderPtb<TRow> where TRow : class // class notnull
 
 	public PivotBuilderPtb(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 	{
-		//			if (list is not IEnumerable<T>)
-		//			throw new ArgumentException("list must be IEnumerable<T>");
-
-		//	_list = (IEnumerable<T>)list;
 		_rows = rows;
 		_fields = fields.ToList();
 	}

@@ -12,7 +12,8 @@ namespace PivotDataExport;
 public class PivotBuilder<TRow> where TRow : class // class notnull
 {
 	List<Field<TRow>> _fields;
-	List<TRow> _rows;
+	IEnumerable<TRow> _rowsSource;
+	List<TRow> _rowsList = null!;
 
 	public List<Field<TRow>> Fields => _fields;
 
@@ -20,12 +21,13 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 	public PivotBuilder(IEnumerable<TRow> rows, IEnumerable<Field<TRow>> fields)
 	{
-		//			if (list is not IEnumerable<T>)
-		//			throw new ArgumentException("list must be IEnumerable<T>");
-
-		//	_list = (IEnumerable<T>)list;
-		_rows = rows.ToList();
+		_rowsSource = rows; // ToList may be slow, do it later (ctor should be fast)
 		_fields = fields.ToList();
+	}
+
+	private List<TRow> GetRowsList()
+	{
+		return _rowsList ??= _rowsSource as List<TRow> ?? _rowsSource.ToList();
 	}
 
 	private void Validate()
@@ -37,7 +39,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 	private List<List<Group<TRow>>> GroupRows(IEnumerable<Field<TRow>> fields, RootType rootType)
 	{
 		var lastGroups = new List<Group<TRow>>();
-		lastGroups.Add(new Group<TRow> { Rows = _rows, RootType = rootType });
+		lastGroups.Add(new Group<TRow> { Rows = GetRowsList(), RootType = rootType });
 
 		var res = GroupRows(lastGroups, fields);
 //			if (!res.Any())
@@ -125,7 +127,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 		Dictionary<(Group<TRow>?, object?), Group<TRow>>[] htSynthMergedAllColGroups = new Dictionary<(Group<TRow>?, object?), Group<TRow>>[colFieldsInGroupOrder.Length];
 
-		var rootColGroup = new Group<TRow> { Rows = _rows, RootType = RootType.Column };
+		var rootColGroup = new Group<TRow> { Rows = GetRowsList(), RootType = RootType.Column };
 
 		foreach (var lastRowThenColGroup in lastRowThenColGroups)
 		{

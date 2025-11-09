@@ -38,7 +38,7 @@ internal class PresentationPtb<TRow, TAgg>
 	/// <typeparam name="TTableRow"></typeparam>
 	/// <param name="toRow"></param>
 	/// <returns></returns>
-	public Table<TTableRow> GetTableCore<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool padEmptyIntersects = false)
+	public Table<TTableRow> GetTable<TTableRow>(Func<object?[], IEnumerable<TableColumn>, TTableRow> toRow, bool padEmptyIntersects = false)
 		where TTableRow : class, IEnumerable
 	{
 		var lastRowGroups = _data.LastRows;// OrDefault() ?? [];
@@ -200,9 +200,9 @@ internal class PresentationPtb<TRow, TAgg>
 		return rows;
 	}
 
-	public Table<object?[]> GetTable_Array(bool padEmptyIntersects = false)
+	public Table<object?[]> GetObjectArrayTable(bool padEmptyIntersects = false)
 	{
-		return GetTableCore((rows, tcols) => rows, padEmptyIntersects: padEmptyIntersects);
+		return GetTable((rows, tcols) => rows, padEmptyIntersects: padEmptyIntersects);
 	}
 
 	/*
@@ -235,9 +235,9 @@ internal class PresentationPtb<TRow, TAgg>
 	/// Every row has all columns
 	/// </summary>
 	/// <returns></returns>
-	public Table<KeyValueList> GetTable_FlatKeyValueList_CompleteColumns(bool padEmptyIntersects = false)
+	public Table<KeyValueList> GetKeyValueListTable(bool padEmptyIntersects = false)
 	{
-		return GetTableCore((row, tcols) =>
+		return GetTable((row, tcols) =>
 		{
 			var dictRow = new KeyValueList();
 			foreach (var v in row.ZipForceEqual(tcols, (f, s) => new { First = f, Second = s }))
@@ -250,7 +250,7 @@ internal class PresentationPtb<TRow, TAgg>
 
 	public DataTable GetDataTable(bool padEmptyIntersects = false)
 	{
-		var t = GetTable_Array(padEmptyIntersects: padEmptyIntersects);
+		var t = GetObjectArrayTable(padEmptyIntersects: padEmptyIntersects);
 
 		DataTable res = new("row");
 
@@ -319,7 +319,7 @@ internal class PresentationPtb<TRow, TAgg>
 	/// Variable columns\every row may  have different columns
 	/// </summary>
 	/// <returns></returns>
-	public Table<KeyValueList> GetTable_NestedKeyValueList_VariableColumns()//bool padEmptyIntersects = false)
+	public Table<KeyValueList> GetNestedKeyValueListTable()//bool padEmptyIntersects = false)
 	{
 		bool partialIntersects = false;
 		var rows = new List<KeyValueList>();

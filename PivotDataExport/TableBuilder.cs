@@ -145,7 +145,7 @@ public class TableBuilder<TRow> where TRow : class
 
 	public Table<object?[]> GetObjectArrayTable(bool padEmptyIntersects = false)
 	{
-		return GetTable((rows, tcols) => rows, padEmptyIntersects);
+		return GetTable((rows, tcols) => rows, padEmptyIntersects: padEmptyIntersects);
 	}
 
 	/*
