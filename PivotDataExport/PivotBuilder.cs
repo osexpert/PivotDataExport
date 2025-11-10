@@ -54,7 +54,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 		}
 	}
 
-	private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)
+	private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields)//, bool freeOriginalLastGroupsMem = true)
 	{
 		List<List<Group<TRow>>> listRes = new();
 
@@ -85,15 +85,15 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 					ParentGroup = go
 				});
 
-				if (lastGroups == originalLastGroups)
-				{
-					if (freeOriginalLastGroupsMem)
-						go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
-				}
-				else
-				{
-					go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
-				}
+				//if (lastGroups == originalLastGroups)
+				//{
+				//	if (freeOriginalLastGroupsMem)
+				//		go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
+				//}
+				//else
+				//{
+				//	go.Rows = null!; // free mem, no longer needed now we have divided rows futher down in sub groups
+				//}
 
 				allSubGroups.AddRange(subGroups);
 			}
@@ -179,10 +179,10 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 			}
 
 			groupContext?.Dispose();
-			groupContext = null;
+			//groupContext = null;
 
 			// free mem
-			lastRowThenColGroup.Rows = null!;
+			//lastRowThenColGroup.Rows = null!;
 		}
 
 		//var syntLastColGroups = htSynthMergedLastColGroups.Values.ToList(); // TOLIST needed?
