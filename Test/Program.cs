@@ -25,7 +25,7 @@ public class Program
 			salesRecords = records.ToList();
 		}
 
-		Kazinixx.test(salesRecords);
+//		Kazinixx.test(salesRecords);
 
 		//var props = TypeDescriptor.GetProperties(typeof(CsvRow));
 
@@ -40,24 +40,25 @@ public class Program
 		fields.Add(new Field<CsvRow, string>(nameof(CsvRow.Country), r => r.Country, Aggregators.CommaList)
 		{
 			GroupIndex = 1,
-			Area = Area.Row,
+			Area = Area.Data,
 			SortOrder = SortOrder.Descending
 		});
 
 		fields.Add(new Field<CsvRow, string>(nameof(CsvRow.ItemType), r => r.ItemType, Aggregators.CommaList)
 		{
 			GroupIndex = 0,
-			Area = Area.Column,
+			Area = Area.Data,
 			SortOrder = SortOrder.Descending
 		});
 		fields.Add(new Field<CsvRow, string>(nameof(CsvRow.SalesChannel), r => r.SalesChannel, Aggregators.CommaList)
 		{
 			GroupIndex = 1,
-			Area = Area.Column,
+			Area = Area.Data,
 			SortOrder = SortOrder.Ascending
 		});
 
 		fields.Add(new Field<CsvRow, long>(nameof(CsvRow.UnitsSold), r => r.UnitsSold, Enumerable.Sum));
+		fields.Add(new Field<CsvRow, int>("RowCount", r => 1, Enumerable.Count));
 
 		// TODO: Should maybe had a way to set index after all? That was independent of order by ienumerable?
 		//		MoveToTop(fieldsss, "OrderDate");
@@ -77,15 +78,15 @@ public class Program
 		////			TypeValue: object, name, fullname
 
 		var pivot = new PivotBuilder<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
-		var pivot2 = new PivotBuilderPtb<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
+		var pivotPtb = new PivotBuilderPtb<CsvRow>(salesRecords, fields);//, new PropertyDescriptorCollection(props.ToArray()));
 
-		var s3 = Stopwatch.StartNew();
-		var gdata_ptb = pivot2.GetGroupedData();
-		s3.Stop(); // 11.8 sec ?? mem?? now that we get single row value directly, its much faster. But it did show that PTB aggregate a lot more than FIS.
+		var sptb = Stopwatch.StartNew();
+		var gdata_ptb = pivotPtb.GetGroupedData();
+		sptb.Stop();//.Stop(); // 11.8 sec ?? mem?? now that we get single row value directly, its much faster. But it did show that PTB aggregate a lot more than FIS.
 
-		var s = Stopwatch.StartNew();
+		var sfis = Stopwatch.StartNew();
 		var gdata_fis = pivot.GetGroupedData();
-		s.Stop(); // 6.14 sec
+		sfis.Stop(); // 6.14 sec
 
 
 		//			var pivotTable = salesRecords
@@ -112,39 +113,40 @@ public class Program
 		//.SetRow(e => e.Country)
 		//.Build();
 
-		var s2 = Stopwatch.StartNew();
-
+		//var s2 = Stopwatch.StartNew();
+		sfis.Start();
 		var pres_fis = new TableBuilder<CsvRow>(gdata_fis);
-		var nested_kv_tbl = pres_fis.GetNestedKeyValueListTable();
+		var nested_kv_tbl_fis = pres_fis.GetNestedKeyValueListTable();
 
-		s2.Stop();
+		sfis.Stop();
 
-		var s4 = Stopwatch.StartNew();
+		//var s4 = Stopwatch.StartNew();
 
-		//var pres_ptb = new PresentationPtb<CsvRow>(gdata_ptb);
-		var nested_kv_tbl2 = pres_fis.GetNestedKeyValueListTable();
+		sptb.Start();
+		var pres_ptb = new TableBuilderPtb<CsvRow>(gdata_ptb);
+		var nested_kv_tbl_ptb = pres_ptb.GetNestedKeyValueListTable();
 
-		s4.Stop();
+		sptb.Stop();
 
 
 		using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv.json", FileMode.Create))
 		{
-			JsonSerializer.Serialize(f, nested_kv_tbl, new JsonSerializerOptions { WriteIndented = true });
+			JsonSerializer.Serialize(f, nested_kv_tbl_fis, new JsonSerializerOptions { WriteIndented = true });
 		}
 
 		using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv.xml", FileMode.Create))
 		{
-			nested_kv_tbl.WriteXml(f);
+			nested_kv_tbl_fis.WriteXml(f);
 		}
 
 		using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv2.json", FileMode.Create))
 		{
-			JsonSerializer.Serialize(f, nested_kv_tbl2, new JsonSerializerOptions { WriteIndented = true });
+			JsonSerializer.Serialize(f, nested_kv_tbl_ptb, new JsonSerializerOptions { WriteIndented = true });
 		}
 
 		using (var f = File.Open(@"d:\pivottest\test5mill_nested_kv2.xml", FileMode.Create))
 		{
-			nested_kv_tbl2.WriteXml(f);
+			nested_kv_tbl_ptb.WriteXml(f);
 		}
 
 

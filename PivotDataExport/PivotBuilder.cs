@@ -39,12 +39,19 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 	private List<List<Group<TRow>>> GroupRows(IEnumerable<Field<TRow>> fields, RootType rootType)
 	{
 		var lastGroups = new List<Group<TRow>>();
-		lastGroups.Add(new Group<TRow> { Rows = GetRowsList(), RootType = rootType });
-
-		var res = GroupRows(lastGroups, fields);
-//			if (!res.Any())
-//			return new List<List<Group<TRow>>>() { lastGroups };
-		return res;
+		var rows = GetRowsList();
+		if (rows.Any())
+		{
+			lastGroups.Add(new Group<TRow> { Rows = rows, RootType = rootType });
+			var res = GroupRows(lastGroups, fields);
+			//			if (!res.Any())
+			//			return new List<List<Group<TRow>>>() { lastGroups };
+			return res;
+		}
+		else
+		{
+			return [lastGroups];
+		}
 	}
 
 	private List<List<Group<TRow>>> GroupRows(List<Group<TRow>> lastGroups, IEnumerable<Field<TRow>> fields, bool freeOriginalLastGroupsMem = true)
@@ -125,7 +132,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 		List<Group<TRow>> lastRowThenColGroups = allRowThenColGroups.Last();
 
-		Dictionary<(Group<TRow>?, object?), Group<TRow>>[] htSynthMergedAllColGroups = new Dictionary<(Group<TRow>?, object?), Group<TRow>>[colFieldsInGroupOrder.Length];
+		var htSynthMergedAllColGroups = new Dictionary<(Group<TRow>?, object?), Group<TRow>>[colFieldsInGroupOrder.Length];
 
 		var rootColGroup = new Group<TRow> { Rows = GetRowsList(), RootType = RootType.Column };
 
@@ -180,7 +187,7 @@ public class PivotBuilder<TRow> where TRow : class // class notnull
 
 		//var syntLastColGroups = htSynthMergedLastColGroups.Values.ToList(); // TOLIST needed?
 		var allColGroups = htSynthMergedAllColGroups
-			.Select(g => g == null ? new List<Group<TRow>>() : g.Values.ToList())
+			.Select(g => g == null ? [] : g.Values.ToList())
 			.ToList();
 
 		var b1 = colFieldsInGroupOrder.Any();

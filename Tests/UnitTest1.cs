@@ -1308,6 +1308,34 @@ public class UnitTest1
 		""";
 
 	[TestMethod]
+	public void Test_NoRows()
+	{
+		var p1 = new Field<Test1Row, string>(nameof(Test1Row.Site),
+			row =>
+			{
+				throw new Exception("No row but still asking for value");
+			},
+			rows =>
+			{
+				throw new Exception("No rows but still asking for value");
+			});
+
+		var props = new Field<Test1Row>[] { p1 };
+
+		var p = new PivotBuilder<Test1Row>([], props);
+
+		var fields = p.Fields.ToDictionary(k => k.Name);
+		fields[nameof(Test1Row.Site)].Area = Area.Data;
+		fields[nameof(Test1Row.Site)].SortOrder = SortOrder.Ascending;
+
+		var gdata = p.GetGroupedData();
+		var pres = new TableBuilder<Test1Row>(gdata);
+
+		var dt = pres.GetDataTable();
+		dt.TableName = "row";
+	}
+
+	[TestMethod]
 	public void GroupOnTime()
 	{
 		(PivotBuilder<Test1Row> td, PivotBuilderPtb<Test1Row> td2) = GetPivoterTestData();
