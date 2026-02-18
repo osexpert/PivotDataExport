@@ -117,6 +117,8 @@ public class TableBuilder<TRow> where TRow : class
 			{
 				var startIdx = grpStartIdx[lastColGroup];
 
+				lastRowGroup.IntersectData ??= new();
+
 				var hasData = lastRowGroup.IntersectData.TryGetValue(lastColGroup, out var values);
 				if (hasData || padEmptyIntersects)
 				{
@@ -243,6 +245,8 @@ public class TableBuilder<TRow> where TRow : class
 			// Add the data
 			foreach (var cg in lastColGroupsSorted)
 			{
+				rg.IntersectData ??= new();
+
 				var hasData = rg.IntersectData.TryGetValue(cg, out var data);
 				// padEmptyIntersects did work here, but not in PresentationPtb, so removed from here for now. Maybe add back again if find out how to implement in Presentation
 				// added back

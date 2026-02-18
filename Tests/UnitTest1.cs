@@ -1380,4 +1380,137 @@ public class UnitTest1
 		var xml_flat_fis = flat_tbl_fis.ToXml();
 		Assert.AreEqual(xml_flat_fis, xml_flat_ptb);
 	}
+
+
+	const string str_Test_NoDataFields_json = """
+		{
+		  "rows": [
+		    {
+		      "Site": "Site1",
+		      "Unit": "Unit1"
+		    },
+		    {
+		      "Site": "Site1",
+		      "Unit": "Unit2"
+		    },
+		    {
+		      "Site": "Site3",
+		      "Unit": "Unit1"
+		    },
+		    {
+		      "Site": "Site5",
+		      "Unit": "Unit6"
+		    }
+		  ]
+		}
+		""";
+
+	[TestMethod]
+	public void Test_NoDataFields_GetNestedKeyValueListTable()
+	{
+		(PivotBuilder<Test1Row> p, PivotBuilderPtb<Test1Row> td2) = GetPivoterTestData();
+
+		var fields = p.Fields.ToDictionary(k => k.Name);
+		fields[nameof(Test1Row.Site)].Area = Area.Row;
+		fields[nameof(Test1Row.Unit)].Area = Area.Row;
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Number));
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Name));
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Group));
+		p.Fields.RemoveAll(f => f.Name == "RowCount");
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Time));
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Weight));
+
+		var gd = p.GetGroupedData();
+		var tb = new TableBuilder<Test1Row>(gd);
+		var tbl = tb.GetNestedKeyValueListTable();
+		var tbl_json = ToJson(tbl);
+		Assert.AreEqual(str_Test_NoDataFields_json, tbl_json);
+	}
+
+	const string str_Test_NoDataFields_xml = """
+		<DocumentElement>
+		  <row>
+		    <Site>Site1</Site>
+		    <Unit>Unit1</Unit>
+		  </row>
+		  <row>
+		    <Site>Site1</Site>
+		    <Unit>Unit2</Unit>
+		  </row>
+		  <row>
+		    <Site>Site3</Site>
+		    <Unit>Unit1</Unit>
+		  </row>
+		  <row>
+		    <Site>Site5</Site>
+		    <Unit>Unit6</Unit>
+		  </row>
+		</DocumentElement>
+		""";
+
+	[TestMethod]
+	public void Test_NoDataFields_GetDataTable()
+	{
+		(PivotBuilder<Test1Row> p, PivotBuilderPtb<Test1Row> td2) = GetPivoterTestData();
+
+		var fields = p.Fields.ToDictionary(k => k.Name);
+		fields[nameof(Test1Row.Site)].Area = Area.Row;
+		fields[nameof(Test1Row.Unit)].Area = Area.Row;
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Number));
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Name));
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Group));
+		p.Fields.RemoveAll(f => f.Name == "RowCount");
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Time));
+		p.Fields.RemoveAll(f => f.Name == nameof(Test1Row.Weight));
+
+		var gd = p.GetGroupedData();
+		var tb = new TableBuilder<Test1Row>(gd);
+		var dt = tb.GetDataTable();
+		dt.TableName = "row";
+		string xml = dt.ToXml();
+		Assert.AreEqual(str_Test_NoDataFields_xml, xml);
+	}
+
+	const string str_Test_NoFields_json = """
+		{
+		  "rows": [
+		    {}
+		  ]
+		}
+		""";
+
+	[TestMethod]
+	public void Test_NoFields_GetNestedKeyValueListTable()
+	{
+		(PivotBuilder<Test1Row> p, PivotBuilderPtb<Test1Row> td2) = GetPivoterTestData();
+
+		p.Fields.Clear();
+
+		var gd = p.GetGroupedData();
+		var tb = new TableBuilder<Test1Row>(gd);
+		var tbl = tb.GetNestedKeyValueListTable();
+		var tbl_json = ToJson(tbl);
+		Assert.AreEqual(str_Test_NoFields_json, tbl_json);
+	}
+
+	const string str_Test_NoFields_xml = """
+		<DocumentElement>
+		  <row />
+		</DocumentElement>
+		""";
+
+	[TestMethod]
+	public void Test_NoFields_GetDataTable()
+	{
+		(PivotBuilder<Test1Row> p, PivotBuilderPtb<Test1Row> td2) = GetPivoterTestData();
+
+		p.Fields.Clear();
+
+		var gd = p.GetGroupedData();
+		var tb = new TableBuilder<Test1Row>(gd);
+		var dt = tb.GetDataTable();
+		dt.TableName = "row";
+		string xml = dt.ToXml();
+		Assert.AreEqual(str_Test_NoFields_xml, xml);
+	}
 }
