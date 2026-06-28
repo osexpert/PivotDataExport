@@ -38,7 +38,6 @@ public class Field<TRow> where TRow : class
 	/// </summary>
 	internal protected Func<object?, object?> GetDisplayValue = o => o;
 
-	// TODO: need both GroupComparer and SortComparer?
 	internal protected IEqualityComparer<object?> GroupComparer = EqualityComparer<object?>.Default;
 
 	internal protected IComparer<object?> SortComparer = Comparer<object?>.Default;
@@ -47,9 +46,6 @@ public class Field<TRow> where TRow : class
 	/// Example: field being DateTime but the display type is DateOnly.
 	/// </summary>
 	public Type DisplayType { get; internal protected set; } = null!;
-
-	// FIXME: kind of pointless...could simply used passed order
-	//public int Index { get; set; }  // 0, 1, 2
 
 	public Type DataType { get; internal protected set; } = null!;
 

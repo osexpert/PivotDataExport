@@ -46,10 +46,10 @@ public class Table<TTableRow> : IXmlSerializable
 
 	void IXmlSerializable.WriteXml(XmlWriter writer)
 	{
-		writer.WriteStartElement("Rows");
+		writer.WriteStartElement(Constants.XmlRows);
 		foreach (var row in Rows)
 		{
-			writer.WriteStartElement("Row");
+			writer.WriteStartElement(Constants.XmlRow);
 			WriterXmlRow(writer, row);
 			writer.WriteEndElement();
 		}
@@ -87,7 +87,7 @@ public class Table<TTableRow> : IXmlSerializable
 			{
 				foreach (var lsee in lse)
 				{
-					writer.WriteStartElement("Entry");
+					writer.WriteStartElement(Constants.XmlEntry);
 					WriteXmlKeyValuePairs(writer, lsee);
 					writer.WriteEndElement();
 				}

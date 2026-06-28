@@ -197,7 +197,7 @@ public class TableBuilder<TRow> where TRow : class
 	{
 		var t = GetObjectArrayTable(padEmptyIntersects: padEmptyIntersects);
 
-		DataTable res = new("Row");
+		DataTable res = new(Constants.TableName);
 
 		foreach (var f in t.Columns)
 		{
@@ -286,7 +286,7 @@ public class TableBuilder<TRow> where TRow : class
 		};
 	}
 
-	public string ListSuffix { get; set; } = "List";
+	public string ListSuffix { get; set; } = Constants.ListSuffix;
 
 	private KeyValueList GetCreateKeyVals(Group<TRow> cg, 
 		KeyValueList row,

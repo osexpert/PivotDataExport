@@ -23,7 +23,7 @@ public class UnitTest1
 
 	const string str_TestCompare_RowGroupOnSite = """
 		<DocumentElement>
-		  <row>
+		  <Row>
 		    <Site>Site1</Site>
 		    <Unit>Unit1, Unit2</Unit>
 		    <Group>Group1, Group2</Group>
@@ -32,8 +32,8 @@ public class UnitTest1
 		    <Weight>3.6999999999999997</Weight>
 		    <RowCount>3</RowCount>
 		    <Time>2024-01-05T03:04:05.0000000</Time>
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site3</Site>
 		    <Unit>Unit1</Unit>
 		    <Group>Group1</Group>
@@ -42,8 +42,8 @@ public class UnitTest1
 		    <Weight>2.1</Weight>
 		    <RowCount>1</RowCount>
 		    <Time>2024-01-04T03:04:05.0000000</Time>
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site5</Site>
 		    <Unit>Unit6</Unit>
 		    <Group>Group1</Group>
@@ -52,7 +52,7 @@ public class UnitTest1
 		    <Weight>5.1</Weight>
 		    <RowCount>1</RowCount>
 		    <Time>2024-01-06T03:04:05.0000000</Time>
-		  </row>
+		  </Row>
 		</DocumentElement>
 		""";
 
@@ -156,9 +156,7 @@ public class UnitTest1
 		var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 		var dt_fis = pres_fis.GetDataTable();
-		dt_fis.TableName = "row";
 		var dt_ptb = pres_ptb.GetDataTable();
-		dt_ptb.TableName = "row";
 
 		string xml_ptb = dt_ptb.ToXml();
 		string xml_fis = dt_fis.ToXml();
@@ -209,7 +207,7 @@ public class UnitTest1
 
 	const string str_TestCompare_RowGroupOnSite_ColGroupOnName = """
 		<DocumentElement>
-		  <row>
+		  <Row>
 		    <Site>Site1</Site>
 		    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1</_x002F_Name_x003A_Name1_x002F_Unit>
 		    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
@@ -223,8 +221,8 @@ public class UnitTest1
 		    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
 		    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
 		    <_x002F_Name_x003A_Name3_x002F_Time>2024-01-05T03:04:05.0000000</_x002F_Name_x003A_Name3_x002F_Time>
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site3</Site>
 		    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1</_x002F_Name_x003A_Name1_x002F_Unit>
 		    <_x002F_Name_x003A_Name1_x002F_Group>Group1</_x002F_Name_x003A_Name1_x002F_Group>
@@ -238,8 +236,8 @@ public class UnitTest1
 		    <_x002F_Name_x003A_Name3_x002F_Weight>0</_x002F_Name_x003A_Name3_x002F_Weight>
 		    <_x002F_Name_x003A_Name3_x002F_RowCount>0</_x002F_Name_x003A_Name3_x002F_RowCount>
 		    <_x002F_Name_x003A_Name3_x002F_Time />
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site5</Site>
 		    <_x002F_Name_x003A_Name1_x002F_Unit>Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
 		    <_x002F_Name_x003A_Name1_x002F_Group>Group1</_x002F_Name_x003A_Name1_x002F_Group>
@@ -253,7 +251,7 @@ public class UnitTest1
 		    <_x002F_Name_x003A_Name3_x002F_Weight>0</_x002F_Name_x003A_Name3_x002F_Weight>
 		    <_x002F_Name_x003A_Name3_x002F_RowCount>0</_x002F_Name_x003A_Name3_x002F_RowCount>
 		    <_x002F_Name_x003A_Name3_x002F_Time />
-		  </row>
+		  </Row>
 		</DocumentElement>
 		""";
 
@@ -439,9 +437,7 @@ public class UnitTest1
 		var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 		var dt_fis = pres_fis.GetDataTable(padEmptyIntersects: true);
-		dt_fis.TableName = "row";
 		var dt_ptb = pres_ptb.GetDataTable(padEmptyIntersects: true);
-		dt_ptb.TableName = "row";
 
 		string xml_ptb = dt_ptb.ToXml();
 		string xml_fis = dt_fis.ToXml();
@@ -469,7 +465,7 @@ public class UnitTest1
 
 	const string str_TestCompare_ColGroupOnName = """
 		<DocumentElement>
-		  <row>
+		  <Row>
 		    <_x002F_Name_x003A_Name1_x002F_Site>Site1, Site3, Site5</_x002F_Name_x003A_Name1_x002F_Site>
 		    <_x002F_Name_x003A_Name1_x002F_Unit>Unit1, Unit6</_x002F_Name_x003A_Name1_x002F_Unit>
 		    <_x002F_Name_x003A_Name1_x002F_Group>Group1, Group2</_x002F_Name_x003A_Name1_x002F_Group>
@@ -484,7 +480,7 @@ public class UnitTest1
 		    <_x002F_Name_x003A_Name3_x002F_Weight>1.4</_x002F_Name_x003A_Name3_x002F_Weight>
 		    <_x002F_Name_x003A_Name3_x002F_RowCount>1</_x002F_Name_x003A_Name3_x002F_RowCount>
 		    <_x002F_Name_x003A_Name3_x002F_Time>2024-01-05T03:04:05.0000000</_x002F_Name_x003A_Name3_x002F_Time>
-		  </row>
+		  </Row>
 		</DocumentElement>
 		""";
 
@@ -583,9 +579,7 @@ public class UnitTest1
 		var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 		var dt_fis = pres_fis.GetDataTable();
-		dt_fis.TableName = "row";
 		var dt_ptb = pres_ptb.GetDataTable();
-		dt_ptb.TableName = "row";
 
 		string xml_fis = dt_fis.ToXml();
 		string xml_ptb = dt_ptb.ToXml();
@@ -613,7 +607,7 @@ public class UnitTest1
 
 	const string str_TestCompare_NoGroup = """
 		<DocumentElement>
-		  <row>
+		  <Row>
 		    <Site>Site1, Site3, Site5</Site>
 		    <Unit>Unit1, Unit2, Unit6</Unit>
 		    <Group>Group1, Group2</Group>
@@ -622,7 +616,7 @@ public class UnitTest1
 		    <Weight>10.9</Weight>
 		    <RowCount>5</RowCount>
 		    <Time>2024-01-06T03:04:05.0000000</Time>
-		  </row>
+		  </Row>
 		</DocumentElement>
 		""";
 
@@ -692,9 +686,7 @@ public class UnitTest1
 		var pres_ptb = new TableBuilderPtb<Test1Row>(gdata_ptb);
 
 		var dt_fis = pres_fis.GetDataTable();
-		dt_fis.TableName = "row";
 		var dt_ptb = pres_ptb.GetDataTable();
-		dt_ptb.TableName = "row";
 
 		string xml_ptb = dt_ptb.ToXml();
 		string xml_fis = dt_fis.ToXml();
@@ -1332,7 +1324,6 @@ public class UnitTest1
 		var pres = new TableBuilder<Test1Row>(gdata);
 
 		var dt = pres.GetDataTable();
-		dt.TableName = "row";
 	}
 
 	[TestMethod]
@@ -1429,22 +1420,22 @@ public class UnitTest1
 
 	const string str_Test_NoDataFields_xml = """
 		<DocumentElement>
-		  <row>
+		  <Row>
 		    <Site>Site1</Site>
 		    <Unit>Unit1</Unit>
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site1</Site>
 		    <Unit>Unit2</Unit>
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site3</Site>
 		    <Unit>Unit1</Unit>
-		  </row>
-		  <row>
+		  </Row>
+		  <Row>
 		    <Site>Site5</Site>
 		    <Unit>Unit6</Unit>
-		  </row>
+		  </Row>
 		</DocumentElement>
 		""";
 
@@ -1466,7 +1457,6 @@ public class UnitTest1
 		var gd = p.GetGroupedData();
 		var tb = new TableBuilder<Test1Row>(gd);
 		var dt = tb.GetDataTable();
-		dt.TableName = "row";
 		string xml = dt.ToXml();
 		Assert.AreEqual(str_Test_NoDataFields_xml, xml);
 	}
@@ -1495,7 +1485,7 @@ public class UnitTest1
 
 	const string str_Test_NoFields_xml = """
 		<DocumentElement>
-		  <row />
+		  <Row />
 		</DocumentElement>
 		""";
 
@@ -1509,7 +1499,6 @@ public class UnitTest1
 		var gd = p.GetGroupedData();
 		var tb = new TableBuilder<Test1Row>(gd);
 		var dt = tb.GetDataTable();
-		dt.TableName = "row";
 		string xml = dt.ToXml();
 		Assert.AreEqual(str_Test_NoFields_xml, xml);
 	}

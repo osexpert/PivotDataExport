@@ -252,7 +252,7 @@ internal class PresentationPtb<TRow, TAgg>
 	{
 		var t = GetObjectArrayTable(padEmptyIntersects: padEmptyIntersects);
 
-		DataTable res = new("row");
+		DataTable res = new(Constants.TableName);
 
 		foreach (var f in t.Columns)
 		{
@@ -422,7 +422,7 @@ internal class PresentationPtb<TRow, TAgg>
 			groupToLists.Add(cg_ParentOrFake, list);
 
 			var parKeyVals = groupToKeyVals[cg_ParentOrFake];
-			parKeyVals.Add(cg.Field.Name + "List", list);
+			parKeyVals.Add(cg.Field.Name + Constants.ListSuffix, list);
 		}
 
 		if (!groupToKeyVals.TryGetValue(cg, out var keyVals))
